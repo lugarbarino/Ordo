@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catálogo</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primario:#1a4d8f;--celeste:#e8f0fc;--gris:#f5f6f8;
+      --borde:#dde3ed;--texto:#1e2a3a;--suave:#6b7a90;--verde:#1a8f5a;
+    }
+    body{font-family:'Segoe UI',Arial,sans-serif;color:var(--texto);background:var(--gris);min-height:100vh}
+
+    /* HEADER EMPRESA */
+    .empresa-header{background:var(--primario);color:white;padding:32px 48px;display:flex;align-items:center;gap:24px}
+    .empresa-logo{width:72px;height:72px;border-radius:12px;object-fit:cover;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0}
+    .empresa-logo img{width:72px;height:72px;border-radius:12px;object-fit:cover}
+    .empresa-info h1{font-size:1.6rem;font-weight:800}
+    .empresa-info p{opacity:.8;font-size:.92rem;margin-top:4px;max-width:500px;line-height:1.5}
+
+    /* BARRA BUSQUEDA */
+    .busqueda-bar{background:white;border-bottom:1px solid var(--borde);padding:16px 48px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+    .input-buscar{flex:1;min-width:200px;padding:10px 16px 10px 40px;border:1.5px solid var(--borde);border-radius:8px;font-size:.95rem;outline:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7a90' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") no-repeat 12px center;transition:border-color .2s}
+    .input-buscar:focus{border-color:var(--primario)}
+    .select-cat{padding:10px 14px;border:1.5px solid var(--borde);border-radius:8px;font-size:.92rem;background:white;cursor:pointer;outline:none;min-width:170px}
+    .select-cat:focus{border-color:var(--primario)}
+    .contador{color:var(--suave);font-size:.85rem;white-space:nowrap}
+
+    /* GRID */
+    .contenedor{padding:28px 48px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+
+    /* TARJETA */
+    .tarjeta{background:white;border-radius:14px;border:1.5px solid var(--borde);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}
+    .tarjeta:hover{box-shadow:0 8px 24px rgba(0,0,0,.1);transform:translateY(-3px)}
+    .tarjeta-img{width:100%;height:190px;background:linear-gradient(135deg,#f0f4fa,#e8eef8);display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;position:relative;border-bottom:1px solid var(--borde);cursor:zoom-in}
+    .tarjeta-img img{width:100%;height:100%;object-fit:cover}
+    .tarjeta-codigo{position:absolute;top:10px;right:10px;font-size:.72rem;color:white;font-family:monospace;background:rgba(0,0,0,.45);padding:3px 8px;border-radius:5px}
+    .tarjeta-body{padding:16px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+    .tarjeta-cat{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;align-self:flex-start;background:var(--celeste);color:var(--primario)}
+    .tarjeta-nombre{font-size:.97rem;font-weight:700;line-height:1.35}
+    .tarjeta-desc{font-size:.83rem;color:var(--suave);line-height:1.5;flex:1}
+    .tarjeta-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--borde);margin-top:4px}
+    .precio{font-size:1.05rem;font-weight:700;color:var(--primario)}
+    .precio.consultar{color:var(--suave);font-size:.85rem;font-weight:500}
+    .stock{font-size:.78rem;padding:3px 10px;border-radius:20px;font-weight:600}
+    .stock-d{background:#e6f7ef;color:var(--verde)}
+    .stock-c{background:#fff3e0;color:#b36000}
+    .stock-s{background:#fde8e8;color:#c0392b}
+
+    /* MODAL FOTO */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.activo{display:flex}
+    .modal-img-wrap{background:white;border-radius:16px;padding:16px;max-width:90vw;max-height:90vh;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
+    .modal-img-wrap img{max-width:80vw;max-height:72vh;object-fit:contain;border-radius:8px}
+    .modal-nombre{font-size:1rem;font-weight:700;text-align:center}
+    .modal-cerrar{position:absolute;top:10px;right:14px;font-size:1.3rem;cursor:pointer;color:var(--suave);background:none;border:none}
+
+    /* ESTADOS */
+    .estado{text-align:center;padding:80px 20px;color:var(--suave)}
+    .estado .icon{font-size:4rem;margin-bottom:16px}
+    .estado h2{font-size:1.3rem;color:var(--texto);margin-bottom:8px}
+
+    /* FOOTER */
+    .footer-cat{text-align:center;padding:32px;color:var(--suave);font-size:.82rem;border-top:1px solid var(--borde);margin-top:20px}
+    .footer-cat a{color:var(--primario);text-decoration:none;font-weight:600}
+
+    /* SPINNER */
+    .spinner-wrap{display:flex;align-items:center;justify-content:center;height:300px}
+    .spinner{width:40px;height:40px;border:4px solid var(--borde);border-top-color:var(--primario);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:600px){
+      .empresa-header{padding:24px 20px;flex-direction:column;align-items:flex-start;gap:16px}
+      .busqueda-bar,.contenedor{padding-left:16px;padding-right:16px}
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="spinner-wrap" id="spinnerWrap">
+  <div class="spinner"></div>
+</div>
+
+<!-- EMPRESA NO ENCONTRADA -->
+<div class="estado" id="estadoError" style="display:none">
+  <div class="icon">😕</div>
+  <h2>Catálogo no encontrado</h2>
+  <p>Revisá el link o pedile uno nuevo a la empresa.</p>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div id="contenidoPrincipal" style="display:none">
+
+  <div class="empresa-header" id="empresaHeader">
+    <div class="empresa-logo" id="empresaLogo">🏥</div>
+    <div class="empresa-info">
+      <h1 id="empresaNombre">—</h1>
+      <p id="empresaDesc">—</p>
+    </div>
+  </div>
+
+  <div class="busqueda-bar">
+    <input class="input-buscar" type="text" id="buscar" placeholder="Buscar productos..." oninput="filtrar()"/>
+    <select class="select-cat" id="selectCat" onchange="filtrar()">
+      <option value="">Todas las categorías</option>
+    </select>
+    <span class="contador" id="contador"></span>
+  </div>
+
+  <div class="contenedor">
+    <div id="estadoVacio" class="estado" style="display:none">
+      <div class="icon">📦</div>
+      <h2>No hay productos todavía</h2>
+      <p>Volvé a consultar pronto.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="footer-cat">
+    Catálogo creado con <a href="index.html">CatálogoApp</a> · Solo lectura
+  </div>
+</div>
+
+<!-- MODAL FOTO -->
+<div class="modal-overlay" id="modalFoto" onclick="cerrarModal(event)">
+  <div class="modal-img-wrap">
+    <button class="modal-cerrar" onclick="document.getElementById('modalFoto').classList.remove('activo')">✕</button>
+    <img id="modalFotoImg" src="" alt=""/>
+    <div class="modal-nombre" id="modalFotoNombre"></div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://mfbsymubromhwljotrca.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYnN5bXVicm9taHdsam90cmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE3NTMsImV4cCI6MjA5MDU1Nzc1M30.Y7pbjwByvOcSHroKSrCDyXZnmjSfxCSavUflvZJCq1U'
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  let TODOS = []
+  let COLOR = '#1a4d8f'
+
+  async function init() {
+    const params = new URLSearchParams(location.search)
+    const slug   = params.get('slug')
+
+    if (!slug) { mostrarError(); return }
+
+    // Cargar empresa
+    const { data: empresa } = await db.from('empresas').select('*').eq('slug', slug).single()
+    if (!empresa) { mostrarError(); return }
+
+    COLOR = empresa.color || '#1a4d8f'
+
+    // Aplicar color de la empresa
+    document.documentElement.style.setProperty('--primario', COLOR)
+
+    // Header empresa
+    document.title = empresa.nombre + ' — Catálogo'
+    document.getElementById('empresaNombre').textContent = empresa.nombre
+    document.getElementById('empresaDesc').textContent   = empresa.descripcion || ''
+
+    if (empresa.logo_url) {
+      document.getElementById('empresaLogo').innerHTML = `<img src="${empresa.logo_url}" alt="${empresa.nombre}" onerror="this.parentElement.textContent='🏥'"/>`
+    }
+
+    // Cargar productos
+    const { data: productos } = await db.from('productos').select('*').eq('empresa_id', empresa.id).order('categoria').order('nombre')
+    TODOS = productos || []
+
+    // Categorías
+    const cats = [...new Set(TODOS.map(p => p.categoria).filter(Boolean))].sort()
+    const sel  = document.getElementById('selectCat')
+    cats.forEach(c => {
+      const o = document.createElement('option')
+      o.value = c; o.textContent = c; sel.appendChild(o)
+    })
+
+    document.getElementById('spinnerWrap').style.display    = 'none'
+    document.getElementById('contenidoPrincipal').style.display = 'block'
+
+    filtrar()
+  }
+
+  function filtrar() {
+    const q   = document.getElementById('buscar').value.toLowerCase()
+    const cat = document.getElementById('selectCat').value
+    const res = TODOS.filter(p =>
+      (!q   || (p.nombre || '').toLowerCase().includes(q) || (p.descripcion || '').toLowerCase().includes(q) || (p.codigo || '').toLowerCase().includes(q)) &&
+      (!cat || p.categoria === cat)
+    )
+    renderizar(res)
+    document.getElementById('contador').textContent = `${res.length} producto${res.length !== 1 ? 's' : ''}`
+  }
+
+  const ICONOS = { 'laparosc':'🔬','ginecol':'⚕️','equipo':'🖥️','pinza':'🔧','trocar':'💉','clip':'🩺' }
+  function getIcono(cat) {
+    if (!cat) return '🏥'
+    const c = cat.toLowerCase()
+    for (const [k,v] of Object.entries(ICONOS)) { if (c.includes(k)) return v }
+    return '🏥'
+  }
+
+  function renderizar(lista) {
+    const grid  = document.getElementById('grid')
+    const empty = document.getElementById('estadoVacio')
+    grid.innerHTML = ''
+    if (!lista.length) { empty.style.display = 'block'; return }
+    empty.style.display = 'none'
+
+    lista.forEach(p => {
+      const precioTxt = p.precio
+        ? (isNaN(p.precio) ? p.precio : `$${Number(p.precio).toLocaleString('es-AR')}`)
+        : 'Consultar'
+      const stockCls = p.stock === 'Disponible' ? 'stock-d' : p.stock === 'Sin stock' ? 'stock-s' : 'stock-c'
+      const icono = getIcono(p.categoria)
+
+      let imgHTML = ''
+      if (p.imagen_url) {
+        imgHTML = `<div class="tarjeta-img" onclick="abrirFoto('${p.imagen_url.replace(/'/g,"\\'")}','${(p.nombre||'').replace(/'/g,"\\'")}')">
+          <img src="${p.imagen_url}" alt="${p.nombre}" onerror="this.parentElement.innerHTML='<span style=\\'font-size:3rem\\'>${icono}</span>'"/>
+          ${p.codigo ? `<span class="tarjeta-codigo">${p.codigo}</span>` : ''}
+        </div>`
+      } else {
+        imgHTML = `<div class="tarjeta-img">
+          <span style="font-size:3rem">${icono}</span>
+          ${p.codigo ? `<span class="tarjeta-codigo">${p.codigo}</span>` : ''}
+        </div>`
+      }
+
+      const card = document.createElement('div')
+      card.className = 'tarjeta'
+      card.innerHTML = `
+        ${imgHTML}
+        <div class="tarjeta-body">
+          ${p.categoria ? `<span class="tarjeta-cat">${p.categoria}</span>` : ''}
+          <div class="tarjeta-nombre">${p.nombre}</div>
+          ${p.descripcion ? `<div class="tarjeta-desc">${p.descripcion}</div>` : ''}
+          <div class="tarjeta-footer">
+            <span class="precio ${precioTxt === 'Consultar' ? 'consultar' : ''}">${precioTxt}</span>
+            <span class="stock ${stockCls}">${p.stock || 'Consultar'}</span>
+          </div>
+        </div>`
+      grid.appendChild(card)
+    })
+  }
+
+  function abrirFoto(url, nombre) {
+    document.getElementById('modalFotoImg').src     = url
+    document.getElementById('modalFotoNombre').textContent = nombre
+    document.getElementById('modalFoto').classList.add('activo')
+  }
+  function cerrarModal(e) {
+    if (e.target === document.getElementById('modalFoto'))
+      document.getElementById('modalFoto').classList.remove('activo')
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('modalFoto').classList.remove('activo')
+  })
+
+  function mostrarError() {
+    document.getElementById('spinnerWrap').style.display = 'none'
+    document.getElementById('estadoError').style.display = 'block'
+  }
+
+  init()
+</script>
+</body>
+</html>

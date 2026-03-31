@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Admin — CatálogoApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --azul:#1a4d8f;--azul2:#2d6cc0;--celeste:#e8f0fc;
+      --gris:#f5f6f8;--borde:#dde3ed;--texto:#1e2a3a;--suave:#6b7a90;--verde:#1a8f5a;--rojo:#c0392b;
+    }
+    body{font-family:'Segoe UI',Arial,sans-serif;color:var(--texto);background:var(--gris);display:flex;min-height:100vh}
+
+    /* SIDEBAR */
+    .sidebar{width:230px;background:var(--azul);color:white;display:flex;flex-direction:column;padding:0;flex-shrink:0;min-height:100vh}
+    .sidebar-logo{padding:24px 20px 20px;font-size:1.2rem;font-weight:800;border-bottom:1px solid rgba(255,255,255,.1)}
+    .sidebar-logo span{opacity:.7}
+    .sidebar-nav{flex:1;padding:16px 0}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:12px 20px;cursor:pointer;font-size:.9rem;font-weight:500;transition:background .2s;border:none;background:none;color:white;width:100%;text-align:left}
+    .nav-item:hover{background:rgba(255,255,255,.1)}
+    .nav-item.activo{background:rgba(255,255,255,.15);font-weight:700}
+    .nav-item .icon{font-size:1.1rem;width:22px}
+    .sidebar-bottom{padding:16px;border-top:1px solid rgba(255,255,255,.1)}
+    .user-info{font-size:.8rem;opacity:.7;margin-bottom:10px;word-break:break-all}
+    .btn-salir{width:100%;padding:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600}
+    .btn-salir:hover{background:rgba(255,255,255,.2)}
+
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{background:white;border-bottom:1px solid var(--borde);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+    .topbar h1{font-size:1.2rem;font-weight:800}
+    .topbar-actions{display:flex;gap:10px}
+    .content{padding:28px 32px;flex:1;overflow-y:auto}
+
+    /* PANELS */
+    .panel{display:none}
+    .panel.activo{display:block}
+
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:28px}
+    .stat{background:white;border-radius:12px;padding:20px;border:1.5px solid var(--borde)}
+    .stat-num{font-size:2rem;font-weight:800;color:var(--azul)}
+    .stat-label{font-size:.82rem;color:var(--suave);margin-top:4px}
+
+    /* LINK PUBLICO */
+    .link-box{background:white;border-radius:12px;padding:20px 24px;border:1.5px solid var(--borde);margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .link-box label{font-size:.82rem;font-weight:700;color:var(--suave);display:block;margin-bottom:4px}
+    .link-url{font-size:.95rem;color:var(--azul);font-weight:600}
+    .btn{padding:9px 18px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+    .btn-primary{background:var(--azul);color:white}.btn-primary:hover{background:var(--azul2)}
+    .btn-outline{background:white;color:var(--azul);border:2px solid var(--azul)}.btn-outline:hover{background:var(--celeste)}
+    .btn-red{background:#fde8e8;color:var(--rojo);border:none}.btn-red:hover{background:#fbd5d5}
+    .btn-green{background:var(--verde);color:white}.btn-green:hover{opacity:.9}
+    .btn-sm{padding:6px 12px;font-size:.8rem}
+
+    /* TABLA PRODUCTOS */
+    .tabla-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .tabla-header h2{font-size:1.1rem;font-weight:800}
+    .tabla-acciones{display:flex;gap:10px;align-items:center}
+    .input-buscar{padding:9px 14px;border:1.5px solid var(--borde);border-radius:8px;font-size:.88rem;outline:none;min-width:200px}
+    .input-buscar:focus{border-color:var(--azul2)}
+
+    table{width:100%;background:white;border-radius:12px;overflow:hidden;border-collapse:collapse;border:1.5px solid var(--borde)}
+    th{background:var(--gris);padding:12px 16px;text-align:left;font-size:.82rem;font-weight:700;color:var(--suave);text-transform:uppercase;letter-spacing:.4px}
+    td{padding:13px 16px;border-top:1px solid var(--borde);font-size:.88rem;vertical-align:middle}
+    tr:hover td{background:#fafbff}
+    .td-img{width:52px;height:52px;object-fit:cover;border-radius:8px;background:var(--gris);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+    .td-img img{width:52px;height:52px;object-fit:cover;border-radius:8px}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
+    .badge-disp{background:#e6f7ef;color:var(--verde)}
+    .badge-cons{background:#fff3e0;color:#b36000}
+    .badge-sin{background:#fde8e8;color:var(--rojo)}
+    .td-actions{display:flex;gap:6px}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--suave)}
+    .empty-state .icon{font-size:3rem;margin-bottom:12px}
+
+    /* FORM CONFIG */
+    .config-form{background:white;border-radius:14px;padding:28px;border:1.5px solid var(--borde);max-width:600px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-group{margin-bottom:18px}
+    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px}
+    .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:1.5px solid var(--borde);border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit}
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--azul2)}
+    .form-group textarea{resize:vertical;min-height:80px}
+    .form-hint{font-size:.78rem;color:var(--suave);margin-top:4px}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.activo{display:flex}
+    .modal{background:white;border-radius:16px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;position:relative}
+    .modal h3{font-size:1.15rem;font-weight:800;margin-bottom:20px}
+    .modal-cerrar{position:absolute;top:16px;right:18px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--suave)}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--borde)}
+
+    /* PDF UPLOAD */
+    .pdf-zone{border:2.5px dashed var(--borde);border-radius:14px;padding:40px 24px;text-align:center;background:var(--gris);cursor:pointer;transition:all .2s;margin-bottom:20px}
+    .pdf-zone:hover{border-color:var(--azul2);background:var(--celeste)}
+    .pdf-zone .icon{font-size:2.5rem;margin-bottom:12px}
+    .pdf-zone h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+    .pdf-zone p{font-size:.85rem;color:var(--suave)}
+    #inputPDF{display:none}
+
+    /* NOTIF */
+    .notif{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:.92rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.15);display:none;z-index:300;animation:fadeIn .3s ease}
+    .notif.ok{background:var(--verde);color:white}
+    .notif.err{background:var(--rojo);color:white}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    /* LOADING */
+    .loading{display:none;text-align:center;padding:60px;color:var(--suave)}
+    .spinner{display:inline-block;width:36px;height:36px;border:4px solid var(--borde);border-top-color:var(--azul);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:700px){
+      .sidebar{width:60px}.sidebar-logo{padding:16px;font-size:1rem}
+      .nav-item span{display:none}.sidebar-bottom .user-info,.btn-salir span{display:none}
+      .content{padding:16px}.topbar{padding:12px 16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">📋 <span>CatálogoApp</span></div>
+  <nav class="sidebar-nav">
+    <button class="nav-item activo" onclick="showPanel('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></button>
+    <button class="nav-item" onclick="showPanel('productos',this)"><span class="icon">📦</span><span>Productos</span></button>
+    <button class="nav-item" onclick="showPanel('pdf',this)"><span class="icon">🤖</span><span>Cargar PDF</span></button>
+    <button class="nav-item" onclick="showPanel('config',this)"><span class="icon">⚙️</span><span>Mi empresa</span></button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-info" id="userEmail">—</div>
+    <button class="btn-salir" onclick="salir()">🚪 <span>Salir</span></button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <h1 id="topbarTitle">Dashboard</h1>
+    <div class="topbar-actions" id="topbarActions"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="panel activo" id="panelDashboard">
+      <div class="stats">
+        <div class="stat"><div class="stat-num" id="statProductos">—</div><div class="stat-label">Productos</div></div>
+        <div class="stat"><div class="stat-num" id="statCategorias">—</div><div class="stat-label">Categorías</div></div>
+        <div class="stat"><div class="stat-num" id="statDisponibles">—</div><div class="stat-label">Disponibles</div></div>
+      </div>
+      <div class="link-box" id="linkBox" style="display:none">
+        <div>
+          <label>🔗 Link de tu catálogo para clientes</label>
+          <div class="link-url" id="linkUrl">—</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="copiarLink()">📋 Copiar</button>
+          <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()">👁️ Ver</button>
+        </div>
+      </div>
+      <div style="background:white;border-radius:12px;padding:24px;border:1.5px solid var(--borde)">
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:12px">Primeros pasos</h3>
+        <div style="display:flex;flex-direction:column;gap:10px" id="checklistSteps">
+          <div class="step-check" id="check1">⬜ Configurá tu empresa (nombre, logo, slug)</div>
+          <div class="step-check" id="check2">⬜ Cargá tu primer producto o subí un PDF</div>
+          <div class="step-check" id="check3">⬜ Compartí el link con tus clientes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="panel" id="panelProductos">
+      <div class="tabla-header">
+        <h2>Productos</h2>
+        <div class="tabla-acciones">
+          <input class="input-buscar" type="text" placeholder="Buscar..." id="buscarProd" oninput="filtrarTabla()"/>
+          <button class="btn btn-primary" onclick="abrirModalProducto()">+ Agregar</button>
+        </div>
+      </div>
+      <div class="loading" id="loadingProd"><div class="spinner"></div><div>Cargando...</div></div>
+      <div id="tablaWrap"></div>
+    </div>
+
+    <!-- PDF -->
+    <div class="panel" id="panelPDF">
+      <h2 style="margin-bottom:20px">Cargar catálogo desde PDF con IA 🤖</h2>
+      <div class="pdf-zone" onclick="document.getElementById('inputPDF').click()" id="pdfZone">
+        <div class="icon">📄</div>
+        <h3>Hacé clic o arrastrá tu PDF acá</h3>
+        <p>La IA extrae todos los productos automáticamente</p>
+      </div>
+      <input type="file" id="inputPDF" accept=".pdf" onchange="procesarPDF(this)"/>
+      <div id="pdfStatus" style="display:none;background:white;border-radius:12px;padding:24px;border:1.5px solid var(--borde)">
+        <div class="loading" id="pdfLoading" style="display:block;padding:20px">
+          <div class="spinner"></div>
+          <div id="pdfLoadingTxt">Leyendo PDF con IA...</div>
+        </div>
+        <div id="pdfResultado" style="display:none"></div>
+      </div>
+      <div style="background:var(--celeste);border-radius:10px;padding:16px 20px;font-size:.85rem;margin-top:16px">
+        <strong>⚠️ Próximamente:</strong> La extracción automática de PDF con IA requiere configurar la API de Claude.
+        Por ahora podés agregar productos manualmente desde la sección <strong>Productos</strong>.
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="panel" id="panelConfig">
+      <h2 style="margin-bottom:20px">Configuración de mi empresa</h2>
+      <div class="config-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre de la empresa *</label>
+            <input type="text" id="cfgNombre" placeholder="Ej: Instrumental Médico SA"/>
+          </div>
+          <div class="form-group">
+            <label>Slug (URL pública) *</label>
+            <input type="text" id="cfgSlug" placeholder="instrumental-medico" oninput="limpiarSlug()"/>
+            <div class="form-hint" id="slugPreview">Tu link: —</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea id="cfgDesc" placeholder="Breve descripción de tu empresa o catálogo..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>URL del logo</label>
+            <input type="text" id="cfgLogo" placeholder="https://..."/>
+          </div>
+          <div class="form-group">
+            <label>Color principal</label>
+            <input type="color" id="cfgColor" value="#1a4d8f" style="height:44px;padding:4px"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar cambios</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="modalProducto" onclick="cerrarModalClick(event,'modalProducto')">
+  <div class="modal">
+    <button class="modal-cerrar" onclick="cerrarModal('modalProducto')">✕</button>
+    <h3 id="modalProdTitle">Agregar producto</h3>
+    <input type="hidden" id="prodId"/>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nombre *</label>
+        <input type="text" id="prodNombre" placeholder="Nombre del producto"/>
+      </div>
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text" id="prodCodigo" placeholder="OC-101"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoría</label>
+        <input type="text" id="prodCategoria" placeholder="Laparoscópicos"/>
+      </div>
+      <div class="form-group">
+        <label>Precio</label>
+        <input type="text" id="prodPrecio" placeholder="Consultar o 15000"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea id="prodDesc" placeholder="Descripción del producto..." style="min-height:70px"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Stock</label>
+        <select id="prodStock">
+          <option>Disponible</option>
+          <option>Consultar</option>
+          <option>Sin stock</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>URL de imagen</label>
+        <input type="text" id="prodImagen" placeholder="https://..."/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarModal('modalProducto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarProducto()" id="btnGuardarProd">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div class="notif" id="notif"></div>
+
+<script>
+  const SUPABASE_URL = 'https://mfbsymubromhwljotrca.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYnN5bXVicm9taHdsam90cmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE3NTMsImV4cCI6MjA5MDU1Nzc1M30.Y7pbjwByvOcSHroKSrCDyXZnmjSfxCSavUflvZJCq1U'
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  let USER = null, EMPRESA = null, PRODUCTOS = []
+
+  // INIT
+  async function init() {
+    const { data: { session } } = await db.auth.getSession()
+    if (!session) { window.location.href = 'index.html'; return }
+    USER = session.user
+    document.getElementById('userEmail').textContent = USER.email
+
+    await cargarEmpresa()
+    await cargarProductos()
+    actualizarDashboard()
+  }
+
+  async function cargarEmpresa() {
+    const { data } = await db.from('empresas').select('*').eq('user_id', USER.id).single()
+    EMPRESA = data
+    if (EMPRESA) {
+      document.getElementById('cfgNombre').value = EMPRESA.nombre || ''
+      document.getElementById('cfgSlug').value   = EMPRESA.slug || ''
+      document.getElementById('cfgDesc').value   = EMPRESA.descripcion || ''
+      document.getElementById('cfgLogo').value   = EMPRESA.logo_url || ''
+      document.getElementById('cfgColor').value  = EMPRESA.color || '#1a4d8f'
+      actualizarSlugPreview()
+    }
+  }
+
+  async function cargarProductos() {
+    if (!EMPRESA) { renderTabla([]); return }
+    document.getElementById('loadingProd').style.display = 'block'
+    const { data } = await db.from('productos').select('*').eq('empresa_id', EMPRESA.id).order('created_at', { ascending: false })
+    PRODUCTOS = data || []
+    document.getElementById('loadingProd').style.display = 'none'
+    renderTabla(PRODUCTOS)
+  }
+
+  function actualizarDashboard() {
+    document.getElementById('statProductos').textContent = PRODUCTOS.length
+    const cats = new Set(PRODUCTOS.map(p => p.categoria).filter(Boolean))
+    document.getElementById('statCategorias').textContent = cats.size
+    document.getElementById('statDisponibles').textContent = PRODUCTOS.filter(p => p.stock === 'Disponible').length
+
+    if (EMPRESA?.slug) {
+      const url = `${location.origin}/catalogo.html?slug=${EMPRESA.slug}`
+      document.getElementById('linkUrl').textContent = url
+      document.getElementById('linkBox').style.display = 'flex'
+    }
+
+    // Checklist
+    const c1 = EMPRESA?.nombre && EMPRESA?.slug
+    const c2 = PRODUCTOS.length > 0
+    document.getElementById('check1').textContent = (c1 ? '✅' : '⬜') + ' Configurá tu empresa (nombre, logo, slug)'
+    document.getElementById('check2').textContent = (c2 ? '✅' : '⬜') + ' Cargá tu primer producto o subí un PDF'
+    document.getElementById('check3').textContent = (c1 && c2 ? '✅' : '⬜') + ' Compartí el link con tus clientes'
+  }
+
+  // TABLA
+  function renderTabla(lista) {
+    const wrap = document.getElementById('tablaWrap')
+    if (!lista.length) {
+      wrap.innerHTML = `<div class="empty-state"><div class="icon">📦</div><p>No hay productos todavía.<br>Agregá uno o cargá un PDF.</p></div>`
+      return
+    }
+    const rows = lista.map(p => `
+      <tr>
+        <td>
+          ${p.imagen_url
+            ? `<img src="${p.imagen_url}" style="width:48px;height:48px;object-fit:cover;border-radius:8px" onerror="this.style.display='none'">`
+            : `<div style="width:48px;height:48px;background:var(--gris);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">🏥</div>`}
+        </td>
+        <td><strong>${p.nombre}</strong>${p.codigo ? `<br><span style="font-size:.75rem;color:var(--suave)">${p.codigo}</span>` : ''}</td>
+        <td>${p.categoria || '—'}</td>
+        <td>${p.precio || 'Consultar'}</td>
+        <td><span class="badge ${p.stock === 'Disponible' ? 'badge-disp' : p.stock === 'Sin stock' ? 'badge-sin' : 'badge-cons'}">${p.stock || 'Consultar'}</span></td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-sm" onclick='editarProducto(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️</button>
+          <button class="btn btn-red btn-sm" onclick="eliminarProducto('${p.id}')">🗑️</button>
+        </div></td>
+      </tr>`).join('')
+    wrap.innerHTML = `
+      <table>
+        <thead><tr><th></th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`
+  }
+
+  function filtrarTabla() {
+    const q = document.getElementById('buscarProd').value.toLowerCase()
+    const filtrados = PRODUCTOS.filter(p =>
+      (p.nombre || '').toLowerCase().includes(q) ||
+      (p.categoria || '').toLowerCase().includes(q) ||
+      (p.codigo || '').toLowerCase().includes(q)
+    )
+    renderTabla(filtrados)
+  }
+
+  // CRUD PRODUCTOS
+  function abrirModalProducto() {
+    document.getElementById('prodId').value = ''
+    document.getElementById('prodNombre').value = ''
+    document.getElementById('prodCodigo').value = ''
+    document.getElementById('prodCategoria').value = ''
+    document.getElementById('prodPrecio').value = ''
+    document.getElementById('prodDesc').value = ''
+    document.getElementById('prodStock').value = 'Disponible'
+    document.getElementById('prodImagen').value = ''
+    document.getElementById('modalProdTitle').textContent = 'Agregar producto'
+    document.getElementById('btnGuardarProd').textContent = 'Guardar'
+    document.getElementById('modalProducto').classList.add('activo')
+  }
+
+  function editarProducto(p) {
+    document.getElementById('prodId').value        = p.id
+    document.getElementById('prodNombre').value    = p.nombre || ''
+    document.getElementById('prodCodigo').value    = p.codigo || ''
+    document.getElementById('prodCategoria').value = p.categoria || ''
+    document.getElementById('prodPrecio').value    = p.precio || ''
+    document.getElementById('prodDesc').value      = p.descripcion || ''
+    document.getElementById('prodStock').value     = p.stock || 'Disponible'
+    document.getElementById('prodImagen').value    = p.imagen_url || ''
+    document.getElementById('modalProdTitle').textContent = 'Editar producto'
+    document.getElementById('btnGuardarProd').textContent = 'Guardar cambios'
+    document.getElementById('modalProducto').classList.add('activo')
+  }
+
+  async function guardarProducto() {
+    if (!EMPRESA) { notif('Primero configurá tu empresa', 'err'); return }
+    const nombre = document.getElementById('prodNombre').value.trim()
+    if (!nombre) { notif('El nombre es obligatorio', 'err'); return }
+    const id = document.getElementById('prodId').value
+    const btn = document.getElementById('btnGuardarProd')
+    btn.disabled = true; btn.textContent = 'Guardando...'
+
+    const datos = {
+      empresa_id: EMPRESA.id,
+      nombre,
+      codigo:      document.getElementById('prodCodigo').value.trim(),
+      categoria:   document.getElementById('prodCategoria').value.trim(),
+      precio:      document.getElementById('prodPrecio').value.trim(),
+      descripcion: document.getElementById('prodDesc').value.trim(),
+      stock:       document.getElementById('prodStock').value,
+      imagen_url:  document.getElementById('prodImagen').value.trim(),
+    }
+
+    let error
+    if (id) {
+      ({ error } = await db.from('productos').update(datos).eq('id', id))
+    } else {
+      ({ error } = await db.from('productos').insert(datos))
+    }
+
+    btn.disabled = false; btn.textContent = id ? 'Guardar cambios' : 'Guardar'
+    if (error) { notif('Error al guardar: ' + error.message, 'err'); return }
+    cerrarModal('modalProducto')
+    notif('✅ Producto guardado')
+    await cargarProductos()
+    actualizarDashboard()
+  }
+
+  async function eliminarProducto(id) {
+    if (!confirm('¿Eliminás este producto?')) return
+    const { error } = await db.from('productos').delete().eq('id', id)
+    if (error) { notif('Error al eliminar', 'err'); return }
+    notif('🗑️ Producto eliminado')
+    await cargarProductos()
+    actualizarDashboard()
+  }
+
+  // CONFIG EMPRESA
+  function limpiarSlug() {
+    const input = document.getElementById('cfgSlug')
+    input.value = input.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-')
+    actualizarSlugPreview()
+  }
+  function actualizarSlugPreview() {
+    const slug = document.getElementById('cfgSlug').value
+    document.getElementById('slugPreview').textContent = slug
+      ? `Tu link: ${location.origin}/catalogo.html?slug=${slug}`
+      : 'Tu link: —'
+  }
+  document.getElementById('cfgSlug').addEventListener('input', actualizarSlugPreview)
+
+  async function guardarConfig() {
+    const nombre = document.getElementById('cfgNombre').value.trim()
+    const slug   = document.getElementById('cfgSlug').value.trim()
+    if (!nombre || !slug) { notif('Nombre y slug son obligatorios', 'err'); return }
+
+    const datos = {
+      user_id:     USER.id,
+      nombre,
+      slug,
+      descripcion: document.getElementById('cfgDesc').value.trim(),
+      logo_url:    document.getElementById('cfgLogo').value.trim(),
+      color:       document.getElementById('cfgColor').value,
+    }
+
+    let error
+    if (EMPRESA) {
+      ({ error } = await db.from('empresas').update(datos).eq('id', EMPRESA.id))
+    } else {
+      ({ error } = await db.from('empresas').insert(datos))
+    }
+    if (error) { notif('Error: ' + error.message, 'err'); return }
+    notif('✅ Configuración guardada')
+    await cargarEmpresa()
+    actualizarDashboard()
+  }
+
+  // NAV
+  function showPanel(panel, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('activo'))
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('activo'))
+    document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1)).classList.add('activo')
+    btn.classList.add('activo')
+    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', config: 'Mi empresa' }
+    document.getElementById('topbarTitle').textContent = titles[panel] || ''
+  }
+
+  function cerrarModal(id) { document.getElementById(id).classList.remove('activo') }
+  function cerrarModalClick(e, id) { if (e.target === document.getElementById(id)) cerrarModal(id) }
+
+  function copiarLink() {
+    navigator.clipboard.writeText(document.getElementById('linkUrl').textContent)
+    notif('📋 Link copiado')
+  }
+  function abrirCatalogo() {
+    if (EMPRESA?.slug) window.open(`catalogo.html?slug=${EMPRESA.slug}`, '_blank')
+  }
+
+  async function salir() {
+    await db.auth.signOut()
+    window.location.href = 'index.html'
+  }
+
+  // PDF (placeholder)
+  function procesarPDF(input) {
+    const file = input.files[0]
+    if (!file) return
+    document.getElementById('pdfStatus').style.display = 'block'
+    document.getElementById('pdfLoading').style.display = 'block'
+    document.getElementById('pdfResultado').style.display = 'none'
+    document.getElementById('pdfLoadingTxt').textContent = `Leyendo "${file.name}"...`
+    setTimeout(() => {
+      document.getElementById('pdfLoading').style.display = 'none'
+      document.getElementById('pdfResultado').style.display = 'block'
+      document.getElementById('pdfResultado').innerHTML = `
+        <div style="background:#fff3e0;border-radius:10px;padding:16px 20px;font-size:.88rem">
+          <strong>⚠️ Configuración pendiente</strong><br><br>
+          Para extraer productos del PDF automáticamente necesitás agregar tu clave de la API de Claude.<br><br>
+          <strong>Próximamente te explicamos cómo configurarla.</strong><br><br>
+          Por ahora podés agregar los productos manualmente desde <strong>Productos → + Agregar</strong>.
+        </div>`
+      input.value = ''
+    }, 1500)
+  }
+
+  function notif(msg, tipo = 'ok') {
+    const n = document.getElementById('notif')
+    n.textContent = msg
+    n.className = `notif ${tipo}`
+    n.style.display = 'block'
+    setTimeout(() => n.style.display = 'none', 3000)
+  }
+
+  init()
+</script>
+</body>
+</html>

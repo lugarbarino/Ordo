@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CatálogoApp — Creá tu catálogo digital</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --azul:#1a4d8f;--azul2:#2d6cc0;--celeste:#e8f0fc;
+      --gris:#f5f6f8;--borde:#dde3ed;--texto:#1e2a3a;--suave:#6b7a90;--verde:#1a8f5a;
+    }
+    body{font-family:'Segoe UI',Arial,sans-serif;color:var(--texto);background:white}
+
+    /* NAV */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;border-bottom:1px solid var(--borde);position:sticky;top:0;background:white;z-index:100}
+    .logo{font-size:1.3rem;font-weight:800;color:var(--azul)}
+    .logo span{color:var(--azul2)}
+    .nav-btns{display:flex;gap:12px}
+    .btn{padding:10px 22px;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+    .btn-outline{background:white;color:var(--azul);border:2px solid var(--azul)}
+    .btn-outline:hover{background:var(--celeste)}
+    .btn-primary{background:var(--azul);color:white}
+    .btn-primary:hover{background:var(--azul2)}
+    .btn-green{background:var(--verde);color:white}
+    .btn-green:hover{opacity:.9}
+
+    /* HERO */
+    .hero{text-align:center;padding:90px 24px 70px;background:linear-gradient(160deg,#f0f4ff 0%,white 60%)}
+    .hero-badge{display:inline-block;background:var(--celeste);color:var(--azul);font-size:.8rem;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:20px;letter-spacing:.5px}
+    .hero h1{font-size:3rem;font-weight:800;line-height:1.15;margin-bottom:20px;max-width:700px;margin-left:auto;margin-right:auto}
+    .hero h1 span{color:var(--azul2)}
+    .hero p{font-size:1.1rem;color:var(--suave);max-width:520px;margin:0 auto 36px;line-height:1.6}
+    .hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+    .hero-btns .btn{padding:14px 28px;font-size:1rem}
+
+    /* FEATURES */
+    .section{padding:70px 48px}
+    .section-title{text-align:center;font-size:1.9rem;font-weight:800;margin-bottom:10px}
+    .section-sub{text-align:center;color:var(--suave);font-size:1rem;margin-bottom:48px}
+    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1000px;margin:0 auto}
+    .feature-card{background:var(--gris);border-radius:16px;padding:28px 24px;border:1.5px solid var(--borde)}
+    .feature-icon{font-size:2rem;margin-bottom:14px}
+    .feature-card h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+    .feature-card p{font-size:.88rem;color:var(--suave);line-height:1.6}
+
+    /* COMO FUNCIONA */
+    .steps{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+    .step{display:flex;gap:20px;align-items:flex-start;background:white;border:1.5px solid var(--borde);border-radius:14px;padding:22px 24px}
+    .step-num{background:var(--azul);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex-shrink:0}
+    .step h4{font-size:1rem;font-weight:700;margin-bottom:4px}
+    .step p{font-size:.87rem;color:var(--suave)}
+
+    /* CTA */
+    .cta{background:var(--azul);color:white;text-align:center;padding:70px 24px}
+    .cta h2{font-size:2rem;font-weight:800;margin-bottom:14px}
+    .cta p{opacity:.8;margin-bottom:28px;font-size:1rem}
+    .cta .btn{padding:14px 32px;font-size:1rem;background:white;color:var(--azul)}
+
+    /* FOOTER */
+    footer{text-align:center;padding:28px;color:var(--suave);font-size:.85rem;border-top:1px solid var(--borde)}
+
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+    .modal-overlay.activo{display:flex}
+    .modal{background:white;border-radius:18px;padding:36px;width:100%;max-width:420px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+    .modal-cerrar{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--suave)}
+    .modal h2{font-size:1.4rem;font-weight:800;margin-bottom:6px}
+    .modal-sub{font-size:.88rem;color:var(--suave);margin-bottom:24px}
+
+    /* TABS */
+    .tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--borde)}
+    .tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--suave);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+    .tab.activo{color:var(--azul);border-bottom-color:var(--azul)}
+
+    /* FORM */
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--texto)}
+    .form-group input{width:100%;padding:10px 14px;border:1.5px solid var(--borde);border-radius:8px;font-size:.95rem;outline:none;transition:border-color .2s}
+    .form-group input:focus{border-color:var(--azul2)}
+    .btn-block{width:100%;padding:12px;font-size:1rem;margin-top:4px}
+    .form-error{color:#c0392b;font-size:.83rem;margin-top:8px;display:none}
+    .form-success{color:var(--verde);font-size:.85rem;margin-top:8px;display:none}
+    .divider{text-align:center;color:var(--suave);font-size:.82rem;margin:14px 0;position:relative}
+    .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--borde)}
+    .divider::before{left:0}.divider::after{right:0}
+
+    @media(max-width:600px){
+      nav{padding:16px 20px}.hero h1{font-size:2rem}.section{padding:48px 20px}
+      nav .logo-text{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">📋 Catálogo<span>App</span></div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="abrirModal('login')">Iniciar sesión</button>
+    <button class="btn btn-primary" onclick="abrirModal('registro')">Crear cuenta gratis</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">✨ Nuevo — Carga tu catálogo desde PDF con IA</div>
+  <h1>Tu catálogo digital<br/><span>listo en minutos</span></h1>
+  <p>Subí tu PDF, la IA extrae todos tus productos automáticamente. Tus clientes lo ven online, sin poder editar nada.</p>
+  <div class="hero-btns">
+    <button class="btn btn-primary" onclick="abrirModal('registro')">🚀 Empezar gratis</button>
+    <button class="btn btn-outline" onclick="window.open('catalogo.html?slug=demo','_blank')">Ver demo</button>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" style="background:var(--gris)">
+  <div class="section-title">Todo lo que necesitás</div>
+  <div class="section-sub">Sin técnicos, sin complicaciones</div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>IA extrae tus productos</h3>
+      <p>Subís tu catálogo en PDF y la inteligencia artificial identifica todos los productos automáticamente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <h3>Link propio para tus clientes</h3>
+      <p>Recibís un link único <strong>catalogoapp.com/tu-empresa</strong> para compartir con clientes.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛍️</div>
+      <h3>Catálogo siempre actualizado</h3>
+      <p>Agregás, editás o eliminás productos cuando quieras. Los clientes siempre ven la última versión.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎨</div>
+      <h3>Con tu marca</h3>
+      <p>Logo, colores y descripción de tu empresa. Tu catálogo se ve profesional desde el primer día.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Solo lectura para clientes</h3>
+      <p>Tus clientes ven el catálogo pero no pueden modificar nada. Vos tenés el control total.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>Funciona en celular</h3>
+      <p>El catálogo se adapta a cualquier pantalla. Tus clientes lo ven perfecto desde el celular.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="section">
+  <div class="section-title">¿Cómo funciona?</div>
+  <div class="section-sub">3 pasos y listo</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <h4>Creás tu cuenta y configurás tu empresa</h4>
+        <p>Nombre, logo, descripción y el link único para tus clientes. Tarda 2 minutos.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <h4>Subís tu catálogo en PDF</h4>
+        <p>La IA lee el PDF y extrae todos los productos automáticamente. Revisás y confirmás.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <h4>Compartís el link con tus clientes</h4>
+        <p>Tus clientes entran al link y ven el catálogo completo con buscador y filtros. Solo lectura.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Empezá hoy, gratis</h2>
+  <p>Sin tarjeta de crédito. Sin instalaciones. Listo en 5 minutos.</p>
+  <button class="btn" onclick="abrirModal('registro')">Crear mi catálogo →</button>
+</section>
+
+<footer>© 2025 CatálogoApp · Hecho con ❤️ en Argentina</footer>
+
+<!-- MODAL AUTH -->
+<div class="modal-overlay" id="modalOverlay" onclick="cerrarModalClick(event)">
+  <div class="modal">
+    <button class="modal-cerrar" onclick="cerrarModal()">✕</button>
+
+    <div class="tabs">
+      <button class="tab" id="tabLogin" onclick="switchTab('login')">Iniciar sesión</button>
+      <button class="tab" id="tabRegistro" onclick="switchTab('registro')">Crear cuenta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="panelLogin">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="tu@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"/>
+      </div>
+      <div class="form-error" id="loginError"></div>
+      <button class="btn btn-primary btn-block" onclick="login()" id="btnLogin">Iniciar sesión</button>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="panelRegistro" style="display:none">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="tu@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="regPass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')registro()"/>
+      </div>
+      <div class="form-error" id="regError"></div>
+      <div class="form-success" id="regSuccess"></div>
+      <button class="btn btn-green btn-block" onclick="registro()" id="btnRegistro">Crear cuenta gratis</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://mfbsymubromhwljotrca.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYnN5bXVicm9taHdsam90cmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE3NTMsImV4cCI6MjA5MDU1Nzc1M30.Y7pbjwByvOcSHroKSrCDyXZnmjSfxCSavUflvZJCq1U'
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  // Si ya está logueado → admin
+  db.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = 'admin.html'
+  })
+
+  function abrirModal(tab) {
+    document.getElementById('modalOverlay').classList.add('activo')
+    switchTab(tab)
+  }
+  function cerrarModal() {
+    document.getElementById('modalOverlay').classList.remove('activo')
+  }
+  function cerrarModalClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) cerrarModal()
+  }
+
+  function switchTab(tab) {
+    document.getElementById('tabLogin').classList.toggle('activo', tab === 'login')
+    document.getElementById('tabRegistro').classList.toggle('activo', tab === 'registro')
+    document.getElementById('panelLogin').style.display = tab === 'login' ? 'block' : 'none'
+    document.getElementById('panelRegistro').style.display = tab === 'registro' ? 'block' : 'none'
+  }
+
+  async function login() {
+    const email = document.getElementById('loginEmail').value.trim()
+    const pass  = document.getElementById('loginPass').value
+    const err   = document.getElementById('loginError')
+    const btn   = document.getElementById('btnLogin')
+    err.style.display = 'none'
+    if (!email || !pass) { err.textContent = 'Completá todos los campos'; err.style.display = 'block'; return }
+    btn.textContent = 'Ingresando...'; btn.disabled = true
+    const { error } = await db.auth.signInWithPassword({ email, password: pass })
+    if (error) {
+      err.textContent = 'Email o contraseña incorrectos'
+      err.style.display = 'block'
+      btn.textContent = 'Iniciar sesión'; btn.disabled = false
+    } else {
+      window.location.href = 'admin.html'
+    }
+  }
+
+  async function registro() {
+    const email = document.getElementById('regEmail').value.trim()
+    const pass  = document.getElementById('regPass').value
+    const err   = document.getElementById('regError')
+    const ok    = document.getElementById('regSuccess')
+    const btn   = document.getElementById('btnRegistro')
+    err.style.display = 'none'; ok.style.display = 'none'
+    if (!email || !pass) { err.textContent = 'Completá todos los campos'; err.style.display = 'block'; return }
+    if (pass.length < 6) { err.textContent = 'La contraseña debe tener al menos 6 caracteres'; err.style.display = 'block'; return }
+    btn.textContent = 'Creando cuenta...'; btn.disabled = true
+    const { error } = await db.auth.signUp({ email, password: pass })
+    if (error) {
+      err.textContent = error.message
+      err.style.display = 'block'
+      btn.textContent = 'Crear cuenta gratis'; btn.disabled = false
+    } else {
+      ok.textContent = '✅ Cuenta creada. Revisá tu email para confirmar.'
+      ok.style.display = 'block'
+      btn.textContent = 'Crear cuenta gratis'; btn.disabled = false
+      setTimeout(() => window.location.href = 'admin.html', 1500)
+    }
+  }
+</script>
+</body>
+</html>
