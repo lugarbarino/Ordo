@@ -287,16 +287,30 @@
     if (!email || !pass) { err.textContent = 'Completá todos los campos'; err.style.display = 'block'; return }
     if (pass.length < 6) { err.textContent = 'La contraseña debe tener al menos 6 caracteres'; err.style.display = 'block'; return }
     btn.textContent = 'Creando cuenta...'; btn.disabled = true
-    const { error } = await db.auth.signUp({ email, password: pass })
+    const { error } = await db.auth.signUp({
+      email,
+      password: pass,
+      options: { emailRedirectTo: 'https://ordo-catalogo.vercel.app/admin.html' }
+    })
     if (error) {
       err.textContent = error.message
       err.style.display = 'block'
       btn.textContent = 'Crear cuenta gratis'; btn.disabled = false
     } else {
-      ok.textContent = '✅ Cuenta creada. Revisá tu email para confirmar.'
-      ok.style.display = 'block'
-      btn.textContent = 'Crear cuenta gratis'; btn.disabled = false
-      setTimeout(() => window.location.href = 'admin.html', 1500)
+      // Mostrar mensaje de confirmación en el modal
+      document.querySelector('.modal').innerHTML = `
+        <div style="text-align:center;padding:20px 10px">
+          <div style="font-size:3rem;margin-bottom:16px">📧</div>
+          <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:10px">Revisá tu email</h2>
+          <p style="color:#6b7a90;font-size:.92rem;line-height:1.6">
+            Te mandamos un link de confirmación a<br>
+            <strong style="color:#1e2a3a">${email}</strong>
+          </p>
+          <p style="color:#6b7a90;font-size:.85rem;margin-top:12px">
+            Hacé clic en el link del email para activar tu cuenta y entrar al panel.
+          </p>
+          <p style="color:#b0bcd0;font-size:.78rem;margin-top:16px">¿No llegó? Revisá spam 📁</p>
+        </div>`
     }
   }
 </script>
