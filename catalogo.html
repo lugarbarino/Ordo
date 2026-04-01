@@ -17,7 +17,7 @@
 
     /* ── LOGO SOBRE HERO ────────────────────── */
     .logo-wrap{display:flex;justify-content:center;align-items:center;padding:28px 0 0}
-    .logo-img{width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden}
+    .logo-img{width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden}
     .logo-img img{width:100%;height:100%;object-fit:contain}
 
     /* ── HERO ───────────────────────────────── */
@@ -255,8 +255,11 @@
     // Hero
     document.getElementById('heroNombre').textContent = empresa.nombre
     if (empresa.descripcion) document.getElementById('heroDesc').textContent = empresa.descripcion
-    if (empresa.logo_url) {
-      document.getElementById('heroBg').style.backgroundImage = `url('${empresa.logo_url.replace(/'/g,"\\'")}')`
+    if (empresa.banner_url) {
+      const bg = document.getElementById('heroBg')
+      bg.style.backgroundImage = `url('${empresa.banner_url.replace(/'/g,"\\'")}')`
+      bg.style.backgroundSize = 'cover'
+      bg.style.backgroundPosition = 'center'
     }
 
     // Productos

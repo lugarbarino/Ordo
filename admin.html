@@ -375,6 +375,18 @@
             <input type="color" id="cfgColor" value="#3872fa" style="height:44px;padding:4px"/>
           </div>
         </div>
+        <div class="form-group">
+          <label>Fondo del banner (catálogo)</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div id="bannerPreview" style="width:120px;height:56px;border-radius:8px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><span class="material-icons" style="font-size:22px;color:#aaa">image</span></div>
+            <div>
+              <input type="file" id="inputBanner" accept="image/*" style="display:none" onchange="subirBanner(this)"/>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputBanner').click()" id="btnSubirBanner"><span class="material-icons" style="font-size:15px">upload</span> Elegir imagen</button>
+              <div style="font-size:.75rem;color:#666;margin-top:4px">Se muestra como fondo del hero en el catálogo</div>
+            </div>
+          </div>
+          <input type="hidden" id="cfgBanner"/>
+        </div>
         <div class="form-row">
           <div class="form-group">
             <label>📱 WhatsApp para pedidos</label>
@@ -490,6 +502,10 @@
       document.getElementById('cfgSlug').value   = EMPRESA.slug || ''
       document.getElementById('cfgDesc').value   = EMPRESA.descripcion || ''
       document.getElementById('cfgLogo').value    = EMPRESA.logo_url || ''
+      document.getElementById('cfgBanner').value  = EMPRESA.banner_url || ''
+      if (EMPRESA.banner_url) {
+        document.getElementById('bannerPreview').innerHTML = `<img src="${EMPRESA.banner_url}" style="width:120px;height:56px;object-fit:cover;border-radius:8px"/>`
+      }
       document.getElementById('cfgColor').value   = EMPRESA.color || '#3872fa'
       document.getElementById('cfgWhatsapp').value = EMPRESA.whatsapp || ''
       document.getElementById('cfgEmail').value    = EMPRESA.email_contacto || ''
@@ -728,6 +744,7 @@
       slug,
       descripcion:   document.getElementById('cfgDesc').value.trim(),
       logo_url:      document.getElementById('cfgLogo').value.trim(),
+      banner_url:    document.getElementById('cfgBanner').value.trim(),
       color:         document.getElementById('cfgColor').value,
       whatsapp:      document.getElementById('cfgWhatsapp').value.trim(),
       email_contacto: document.getElementById('cfgEmail').value.trim(),
@@ -937,6 +954,26 @@
     document.getElementById('prodImagen').value = url
     document.getElementById('fotoPreview').innerHTML = `<img src="${url}" style="width:80px;height:80px;object-fit:contain;border-radius:10px"/>`
     notif('✅ Foto subida')
+  }
+
+  async function subirBanner(input) {
+    const file = input.files[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { notif('La imagen no puede superar 5MB', 'err'); return }
+    const btn = document.getElementById('btnSubirBanner')
+    btn.textContent = '⏳ Subiendo...'
+    btn.disabled = true
+    const ext = file.name.split('.').pop()
+    const nombre = `banner_${Date.now()}.${ext}`
+    const { data, error } = await db.storage.from('imagenes').upload(nombre, file, { contentType: file.type, upsert: true })
+    btn.innerHTML = '<span class="material-icons" style="font-size:15px">upload</span> Elegir imagen'
+    btn.disabled = false
+    if (error) { notif('Error al subir: ' + error.message, 'err'); return }
+    const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
+    const url = urlData.publicUrl
+    document.getElementById('cfgBanner').value = url
+    document.getElementById('bannerPreview').innerHTML = `<img src="${url}" style="width:120px;height:56px;object-fit:cover;border-radius:8px"/>`
+    notif('✅ Imagen de banner subida')
   }
 
   async function subirLogo(input) {
