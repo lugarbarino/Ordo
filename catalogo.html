@@ -293,7 +293,7 @@
             <span class="precio ${precioTxt === 'Consultar' ? 'consultar' : ''}">${precioTxt}</span>
             <span class="stock ${stockCls}">${p.stock || 'Consultar'}</span>
           </div>
-          <button id="btn-car-${p.id}" onclick="agregarCarrito('${p.id}','${(p.nombre||'').replace(/'/g,"\\'")}','${(p.categoria||'').replace(/'/g,"\\'")}' )" style="margin-top:10px;width:100%;padding:9px;border:2px solid var(--primario);border-radius:8px;background:white;color:var(--primario);font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s">+ Agregar al pedido</button>
+          <button id="btn-car-${p.id}" onclick="agregarCarrito('${p.id}','${(p.nombre||'').replace(/'/g,"\\'")}','${(p.categoria||'').replace(/'/g,"\\'")}' )" style="margin-top:10px;width:100%;padding:9px;border:2px solid var(--primario);border-radius:8px;background:white;color:var(--primario);font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s">+ Agregar al presupuesto</button>
         </div>`
       grid.appendChild(card)
     })
@@ -327,7 +327,7 @@
     }
     actualizarFab()
     const btn = document.getElementById('btn-car-' + id)
-    if (btn) { btn.textContent = '✅ Agregado'; btn.style.background = 'var(--celeste)'; setTimeout(() => { btn.textContent = '+ Agregar al pedido'; btn.style.background = 'white' }, 1000) }
+    if (btn) { btn.textContent = '✅ Agregado al presupuesto'; btn.style.background = 'var(--celeste)'; setTimeout(() => { btn.textContent = '+ Agregar al presupuesto'; btn.style.background = 'white' }, 1000) }
   }
 
   function quitarCarrito(id) {
