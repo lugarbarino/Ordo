@@ -16,54 +16,57 @@
     body{font-family:'Inter',sans-serif;color:var(--texto);background:var(--bg);min-height:100vh}
 
     /* ── TOPBAR ─────────────────────────────── */
-    .topbar{background:white;border-bottom:1px solid var(--borde);padding:0 56px;height:68px;display:flex;align-items:center;gap:12px}
-    .topbar-logo{width:40px;height:40px;border-radius:8px;background:var(--primario);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;overflow:hidden}
-    .topbar-logo img{width:100%;height:100%;object-fit:contain;border-radius:6px}
-    .topbar-nombre{font-size:.95rem;font-weight:700;color:#111;letter-spacing:.3px}
+    .topbar{background:white;border-bottom:1px solid var(--borde);padding:0 56px;height:72px;display:flex;align-items:center;justify-content:center;gap:14px}
+    .topbar-logo{width:46px;height:46px;border-radius:10px;background:var(--primario);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    .topbar-logo img{width:100%;height:100%;object-fit:contain;border-radius:8px}
+    .topbar-info{display:flex;flex-direction:column;line-height:1.2}
+    .topbar-nombre{font-size:1rem;font-weight:800;color:#111;letter-spacing:.8px;text-transform:uppercase}
+    .topbar-subtitulo{font-size:.68rem;font-weight:500;color:var(--suave);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
 
     /* ── HERO ───────────────────────────────── */
-    .hero{margin:24px 56px;border-radius:12px;overflow:hidden;position:relative;min-height:260px;display:flex;align-items:flex-end;padding:48px 64px}
-    .hero-bg{position:absolute;inset:0;background:var(--primario)}
-    .hero-overlay{position:absolute;inset:0;background:rgba(20,50,75,0.55);z-index:1}
-    .hero-content{position:relative;z-index:2;max-width:640px}
-    .hero-label{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px}
-    .hero-title{font-size:2.4rem;font-weight:900;color:white;line-height:1.15;margin-bottom:14px}
-    .hero-desc{font-size:.97rem;color:rgba(255,255,255,.82);line-height:1.65;max-width:520px}
+    .hero{margin:20px 48px;border-radius:16px;overflow:hidden;position:relative;min-height:300px;display:flex;align-items:flex-end;padding:52px 64px}
+    .hero-bg{position:absolute;inset:0;background:var(--primario);background-size:cover;background-position:center}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(120deg,rgba(15,40,65,0.92) 0%,rgba(30,70,100,0.72) 60%,rgba(30,70,100,0.45) 100%);z-index:1}
+    .hero-content{position:relative;z-index:2;max-width:580px}
+    .hero-label{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+    .hero-title{font-size:2.6rem;font-weight:900;color:white;line-height:1.12;margin-bottom:16px;text-wrap:balance}
+    .hero-desc{font-size:.95rem;color:rgba(255,255,255,.78);line-height:1.7;max-width:480px}
 
     /* ── FILTER BAR ─────────────────────────── */
-    .filter-bar{background:white;border-bottom:1px solid var(--borde);padding:0 56px;height:60px;display:flex;align-items:center;gap:4px;position:sticky;top:0;z-index:20;overflow-x:auto}
-    .filter-bar::-webkit-scrollbar{height:0}
-    .cat-pill{padding:7px 18px;border-radius:30px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--cat-text);white-space:nowrap;font-family:'Inter',sans-serif;transition:background .15s,color .15s;flex-shrink:0}
-    .cat-pill:hover{background:#f1f1f1}
-    .cat-pill.activo{background:var(--primario);color:white}
-    .filter-sep{width:1px;height:26px;background:var(--borde);flex-shrink:0;margin:0 8px}
-    .search-wrap{display:flex;align-items:center;gap:8px;border:1.5px solid var(--borde);border-radius:10px;padding:0 14px;margin-left:auto;flex-shrink:0;height:40px;min-width:220px}
-    .search-wrap input{border:none;outline:none;font-size:.88rem;font-family:'Inter',sans-serif;width:100%;background:transparent;color:var(--texto)}
-    .search-wrap input::placeholder{color:var(--suave)}
-    .contador{font-size:.8rem;color:var(--suave);white-space:nowrap;margin-left:12px;flex-shrink:0}
+    .filter-bar{background:white;border-bottom:1px solid var(--borde);padding:0 48px;height:64px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:20}
+    .pill-group{display:flex;align-items:center;background:#f1f1f1;border-radius:40px;padding:4px;gap:2px;overflow-x:auto;flex-shrink:0;max-width:60vw}
+    .pill-group::-webkit-scrollbar{height:0}
+    .cat-pill{padding:7px 20px;border-radius:30px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--cat-text);white-space:nowrap;font-family:'Inter',sans-serif;transition:background .15s,color .15s,box-shadow .15s;flex-shrink:0}
+    .cat-pill:hover{background:rgba(255,255,255,.7)}
+    .cat-pill.activo{background:var(--primario);color:white;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .search-wrap{display:flex;align-items:center;gap:8px;border:1.5px solid var(--borde);border-radius:10px;padding:0 14px;margin-left:auto;flex-shrink:0;height:40px;min-width:200px;transition:border-color .2s}
+    .search-wrap:focus-within{border-color:var(--primario)}
+    .search-wrap input{border:none;outline:none;font-size:.87rem;font-family:'Inter',sans-serif;width:100%;background:transparent;color:var(--texto)}
+    .search-wrap input::placeholder{color:#aab}
+    .contador{font-size:.8rem;color:var(--suave);white-space:nowrap;flex-shrink:0}
 
     /* ── GRID ───────────────────────────────── */
-    .contenedor{padding:32px 56px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+    .contenedor{padding:32px 48px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
 
     /* ── TARJETA ────────────────────────────── */
-    .tarjeta{background:white;border-radius:14px;border:1px solid var(--borde);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}
-    .tarjeta:hover{box-shadow:0 10px 32px rgba(0,0,0,.09);transform:translateY(-2px)}
+    .tarjeta{background:white;border-radius:14px;border:1px solid var(--borde);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .25s,transform .25s}
+    .tarjeta:hover{box-shadow:0 12px 36px rgba(0,0,0,.1);transform:translateY(-3px)}
 
-    .tarjeta-img{width:100%;height:190px;background:linear-gradient(135deg,#f0f4fa,#e8eef8);display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;position:relative;border-bottom:1px solid var(--borde);cursor:zoom-in}
-    .tarjeta-img .img-prod{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
-    .tarjeta-codigo{position:absolute;top:10px;right:10px;font-size:.7rem;color:white;font-family:monospace;background:rgba(0,0,0,.45);padding:3px 8px;border-radius:5px;z-index:2;letter-spacing:.3px}
+    .tarjeta-img{width:100%;height:190px;background:#f7f9fc;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border-bottom:1px solid #eef1f6;cursor:zoom-in}
+    .tarjeta-img .img-prod{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:16px;display:block;z-index:1}
+    .tarjeta-codigo{position:absolute;top:10px;right:10px;font-size:.68rem;color:#444;font-family:monospace;background:rgba(220,225,235,.9);padding:3px 8px;border-radius:5px;z-index:2;letter-spacing:.4px;font-weight:600}
 
-    .tarjeta-body{padding:18px;display:flex;flex-direction:column;flex:1}
-    .tarjeta-cat{display:inline-block;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;align-self:flex-start;background:var(--celeste);color:var(--cat-text);margin-bottom:10px}
-    .tarjeta-nombre{font-size:.9rem;font-weight:700;color:var(--texto);line-height:1.4;text-transform:uppercase;margin-bottom:8px}
-    .tarjeta-desc{font-size:.83rem;color:var(--suave);line-height:1.55;flex:1;margin-bottom:14px}
-    .tarjeta-precio{font-size:.88rem;font-weight:700;color:var(--primario);margin-bottom:12px}
-    .tarjeta-precio.consultar{color:var(--suave);font-weight:500;font-size:.82rem}
+    .tarjeta-body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+    .tarjeta-cat{display:inline-block;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.6px;align-self:flex-start;background:var(--celeste);color:var(--primario);margin-bottom:9px}
+    .tarjeta-nombre{font-size:.88rem;font-weight:700;color:var(--texto);line-height:1.4;text-transform:uppercase;margin-bottom:6px;letter-spacing:.2px}
+    .tarjeta-desc{font-size:.82rem;color:var(--suave);line-height:1.55;flex:1;margin-bottom:14px}
+    .tarjeta-precio{font-size:.87rem;font-weight:700;color:var(--primario);margin-bottom:12px}
+    .tarjeta-precio.consultar{color:var(--suave);font-weight:500;font-size:.8rem}
 
-    .btn-add{width:100%;padding:10px;border:2px solid var(--primario);border-radius:8px;background:white;color:var(--cat-text);font-weight:700;font-size:.82rem;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s,border-color .15s,color .15s}
-    .btn-add:hover{background:var(--celeste)}
-    .btn-add.added{background:#eaeaea;border-color:#eaeaea;color:var(--suave);cursor:default}
+    .btn-add{width:100%;padding:10px 12px;border:2px solid var(--primario);border-radius:8px;background:white;color:var(--cat-text);font-weight:700;font-size:.82rem;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s,box-shadow .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+    .btn-add:hover{background:var(--celeste);box-shadow:0 2px 8px rgba(40,85,118,.15)}
+    .btn-add.added{background:#f0f0f0;border-color:#e0e0e0;color:var(--suave);cursor:default;box-shadow:none}
 
     /* ── MODAL FOTO ─────────────────────────── */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:20px}
@@ -119,13 +122,21 @@
     /* ── RESPONSIVE ─────────────────────────── */
     @media(max-width:768px){
       .topbar,.filter-bar,.contenedor{padding-left:20px;padding-right:20px}
-      .hero{margin:16px 20px;padding:32px 28px;min-height:200px}
-      .hero-title{font-size:1.75rem}
-      .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+      .hero{margin:12px 16px;padding:36px 28px;min-height:220px}
+      .hero-title{font-size:1.9rem}
+      .pill-group{max-width:70vw}
+      .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
     }
     @media(max-width:500px){
-      .grid{grid-template-columns:1fr 1fr}
-      .tarjeta-nombre{font-size:.82rem}
+      .topbar{padding:0 16px}
+      .hero{padding:28px 22px;min-height:180px}
+      .hero-title{font-size:1.5rem}
+      .filter-bar{padding:0 16px;gap:10px}
+      .pill-group{max-width:55vw}
+      .grid{grid-template-columns:1fr 1fr;gap:12px}
+      .tarjeta-img{height:150px}
+      .tarjeta-nombre{font-size:.8rem}
+      .tarjeta-body{padding:12px 14px 14px}
     }
   </style>
 </head>
@@ -147,7 +158,10 @@
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-logo" id="topbarLogo">🏥</div>
-    <span class="topbar-nombre" id="topbarNombre">—</span>
+    <div class="topbar-info">
+      <span class="topbar-nombre" id="topbarNombre">—</span>
+      <span class="topbar-subtitulo" id="topbarSubtitulo"></span>
+    </div>
   </div>
 
   <!-- HERO -->
@@ -163,11 +177,12 @@
 
   <!-- FILTER BAR -->
   <div class="filter-bar" id="filterBar">
-    <button class="cat-pill activo" data-cat="" onclick="seleccionarCat('')">Todas</button>
-    <div class="filter-sep"></div>
-    <div id="pillsWrap" style="display:flex;gap:4px;align-items:center;overflow-x:auto"></div>
+    <div class="pill-group" id="pillGroup">
+      <button class="cat-pill activo" data-cat="" onclick="seleccionarCat('')">Todas</button>
+      <div id="pillsWrap" style="display:contents"></div>
+    </div>
     <div class="search-wrap">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" fill="#6b7a90"/></svg>
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" fill="#aab"/></svg>
       <input type="text" id="buscar" placeholder="Buscar productos..." oninput="filtrar()"/>
     </div>
     <span class="contador" id="contador"></span>
@@ -239,6 +254,7 @@
     // Topbar
     document.title = empresa.nombre + ' — Catálogo'
     document.getElementById('topbarNombre').textContent = empresa.nombre
+    if (empresa.descripcion) document.getElementById('topbarSubtitulo').textContent = empresa.descripcion
     if (empresa.logo_url) {
       document.getElementById('topbarLogo').innerHTML = `<img src="${empresa.logo_url}" alt="${empresa.nombre}" onerror="this.parentElement.textContent='🏥'"/>`
     }
@@ -246,6 +262,9 @@
     // Hero
     document.getElementById('heroNombre').textContent = empresa.nombre
     if (empresa.descripcion) document.getElementById('heroDesc').textContent = empresa.descripcion
+    if (empresa.logo_url) {
+      document.getElementById('heroBg').style.backgroundImage = `url('${empresa.logo_url.replace(/'/g,"\\'")}')`
+    }
 
     // Productos
     const { data: productos } = await db.from('productos').select('*').eq('empresa_id', empresa.id).order('posicion', { ascending: true })
@@ -322,7 +341,9 @@
           <button id="btn-car-${p.id}"
             class="btn-add${enCarrito ? ' added' : ''}"
             onclick="agregarCarrito('${p.id}','${escapedNombre}','${(p.categoria||'').replace(/'/g,"\\'")}')">
-            ${enCarrito ? '✓ Agregado al presupuesto' : '+ Agregar al presupuesto'}
+            ${enCarrito
+              ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg> Agregado'
+              : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Agregar al presupuesto'}
           </button>
         </div>`
       grid.appendChild(card)
@@ -359,7 +380,7 @@
     const btn = document.getElementById('btn-car-' + id)
     if (btn) {
       btn.classList.add('added')
-      btn.textContent = '✓ Agregado al presupuesto'
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg> Agregado'
     }
   }
 
@@ -369,7 +390,7 @@
     renderCarrito()
     // Restaurar botón en la tarjeta
     const btn = document.getElementById('btn-car-' + id)
-    if (btn) { btn.classList.remove('added'); btn.textContent = '+ Agregar al presupuesto' }
+    if (btn) { btn.classList.remove('added'); btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Agregar al presupuesto' }
   }
 
   function cambiarCantidad(id, delta) {
