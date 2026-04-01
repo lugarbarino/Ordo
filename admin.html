@@ -129,6 +129,7 @@
     <button class="nav-item activo" onclick="showPanel('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></button>
     <button class="nav-item" onclick="showPanel('productos',this)"><span class="icon">📦</span><span>Productos</span></button>
     <button class="nav-item" onclick="showPanel('pdf',this)"><span class="icon">🤖</span><span>Cargar PDF</span></button>
+    <button class="nav-item" onclick="showPanel('pedidos',this)"><span class="icon">📋</span><span>Pedidos</span></button>
     <button class="nav-item" onclick="showPanel('config',this)"><span class="icon">⚙️</span><span>Mi empresa</span></button>
   </nav>
   <div class="sidebar-bottom">
@@ -152,6 +153,7 @@
         <div class="stat"><div class="stat-num" id="statProductos">—</div><div class="stat-label">Productos</div></div>
         <div class="stat"><div class="stat-num" id="statCategorias">—</div><div class="stat-label">Categorías</div></div>
         <div class="stat"><div class="stat-num" id="statDisponibles">—</div><div class="stat-label">Disponibles</div></div>
+        <div class="stat" style="cursor:pointer" onclick="showPanel('pedidos',document.querySelectorAll('.nav-item')[3])"><div class="stat-num" id="statPedidos">—</div><div class="stat-label">Pedidos nuevos</div></div>
       </div>
       <div class="link-box" id="linkBox" style="display:none">
         <div>
@@ -244,8 +246,28 @@
             <input type="color" id="cfgColor" value="#1a4d8f" style="height:44px;padding:4px"/>
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>📱 WhatsApp para pedidos</label>
+            <input type="text" id="cfgWhatsapp" placeholder="Ej: 5491112345678"/>
+            <div class="form-hint">Código de país + número, sin espacios ni +</div>
+          </div>
+          <div class="form-group">
+            <label>📧 Email para pedidos</label>
+            <input type="email" id="cfgEmail" placeholder="contacto@empresa.com"/>
+          </div>
+        </div>
         <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar cambios</button>
       </div>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div class="panel" id="panelPedidos">
+      <div class="tabla-header">
+        <h2>Pedidos de presupuesto</h2>
+      </div>
+      <div class="loading" id="loadingPedidos"><div class="spinner"></div><div>Cargando...</div></div>
+      <div id="pedidosWrap"></div>
     </div>
 
   </div>
@@ -340,8 +362,10 @@
       document.getElementById('cfgNombre').value = EMPRESA.nombre || ''
       document.getElementById('cfgSlug').value   = EMPRESA.slug || ''
       document.getElementById('cfgDesc').value   = EMPRESA.descripcion || ''
-      document.getElementById('cfgLogo').value   = EMPRESA.logo_url || ''
-      document.getElementById('cfgColor').value  = EMPRESA.color || '#1a4d8f'
+      document.getElementById('cfgLogo').value    = EMPRESA.logo_url || ''
+      document.getElementById('cfgColor').value   = EMPRESA.color || '#1a4d8f'
+      document.getElementById('cfgWhatsapp').value = EMPRESA.whatsapp || ''
+      document.getElementById('cfgEmail').value    = EMPRESA.email_contacto || ''
       if (EMPRESA.logo_url) {
         document.getElementById('logoPreview').innerHTML = `<img src="${EMPRESA.logo_url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
       }
@@ -358,11 +382,15 @@
     renderTabla(PRODUCTOS)
   }
 
-  function actualizarDashboard() {
+  async function actualizarDashboard() {
     document.getElementById('statProductos').textContent = PRODUCTOS.length
     const cats = new Set(PRODUCTOS.map(p => p.categoria).filter(Boolean))
     document.getElementById('statCategorias').textContent = cats.size
     document.getElementById('statDisponibles').textContent = PRODUCTOS.filter(p => p.stock === 'Disponible').length
+    if (EMPRESA) {
+      const { count } = await db.from('pedidos').select('*', { count: 'exact', head: true }).eq('empresa_id', EMPRESA.id).eq('estado', 'Pendiente')
+      document.getElementById('statPedidos').textContent = count || 0
+    }
 
     if (EMPRESA?.slug) {
       const url = `${location.origin}/catalogo.html?slug=${EMPRESA.slug}`
@@ -518,12 +546,14 @@
     if (!nombre || !slug) { notif('Nombre y slug son obligatorios', 'err'); return }
 
     const datos = {
-      user_id:     USER.id,
+      user_id:       USER.id,
       nombre,
       slug,
-      descripcion: document.getElementById('cfgDesc').value.trim(),
-      logo_url:    document.getElementById('cfgLogo').value.trim(),
-      color:       document.getElementById('cfgColor').value,
+      descripcion:   document.getElementById('cfgDesc').value.trim(),
+      logo_url:      document.getElementById('cfgLogo').value.trim(),
+      color:         document.getElementById('cfgColor').value,
+      whatsapp:      document.getElementById('cfgWhatsapp').value.trim(),
+      email_contacto: document.getElementById('cfgEmail').value.trim(),
     }
 
     let error
@@ -543,9 +573,50 @@
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('activo'))
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('activo'))
     document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1)).classList.add('activo')
-    btn.classList.add('activo')
-    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', config: 'Mi empresa' }
+    if (btn) btn.classList.add('activo')
+    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
+    if (panel === 'pedidos') cargarPedidos()
+  }
+
+  async function cargarPedidos() {
+    if (!EMPRESA) return
+    document.getElementById('loadingPedidos').style.display = 'block'
+    document.getElementById('pedidosWrap').innerHTML = ''
+    const { data: pedidos } = await db.from('pedidos').select('*').eq('empresa_id', EMPRESA.id).order('created_at', { ascending: false })
+    document.getElementById('loadingPedidos').style.display = 'none'
+
+    if (!pedidos || !pedidos.length) {
+      document.getElementById('pedidosWrap').innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Todavía no recibiste pedidos.</p></div>'
+      return
+    }
+
+    const estados = ['Pendiente','Visto','Respondido']
+    const colores = { Pendiente:'badge-cons', Visto:'badge-disp', Respondido:'badge-sin' }
+
+    let html = pedidos.map(p => {
+      const prods = (p.productos || []).map(x => `<li>${x.cantidad}x <strong>${x.nombre}</strong></li>`).join('')
+      const fecha = new Date(p.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      const opts = estados.map(e => `<option value="${e}" ${p.estado===e?'selected':''}>${e}</option>`).join('')
+      return `<div style="background:white;border-radius:12px;padding:20px 24px;border:1.5px solid var(--borde);margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+          <div>
+            <div style="font-weight:700;font-size:1rem">${p.nombre_cliente}</div>
+            <div style="font-size:.83rem;color:var(--suave)">${p.email_cliente||''} ${p.telefono_cliente ? '· '+p.telefono_cliente : ''} ${p.empresa_cliente ? '· '+p.empresa_cliente : ''}</div>
+            <div style="font-size:.78rem;color:var(--suave);margin-top:2px">${fecha}</div>
+          </div>
+          <select onchange="cambiarEstadoPedido('${p.id}',this.value)" style="padding:6px 10px;border:1.5px solid var(--borde);border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;outline:none">${opts}</select>
+        </div>
+        <ul style="font-size:.88rem;padding-left:18px;margin-bottom:${p.mensaje?'10px':'0'}">${prods}</ul>
+        ${p.mensaje ? `<div style="font-size:.85rem;color:var(--suave);font-style:italic;border-top:1px solid var(--borde);padding-top:8px;margin-top:8px">"${p.mensaje}"</div>` : ''}
+      </div>`
+    }).join('')
+    document.getElementById('pedidosWrap').innerHTML = html
+  }
+
+  async function cambiarEstadoPedido(id, estado) {
+    await db.from('pedidos').update({ estado }).eq('id', id)
+    actualizarDashboard()
   }
 
   function cerrarModal(id) { document.getElementById(id).classList.remove('activo') }

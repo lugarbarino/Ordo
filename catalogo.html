@@ -58,6 +58,35 @@
     .modal-nombre{font-size:1rem;font-weight:700;text-align:center}
     .modal-cerrar{position:absolute;top:10px;right:14px;font-size:1.3rem;cursor:pointer;color:var(--suave);background:none;border:none}
 
+    /* CARRITO FLOTANTE */
+    .carrito-fab{position:fixed;bottom:28px;right:28px;background:var(--primario);color:white;border:none;border-radius:50px;padding:14px 22px;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:50;display:none;align-items:center;gap:10px;transition:transform .15s}
+    .carrito-fab:hover{transform:scale(1.04)}
+    .carrito-badge{background:white;color:var(--primario);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
+
+    /* MODAL CARRITO */
+    .modal-car{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:flex-end;justify-content:center;padding:0}
+    .modal-car.activo{display:flex}
+    .modal-car-box{background:white;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+    .modal-car-header{padding:20px 24px 16px;border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between}
+    .modal-car-header h3{font-size:1.1rem;font-weight:800}
+    .modal-car-body{flex:1;overflow-y:auto;padding:16px 24px}
+    .modal-car-footer{padding:16px 24px;border-top:1px solid var(--borde);display:flex;flex-direction:column;gap:10px}
+    .car-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--borde)}
+    .car-item:last-child{border-bottom:none}
+    .car-item-nombre{flex:1;font-size:.9rem;font-weight:600}
+    .car-item-cat{font-size:.75rem;color:var(--suave)}
+    .car-qty{display:flex;align-items:center;gap:8px}
+    .car-qty button{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--borde);background:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primario)}
+    .car-qty button:hover{background:var(--celeste)}
+    .car-qty span{font-weight:700;min-width:20px;text-align:center}
+    .car-del{background:none;border:none;cursor:pointer;color:var(--suave);font-size:1rem;padding:4px}
+    .car-del:hover{color:#c0392b}
+
+    /* FORM PEDIDO */
+    .form-ped label{display:block;font-size:.83rem;font-weight:600;margin-bottom:4px;margin-top:12px}
+    .form-ped input,.form-ped textarea{width:100%;padding:9px 13px;border:1.5px solid var(--borde);border-radius:8px;font-size:.9rem;outline:none;font-family:inherit}
+    .form-ped input:focus,.form-ped textarea:focus{border-color:var(--primario)}
+
     /* ESTADOS */
     .estado{text-align:center;padding:80px 20px;color:var(--suave)}
     .estado .icon{font-size:4rem;margin-bottom:16px}
@@ -126,6 +155,23 @@
   </div>
 </div>
 
+<!-- CARRITO FAB -->
+<button class="carrito-fab" id="carritoFab" onclick="abrirCarrito()">
+  🛒 Ver pedido <span class="carrito-badge" id="carritoBadge">0</span>
+</button>
+
+<!-- MODAL CARRITO -->
+<div class="modal-car" id="modalCarrito" onclick="if(event.target===this)cerrarCarrito()">
+  <div class="modal-car-box">
+    <div class="modal-car-header">
+      <h3>📋 Tu pedido de presupuesto</h3>
+      <button onclick="cerrarCarrito()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#6b7a90">✕</button>
+    </div>
+    <div class="modal-car-body" id="carritoBody"></div>
+    <div class="modal-car-footer" id="carritoFooter"></div>
+  </div>
+</div>
+
 <!-- MODAL FOTO -->
 <div class="modal-overlay" id="modalFoto" onclick="cerrarModal(event)">
   <div class="modal-img-wrap">
@@ -143,6 +189,8 @@
 
   let TODOS = []
   let COLOR = '#1a4d8f'
+  let EMPRESA_DATA = null
+  let CARRITO = [] // [{id, nombre, categoria, cantidad}]
 
   async function init() {
     const params = new URLSearchParams(location.search)
@@ -154,6 +202,7 @@
     const { data: empresa } = await db.from('empresas').select('*').eq('slug', slug).single()
     if (!empresa) { mostrarError(); return }
 
+    EMPRESA_DATA = empresa
     COLOR = empresa.color || '#1a4d8f'
 
     // Aplicar color de la empresa
@@ -244,6 +293,7 @@
             <span class="precio ${precioTxt === 'Consultar' ? 'consultar' : ''}">${precioTxt}</span>
             <span class="stock ${stockCls}">${p.stock || 'Consultar'}</span>
           </div>
+          <button id="btn-car-${p.id}" onclick="agregarCarrito('${p.id}','${(p.nombre||'').replace(/'/g,"\\'")}','${(p.categoria||'').replace(/'/g,"\\'")}' )" style="margin-top:10px;width:100%;padding:9px;border:2px solid var(--primario);border-radius:8px;background:white;color:var(--primario);font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s">+ Agregar al pedido</button>
         </div>`
       grid.appendChild(card)
     })
@@ -265,6 +315,123 @@
   function mostrarError() {
     document.getElementById('spinnerWrap').style.display = 'none'
     document.getElementById('estadoError').style.display = 'block'
+  }
+
+  // ─── CARRITO ───────────────────────────────────────────
+  function agregarCarrito(id, nombre, categoria) {
+    const existe = CARRITO.find(x => x.id === id)
+    if (existe) {
+      existe.cantidad++
+    } else {
+      CARRITO.push({ id, nombre, categoria, cantidad: 1 })
+    }
+    actualizarFab()
+    const btn = document.getElementById('btn-car-' + id)
+    if (btn) { btn.textContent = '✅ Agregado'; btn.style.background = 'var(--celeste)'; setTimeout(() => { btn.textContent = '+ Agregar al pedido'; btn.style.background = 'white' }, 1000) }
+  }
+
+  function quitarCarrito(id) {
+    CARRITO = CARRITO.filter(x => x.id !== id)
+    actualizarFab()
+    renderCarrito()
+  }
+
+  function cambiarCantidad(id, delta) {
+    const item = CARRITO.find(x => x.id === id)
+    if (!item) return
+    item.cantidad = Math.max(1, item.cantidad + delta)
+    renderCarrito()
+  }
+
+  function actualizarFab() {
+    const total = CARRITO.reduce((s, x) => s + x.cantidad, 0)
+    const fab = document.getElementById('carritoFab')
+    fab.style.display = total > 0 ? 'flex' : 'none'
+    document.getElementById('carritoBadge').textContent = total
+  }
+
+  function abrirCarrito() {
+    renderCarrito()
+    document.getElementById('modalCarrito').classList.add('activo')
+  }
+
+  function cerrarCarrito() {
+    document.getElementById('modalCarrito').classList.remove('activo')
+  }
+
+  function renderCarrito() {
+    const body = document.getElementById('carritoBody')
+    const footer = document.getElementById('carritoFooter')
+    if (!CARRITO.length) {
+      body.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#6b7a90">Tu pedido está vacío.<br>Agregá productos desde el catálogo.</div>'
+      footer.innerHTML = ''
+      return
+    }
+    body.innerHTML = CARRITO.map(x => `
+      <div class="car-item">
+        <div style="flex:1">
+          <div class="car-item-nombre">${x.nombre}</div>
+          ${x.categoria ? `<div class="car-item-cat">${x.categoria}</div>` : ''}
+        </div>
+        <div class="car-qty">
+          <button onclick="cambiarCantidad('${x.id}',-1)">−</button>
+          <span>${x.cantidad}</span>
+          <button onclick="cambiarCantidad('${x.id}',1)">+</button>
+        </div>
+        <button class="car-del" onclick="quitarCarrito('${x.id}')">🗑️</button>
+      </div>`).join('')
+
+    footer.innerHTML = `
+      <div class="form-ped" id="formPedido">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><label>Nombre *</label><input id="pedNombre" placeholder="Tu nombre"/></div>
+          <div><label>Teléfono *</label><input id="pedTel" placeholder="Tu teléfono"/></div>
+        </div>
+        <label>Email</label><input id="pedEmail" placeholder="tu@email.com" type="email"/>
+        <label>Empresa / Institución</label><input id="pedEmpresa" placeholder="Opcional"/>
+        <label>Mensaje adicional</label><input id="pedMensaje" placeholder="Opcional"/>
+      </div>
+      <button onclick="enviarPedido()" style="width:100%;padding:13px;background:var(--primario);color:white;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:4px">📩 Enviar pedido de presupuesto</button>`
+  }
+
+  async function enviarPedido() {
+    const nombre = document.getElementById('pedNombre').value.trim()
+    const tel    = document.getElementById('pedTel').value.trim()
+    if (!nombre || !tel) { alert('Nombre y teléfono son obligatorios'); return }
+
+    const pedido = {
+      empresa_id:      EMPRESA_DATA.id,
+      nombre_cliente:  nombre,
+      telefono_cliente: tel,
+      email_cliente:   document.getElementById('pedEmail').value.trim(),
+      empresa_cliente: document.getElementById('pedEmpresa').value.trim(),
+      mensaje:         document.getElementById('pedMensaje').value.trim(),
+      productos:       CARRITO.map(x => ({ id: x.id, nombre: x.nombre, cantidad: x.cantidad })),
+    }
+
+    const { error } = await db.from('pedidos').insert(pedido)
+    if (error) { alert('Error al enviar el pedido. Intentá de nuevo.'); return }
+
+    // Armar texto del pedido
+    const lista = CARRITO.map(x => `• ${x.cantidad}x ${x.nombre}`).join('\n')
+    const texto = `Hola! Soy ${nombre} (${tel}). Solicito presupuesto de:\n\n${lista}${pedido.mensaje ? '\n\nMensaje: ' + pedido.mensaje : ''}`
+
+    // WhatsApp
+    if (EMPRESA_DATA.whatsapp) {
+      window.open(`https://wa.me/${EMPRESA_DATA.whatsapp}?text=${encodeURIComponent(texto)}`, '_blank')
+    }
+
+    // Email
+    if (EMPRESA_DATA.email_contacto) {
+      const asunto = `Solicitud de presupuesto de ${nombre}`
+      window.open(`mailto:${EMPRESA_DATA.email_contacto}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`, '_blank')
+    }
+
+    // Limpiar
+    CARRITO = []
+    actualizarFab()
+    cerrarCarrito()
+    alert('✅ ¡Pedido enviado! Nos pondremos en contacto pronto.')
   }
 
   init()
