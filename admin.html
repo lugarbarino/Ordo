@@ -578,6 +578,8 @@
         <td>${p.precio || 'Consultar'}</td>
         <td><span class="badge ${p.stock === 'Disponible' ? 'badge-disp' : p.stock === 'Sin stock' ? 'badge-sin' : 'badge-cons'}">${p.stock || 'Consultar'}</span></td>
         <td><div class="td-actions">
+          <button class="btn btn-secondary btn-sm" onclick="moverProducto('${p.id}',-1)" title="Subir"><span class="material-icons" style="font-size:16px">arrow_upward</span></button>
+          <button class="btn btn-secondary btn-sm" onclick="moverProducto('${p.id}',1)" title="Bajar"><span class="material-icons" style="font-size:16px">arrow_downward</span></button>
           <button class="btn btn-outline btn-sm" onclick='editarProducto(${JSON.stringify(p).replace(/'/g,"&#39;")})'><span class="material-icons" style="font-size:16px">edit</span></button>
           <button class="btn btn-red btn-sm" onclick="eliminarProducto('${p.id}')"><span class="material-icons" style="font-size:16px">delete</span></button>
         </div></td>
@@ -670,6 +672,26 @@
       await cargarProductos()
     }
     actualizarDashboard()
+  }
+
+  async function moverProducto(id, dir) {
+    const idx = PRODUCTOS.findIndex(p => String(p.id) === String(id))
+    if (idx === -1) return
+    const nuevoIdx = idx + dir
+    if (nuevoIdx < 0 || nuevoIdx >= PRODUCTOS.length) return
+    const a = PRODUCTOS[idx]
+    const b = PRODUCTOS[nuevoIdx]
+    const posA = a.posicion
+    const posB = b.posicion
+    // Swap posicion en DB
+    await Promise.all([
+      db.from('productos').update({ posicion: posB }).eq('id', a.id),
+      db.from('productos').update({ posicion: posA }).eq('id', b.id)
+    ])
+    // Swap en memoria
+    PRODUCTOS[idx]      = { ...b, posicion: posA }
+    PRODUCTOS[nuevoIdx] = { ...a, posicion: posB }
+    renderTabla(PRODUCTOS)
   }
 
   async function eliminarProducto(id) {

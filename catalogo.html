@@ -35,10 +35,9 @@
     /* TARJETA */
     .tarjeta{background:white;border-radius:14px;border:1.5px solid var(--borde);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s}
     .tarjeta:hover{box-shadow:0 8px 24px rgba(0,0,0,.1);transform:translateY(-3px)}
-    .tarjeta-img{width:100%;height:190px;display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;position:relative;border-bottom:1px solid var(--borde);cursor:zoom-in}
-    .tarjeta-img:not(.tarjeta-img-foto){background:linear-gradient(135deg,#f0f4fa,#e8eef8)}
-    .tarjeta-img-foto{background-size:cover;background-position:center;background-repeat:no-repeat}
-    .tarjeta-codigo{position:absolute;top:10px;right:10px;font-size:.72rem;color:white;font-family:monospace;background:rgba(0,0,0,.45);padding:3px 8px;border-radius:5px}
+    .tarjeta-img{width:100%;height:190px;display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;position:relative;border-bottom:1px solid var(--borde);cursor:zoom-in;background:linear-gradient(135deg,#f0f4fa,#e8eef8)}
+    .tarjeta-img .img-prod{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
+    .tarjeta-codigo{position:absolute;top:10px;right:10px;font-size:.72rem;color:white;font-family:monospace;background:rgba(0,0,0,.45);padding:3px 8px;border-radius:5px;z-index:2}
     .tarjeta-body{padding:16px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
     .tarjeta-cat{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;align-self:flex-start;background:var(--celeste);color:var(--primario)}
     .tarjeta-nombre{font-size:.97rem;font-weight:700;line-height:1.35}
@@ -269,9 +268,13 @@
       const stockCls = p.stock === 'Disponible' ? 'stock-d' : p.stock === 'Sin stock' ? 'stock-s' : 'stock-c'
       const icono = getIcono(p.categoria)
 
+      const escapedUrl = (p.imagen_url || '').replace(/"/g, '&quot;')
+      const escapedNombre = (p.nombre || '').replace(/"/g, '&quot;').replace(/'/g, "\\'")
+      const escapedUrlJs = (p.imagen_url || '').replace(/'/g, "\\'")
       let imgHTML = ''
       if (p.imagen_url) {
-        imgHTML = `<div class="tarjeta-img tarjeta-img-foto" style="background-image:url('${p.imagen_url.replace(/'/g,"\\'")}') " onclick="abrirFoto('${p.imagen_url.replace(/'/g,"\\'")}','${(p.nombre||'').replace(/'/g,"\\'")}')">
+        imgHTML = `<div class="tarjeta-img" onclick="abrirFoto('${escapedUrlJs}','${escapedNombre}')">
+          <img class="img-prod" src="${escapedUrl}" alt="${escapedNombre}" onerror="this.style.display='none'">
           ${p.codigo ? `<span class="tarjeta-codigo">${p.codigo}</span>` : ''}
         </div>`
       } else {
