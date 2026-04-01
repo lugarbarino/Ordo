@@ -65,7 +65,7 @@
     .modal-cerrar{position:absolute;top:10px;right:14px;font-size:1.3rem;cursor:pointer;color:var(--sub);background:none;border:none}
 
     /* FAB */
-    .carrito-fab{position:fixed;bottom:28px;right:28px;background:var(--p);color:white;border:none;border-radius:50px;padding:14px 22px;font-size:.92rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:50;display:none;align-items:center;gap:10px;font-family:'Inter',sans-serif;transition:transform .15s}
+    .carrito-fab{position:fixed;bottom:28px;right:28px;background:var(--p);color:white;border:none;border-radius:13px;padding:0 22px;height:60px;font-size:.92rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:50;display:none;align-items:center;gap:10px;font-family:'Inter',sans-serif;transition:transform .15s}
     .carrito-fab:hover{transform:scale(1.04)}
     .carrito-badge{background:white;color:var(--p);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800}
 
@@ -166,7 +166,7 @@
 
 <!-- FAB -->
 <button class="carrito-fab" id="carritoFab" onclick="abrirCarrito()">
-  🛒 Ver presupuesto <span class="carrito-badge" id="carritoBadge">0</span>
+  <span class="material-icons" style="opacity:.3;font-size:20px">receipt_long</span> Ver presupuesto <span class="carrito-badge" id="carritoBadge">0</span>
 </button>
 
 <!-- MODAL CARRITO -->
