@@ -376,7 +376,7 @@
   async function cargarProductos() {
     if (!EMPRESA) { renderTabla([]); return }
     document.getElementById('loadingProd').style.display = 'block'
-    const { data } = await db.from('productos').select('*').eq('empresa_id', EMPRESA.id).order('created_at', { ascending: true })
+    const { data } = await db.from('productos').select('*').eq('empresa_id', EMPRESA.id).order('posicion', { ascending: true })
     PRODUCTOS = data || []
     document.getElementById('loadingProd').style.display = 'none'
     renderTabla(PRODUCTOS)
