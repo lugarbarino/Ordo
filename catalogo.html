@@ -15,13 +15,10 @@
     }
     body{font-family:'Inter',sans-serif;color:var(--texto);background:var(--bg);min-height:100vh}
 
-    /* ── TOPBAR ─────────────────────────────── */
-    .topbar{background:white;border-bottom:1px solid var(--borde);padding:0 56px;height:72px;display:flex;align-items:center;justify-content:center;gap:14px}
-    .topbar-logo{width:46px;height:46px;border-radius:10px;background:var(--primario);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-    .topbar-logo img{width:100%;height:100%;object-fit:contain;border-radius:8px}
-    .topbar-info{display:flex;flex-direction:column;line-height:1.2}
-    .topbar-nombre{font-size:1rem;font-weight:800;color:#111;letter-spacing:.8px;text-transform:uppercase}
-    .topbar-subtitulo{font-size:.68rem;font-weight:500;color:var(--suave);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+    /* ── LOGO SOBRE HERO ────────────────────── */
+    .logo-wrap{display:flex;justify-content:center;align-items:center;padding:28px 0 0}
+    .logo-img{width:72px;height:72px;border-radius:14px;background:white;display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+    .logo-img img{width:100%;height:100%;object-fit:contain;border-radius:12px}
 
     /* ── HERO ───────────────────────────────── */
     .hero{margin:20px 48px;border-radius:16px;overflow:hidden;position:relative;min-height:300px;display:flex;align-items:flex-end;padding:52px 64px}
@@ -121,7 +118,9 @@
 
     /* ── RESPONSIVE ─────────────────────────── */
     @media(max-width:768px){
-      .topbar,.filter-bar,.contenedor{padding-left:20px;padding-right:20px}
+      .filter-bar,.contenedor{padding-left:20px;padding-right:20px}
+      .logo-wrap{padding:20px 0 0}
+      .logo-img{width:60px;height:60px}
       .hero{margin:12px 16px;padding:36px 28px;min-height:220px}
       .hero-title{font-size:1.9rem}
       .pill-group{max-width:70vw}
@@ -155,13 +154,9 @@
 <!-- CONTENIDO PRINCIPAL -->
 <div id="contenidoPrincipal" style="display:none">
 
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-logo" id="topbarLogo">🏥</div>
-    <div class="topbar-info">
-      <span class="topbar-nombre" id="topbarNombre">—</span>
-      <span class="topbar-subtitulo" id="topbarSubtitulo"></span>
-    </div>
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <div class="logo-img" id="logoEmpresa">🏥</div>
   </div>
 
   <!-- HERO -->
@@ -251,12 +246,10 @@
     document.documentElement.style.setProperty('--primario', color)
     document.getElementById('heroBg').style.background = color
 
-    // Topbar
+    // Logo + título
     document.title = empresa.nombre + ' — Catálogo'
-    document.getElementById('topbarNombre').textContent = empresa.nombre
-    if (empresa.descripcion) document.getElementById('topbarSubtitulo').textContent = empresa.descripcion
     if (empresa.logo_url) {
-      document.getElementById('topbarLogo').innerHTML = `<img src="${empresa.logo_url}" alt="${empresa.nombre}" onerror="this.parentElement.textContent='🏥'"/>`
+      document.getElementById('logoEmpresa').innerHTML = `<img src="${empresa.logo_url}" alt="${empresa.nombre}" onerror="this.parentElement.textContent='🏥'"/>`
     }
 
     // Hero
