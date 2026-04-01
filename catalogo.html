@@ -211,8 +211,6 @@
 
     // Header
     document.title = empresa.nombre + ' — Catálogo'
-    document.getElementById('headerNombre').textContent = empresa.nombre
-    if (empresa.descripcion) document.getElementById('headerSub').textContent = empresa.descripcion
     if (empresa.logo_url) {
       document.getElementById('headerLogo').innerHTML =
         `<img src="${empresa.logo_url}" alt="${empresa.nombre}" onerror="this.parentElement.textContent='🏥'"/>`
