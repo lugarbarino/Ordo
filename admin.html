@@ -228,8 +228,16 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>URL del logo</label>
-            <input type="text" id="cfgLogo" placeholder="https://..."/>
+            <label>Logo de la empresa</label>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div id="logoPreview" style="width:64px;height:64px;border-radius:10px;background:var(--gris);border:1.5px solid var(--borde);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;overflow:hidden">🏥</div>
+              <div>
+                <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputLogo').click()" id="btnSubirLogo">📁 Elegir logo</button>
+                <div style="font-size:.75rem;color:var(--suave);margin-top:4px">PNG o JPG, máx 2MB</div>
+              </div>
+            </div>
+            <input type="hidden" id="cfgLogo"/>
           </div>
           <div class="form-group">
             <label>Color principal</label>
@@ -334,6 +342,9 @@
       document.getElementById('cfgDesc').value   = EMPRESA.descripcion || ''
       document.getElementById('cfgLogo').value   = EMPRESA.logo_url || ''
       document.getElementById('cfgColor').value  = EMPRESA.color || '#1a4d8f'
+      if (EMPRESA.logo_url) {
+        document.getElementById('logoPreview').innerHTML = `<img src="${EMPRESA.logo_url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
+      }
       actualizarSlugPreview()
     }
   }
@@ -684,6 +695,35 @@
     document.getElementById('prodImagen').value = url
     document.getElementById('fotoPreview').innerHTML = `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:10px"/>`
     notif('✅ Foto subida')
+  }
+
+  async function subirLogo(input) {
+    const file = input.files[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { notif('El logo no puede superar 2MB', 'err'); return }
+
+    const btn = document.getElementById('btnSubirLogo')
+    btn.textContent = '⏳ Subiendo...'
+    btn.disabled = true
+
+    const ext = file.name.split('.').pop()
+    const nombre = `logo_${Date.now()}.${ext}`
+
+    const { data, error } = await db.storage
+      .from('imagenes')
+      .upload(nombre, file, { contentType: file.type, upsert: true })
+
+    btn.textContent = '📁 Elegir logo'
+    btn.disabled = false
+
+    if (error) { notif('Error al subir el logo: ' + error.message, 'err'); return }
+
+    const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
+    const url = urlData.publicUrl
+
+    document.getElementById('cfgLogo').value = url
+    document.getElementById('logoPreview').innerHTML = `<img src="${url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
+    notif('✅ Logo subido')
   }
 
   function notif(msg, tipo = 'ok') {
