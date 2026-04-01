@@ -341,7 +341,7 @@
   async function cargarProductos() {
     if (!EMPRESA) { renderTabla([]); return }
     document.getElementById('loadingProd').style.display = 'block'
-    const { data } = await db.from('productos').select('*').eq('empresa_id', EMPRESA.id).order('id', { ascending: true })
+    const { data } = await db.from('productos').select('*').eq('empresa_id', EMPRESA.id).order('created_at', { ascending: false })
     PRODUCTOS = data || []
     document.getElementById('loadingProd').style.display = 'none'
     renderTabla(PRODUCTOS)
@@ -457,16 +457,24 @@
 
     let error
     if (id) {
+      // EDITAR: actualizar en memoria sin recargar (el orden no cambia)
       ({ error } = await db.from('productos').update(datos).eq('id', id))
+      btn.disabled = false; btn.textContent = 'Guardar cambios'
+      if (error) { notif('Error al guardar: ' + error.message, 'err'); return }
+      const idx = PRODUCTOS.findIndex(p => String(p.id) === String(id))
+      if (idx !== -1) PRODUCTOS[idx] = { ...PRODUCTOS[idx], ...datos }
+      cerrarModal('modalProducto')
+      notif('✅ Producto guardado')
+      renderTabla(PRODUCTOS)
     } else {
-      ({ error } = await db.from('productos').insert(datos))
+      // NUEVO: insertar y recargar para que aparezca en la lista
+      const { data: nuevo, error: err2 } = await db.from('productos').insert(datos).select().single()
+      btn.disabled = false; btn.textContent = 'Guardar'
+      if (err2) { notif('Error al guardar: ' + err2.message, 'err'); return }
+      cerrarModal('modalProducto')
+      notif('✅ Producto guardado')
+      await cargarProductos()
     }
-
-    btn.disabled = false; btn.textContent = id ? 'Guardar cambios' : 'Guardar'
-    if (error) { notif('Error al guardar: ' + error.message, 'err'); return }
-    cerrarModal('modalProducto')
-    notif('✅ Producto guardado')
-    await cargarProductos()
     actualizarDashboard()
   }
 
