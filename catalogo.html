@@ -156,7 +156,7 @@
   <!-- GRID -->
   <div class="contenedor">
     <div id="estadoVacio" class="estado" style="display:none">
-      <div class="icon">📦</div><h2>No hay productos todavía</h2><p>Volvé a consultar pronto.</p>
+      <div class="icon"><span class="material-icons" style="font-size:48px;color:#d8dee6">inventory_2</span></div><h2>No hay productos todavía</h2><p>Volvé a consultar pronto.</p>
     </div>
     <div class="grid" id="grid"></div>
   </div>
@@ -173,8 +173,8 @@
 <div class="modal-car" id="modalCarrito" onclick="if(event.target===this)cerrarCarrito()">
   <div class="modal-car-box">
     <div class="modal-car-header">
-      <h3>📋 Tu pedido de presupuesto</h3>
-      <button onclick="cerrarCarrito()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999">✕</button>
+      <h3 style="display:flex;align-items:center;gap:8px"><span class="material-icons" style="font-size:20px;color:var(--p)">receipt_long</span> Tu pedido de presupuesto</h3>
+      <button onclick="cerrarCarrito()" style="background:none;border:none;cursor:pointer;color:#999;display:flex;align-items:center"><span class="material-icons">close</span></button>
     </div>
     <div class="modal-car-body" id="carritoBody"></div>
     <div class="modal-car-footer" id="carritoFooter"></div>
@@ -184,7 +184,7 @@
 <!-- MODAL FOTO -->
 <div class="modal-overlay" id="modalFoto" onclick="if(event.target===this)document.getElementById('modalFoto').classList.remove('activo')">
   <div class="modal-img-wrap">
-    <button class="modal-cerrar" onclick="document.getElementById('modalFoto').classList.remove('activo')">✕</button>
+    <button class="modal-cerrar" onclick="document.getElementById('modalFoto').classList.remove('activo')"><span class="material-icons">close</span></button>
     <img id="modalFotoImg" src="" alt=""/>
     <div class="modal-nombre" id="modalFotoNombre"></div>
   </div>
@@ -381,7 +381,7 @@
           <span>${x.cantidad}</span>
           <button onclick="cambiarCantidad('${x.id}',1)">+</button>
         </div>
-        <button class="car-del" onclick="quitarCarrito('${x.id}')">🗑️</button>
+        <button class="car-del" onclick="quitarCarrito('${x.id}')"><span class="material-icons" style="font-size:18px">delete_outline</span></button>
       </div>`).join('')
 
     footer.innerHTML = `
@@ -395,7 +395,7 @@
         <label>Mensaje</label><input id="pedMensaje" placeholder="Opcional"/>
       </div>
       <button onclick="enviarPedido()" style="width:100%;padding:13px;background:var(--p);color:white;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:4px;font-family:'Inter',sans-serif">
-        📩 Enviar pedido de presupuesto
+        <span class="material-icons" style="font-size:18px;opacity:.7;vertical-align:middle">send</span> Enviar pedido de presupuesto
       </button>`
   }
 
@@ -423,7 +423,7 @@
       window.open(`mailto:${EMPRESA_DATA.email_contacto}?subject=${encodeURIComponent('Solicitud de presupuesto de '+nombre)}&body=${encodeURIComponent(texto)}`, '_blank')
 
     CARRITO = []; actualizarFab(); cerrarCarrito()
-    alert('✅ ¡Pedido enviado! Nos pondremos en contacto pronto.')
+    alert('Pedido enviado. Nos pondremos en contacto pronto.')
   }
 
   init()
