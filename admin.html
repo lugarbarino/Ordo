@@ -128,14 +128,17 @@
     .empty-state .icon{font-size:3rem;margin-bottom:12px}
 
     /* FORM CONFIG */
-    .config-form{background:white;border-radius:14px;padding:28px;border:1px solid #e3e3e3;max-width:600px}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .form-group{margin-bottom:18px}
-    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px}
-    .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit}
-    .form-group input:focus,.form-group textarea:focus{border-color:#3872fa}
-    .form-group textarea{resize:vertical;min-height:80px}
+    .config-form{background:white;border-radius:14px;padding:32px;border:1px solid #e3e3e3;max-width:520px}
+    .form-group{margin-bottom:22px}
+    .form-group label{display:block;font-size:.88rem;font-weight:700;margin-bottom:6px;color:#1e2a3a}
+    .form-group input,.form-group select{width:100%;padding:11px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit;box-sizing:border-box}
+    .form-group input:focus{border-color:var(--p,#285576)}
     .form-hint{font-size:.78rem;color:#666;margin-top:4px}
+    .cfg-media-row{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:stretch;min-height:110px}
+    .cfg-preview{border:1.5px solid #e3e3e3;border-radius:10px;background:#f9f9f9;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .cfg-preview img{width:100%;height:100%;object-fit:contain}
+    .cfg-upload-btn{border:1.5px solid #1e2a3a;border-radius:10px;background:white;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1e2a3a;font-family:inherit;transition:background .15s;padding:0 16px}
+    .cfg-upload-btn:hover{background:#f5f5f5}
 
     /* MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
@@ -340,65 +343,76 @@
 
     <!-- CONFIG -->
     <div class="panel" id="panelConfig">
-      <h2 style="margin-bottom:20px">Configuración de mi empresa</h2>
       <div class="config-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre de la empresa *</label>
-            <input type="text" id="cfgNombre" placeholder="Ej: Instrumental Médico SA"/>
-          </div>
-          <div class="form-group">
-            <label>Slug (URL pública) *</label>
-            <input type="text" id="cfgSlug" placeholder="instrumental-medico" oninput="limpiarSlug()"/>
-            <div class="form-hint" id="slugPreview">Tu link: —</div>
-          </div>
-        </div>
+        <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:6px">Tu empresa</h2>
+        <p style="color:#6b7a90;font-size:.9rem;margin-bottom:28px">Con estos datos se va a armar tu catalogo público</p>
+
         <div class="form-group">
-          <label>Descripción</label>
-          <textarea id="cfgDesc" placeholder="Breve descripción de tu empresa o catálogo..."></textarea>
+          <label>Nombre para el link publico de tu catalogo</label>
+          <input type="text" id="cfgSlug" placeholder="nombre-de-tu-catalogo" oninput="limpiarSlug()"/>
+          <div class="form-hint" id="slugPreview">Tu link: —</div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Logo de la empresa</label>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div id="logoPreview" style="width:64px;height:64px;border-radius:10px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><span class="material-icons" style="font-size:28px;color:#aaa">business</span></div>
-              <div>
-                <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputLogo').click()" id="btnSubirLogo"><span class="material-icons" style="font-size:15px">upload</span> Elegir logo</button>
-                <div style="font-size:.75rem;color:#666;margin-top:4px">PNG o JPG, máx 2MB</div>
-              </div>
-            </div>
-            <input type="hidden" id="cfgLogo"/>
-          </div>
-          <div class="form-group">
-            <label>Color principal</label>
-            <input type="color" id="cfgColor" value="#3872fa" style="height:44px;padding:4px"/>
-          </div>
-        </div>
+
         <div class="form-group">
-          <label>Fondo del banner (catálogo)</label>
-          <div style="display:flex;align-items:center;gap:12px">
-            <div id="bannerPreview" style="width:120px;height:56px;border-radius:8px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><span class="material-icons" style="font-size:22px;color:#aaa">image</span></div>
-            <div>
-              <input type="file" id="inputBanner" accept="image/*" style="display:none" onchange="subirBanner(this)"/>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputBanner').click()" id="btnSubirBanner"><span class="material-icons" style="font-size:15px">upload</span> Elegir imagen</button>
-              <div style="font-size:.75rem;color:#666;margin-top:4px">Se muestra como fondo del hero en el catálogo</div>
+          <label>Titulo</label>
+          <input type="text" id="cfgNombre" placeholder="Frase que represente tu producto"/>
+        </div>
+
+        <div class="form-group">
+          <label>Parrafo</label>
+          <input type="text" id="cfgDesc" placeholder="Explica un poco mas tu servicio"/>
+        </div>
+
+        <div class="form-group">
+          <label>Logo de la empresa</label>
+          <div style="font-size:.8rem;color:#6b7a90;margin-bottom:10px">Usa una version sin fondo, en png, que se vea en fondo claro.</div>
+          <div class="cfg-media-row">
+            <div class="cfg-preview" id="logoPreview">
+              <span class="material-icons" style="font-size:32px;color:#d8dee6">business</span>
             </div>
+            <button type="button" class="cfg-upload-btn" onclick="document.getElementById('inputLogo').click()">
+              <span class="material-icons" style="font-size:18px">upload_file</span> Subir Logo
+            </button>
           </div>
+          <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
+          <input type="hidden" id="cfgLogo"/>
+        </div>
+
+        <div class="form-group">
+          <div class="cfg-media-row">
+            <div class="cfg-preview" id="bannerPreview">
+              <span class="material-icons" style="font-size:32px;color:#d8dee6">image</span>
+            </div>
+            <button type="button" class="cfg-upload-btn" onclick="document.getElementById('inputBanner').click()">
+              <span class="material-icons" style="font-size:18px">upload_file</span> Subir Imagen
+            </button>
+          </div>
+          <input type="file" id="inputBanner" accept="image/*" style="display:none" onchange="subirBanner(this)"/>
           <input type="hidden" id="cfgBanner"/>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>📱 WhatsApp para pedidos</label>
-            <input type="text" id="cfgWhatsapp" placeholder="Ej: 5491112345678"/>
-            <div class="form-hint">Código de país + número, sin espacios ni +</div>
+
+        <div class="form-group">
+          <label>Color principal</label>
+          <div class="cfg-media-row" style="min-height:70px">
+            <div id="colorPreview" style="border-radius:10px;background:#3872fa"></div>
+            <button type="button" class="cfg-upload-btn" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
           </div>
-          <div class="form-group">
-            <label>📧 Email para pedidos</label>
-            <input type="email" id="cfgEmail" placeholder="contacto@empresa.com"/>
-          </div>
+          <input type="color" id="cfgColor" value="#3872fa" style="display:none" oninput="document.getElementById('colorPreview').style.background=this.value"/>
         </div>
-        <button class="btn btn-primary" onclick="guardarConfig()"><span class="material-icons" style="font-size:16px">save</span> Guardar cambios</button>
+
+        <div class="form-group">
+          <label>Mail para recibir los presupuestos</label>
+          <div style="font-size:.8rem;color:#6b7a90;margin-bottom:8px">Tambien se van a guardar en el tab de pedidos</div>
+          <input type="email" id="cfgEmail" placeholder="tumail@gmail.com"/>
+        </div>
+
+        <input type="hidden" id="cfgWhatsapp"/>
+
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="guardarConfig()" style="padding:14px 28px;border-radius:12px;font-size:.95rem">
+            <span class="material-icons" style="font-size:16px">save</span> Guardar
+          </button>
+        </div>
       </div>
     </div>
 
@@ -504,13 +518,14 @@
       document.getElementById('cfgLogo').value    = EMPRESA.logo_url || ''
       document.getElementById('cfgBanner').value  = EMPRESA.banner_url || ''
       if (EMPRESA.banner_url) {
-        document.getElementById('bannerPreview').innerHTML = `<img src="${EMPRESA.banner_url}" style="width:120px;height:56px;object-fit:cover;border-radius:8px"/>`
+        document.getElementById('bannerPreview').innerHTML = `<img src="${EMPRESA.banner_url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`
       }
       document.getElementById('cfgColor').value   = EMPRESA.color || '#3872fa'
+      document.getElementById('colorPreview').style.background = EMPRESA.color || '#3872fa'
       document.getElementById('cfgWhatsapp').value = EMPRESA.whatsapp || ''
       document.getElementById('cfgEmail').value    = EMPRESA.email_contacto || ''
       if (EMPRESA.logo_url) {
-        document.getElementById('logoPreview').innerHTML = `<img src="${EMPRESA.logo_url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
+        document.getElementById('logoPreview').innerHTML = `<img src="${EMPRESA.logo_url}" style="width:100%;height:100%;object-fit:contain;border-radius:10px"/>`
         document.getElementById('sidebarAvatar').innerHTML = `<img src="${EMPRESA.logo_url}"/>`
       }
       if (EMPRESA.nombre) {
@@ -972,7 +987,7 @@
     const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
     const url = urlData.publicUrl
     document.getElementById('cfgBanner').value = url
-    document.getElementById('bannerPreview').innerHTML = `<img src="${url}" style="width:120px;height:56px;object-fit:cover;border-radius:8px"/>`
+    document.getElementById('bannerPreview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`
     notif('✅ Imagen de banner subida')
   }
 
@@ -1001,7 +1016,7 @@
     const url = urlData.publicUrl
 
     document.getElementById('cfgLogo').value = url
-    document.getElementById('logoPreview').innerHTML = `<img src="${url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
+    document.getElementById('logoPreview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;border-radius:10px"/>`
     notif('✅ Logo subido')
   }
 
