@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ordo — Panel Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <style>.material-icons{font-size:20px;line-height:1;vertical-align:middle}</style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -190,12 +192,12 @@
   </div>
 
   <nav class="sidebar-nav">
-    <button class="nav-item activo" onclick="showPanel('dashboard',this)"><span class="icon">📊</span><span>Dashboard</span></button>
+    <button class="nav-item activo" onclick="showPanel('dashboard',this)"><span class="icon"><span class="material-icons">dashboard</span></span><span>Dashboard</span></button>
     <div class="nav-section">CATÁLOGO</div>
-    <button class="nav-item" onclick="showPanel('pdf',this)"><span class="icon">📄</span><span>Cargar PDF</span></button>
-    <button class="nav-item" onclick="showPanel('productos',this)"><span class="icon">📦</span><span>Productos</span></button>
-    <button class="nav-item" onclick="showPanel('pedidos',this)"><span class="icon">📋</span><span>Pedidos</span></button>
-    <button class="nav-item" onclick="showPanel('config',this)"><span class="icon">⚙️</span><span>Mi empresa</span></button>
+    <button class="nav-item" onclick="showPanel('pdf',this)"><span class="icon"><span class="material-icons">picture_as_pdf</span></span><span>Cargar PDF</span></button>
+    <button class="nav-item" onclick="showPanel('productos',this)"><span class="icon"><span class="material-icons">inventory_2</span></span><span>Productos</span></button>
+    <button class="nav-item" onclick="showPanel('pedidos',this)"><span class="icon"><span class="material-icons">receipt_long</span></span><span>Pedidos</span></button>
+    <button class="nav-item" onclick="showPanel('config',this)"><span class="icon"><span class="material-icons">business</span></span><span>Mi empresa</span></button>
   </nav>
 
   <div class="sidebar-bottom">
@@ -228,8 +230,8 @@
           <h2 class="dash-hero-title">Tu catálogo con <span id="heroProductos">0</span> productos<br>ya está disponible</h2>
           <p class="dash-hero-desc">Compartí tu link con tus clientes y recibí tus pedidos de presupuesto</p>
           <div class="dash-hero-btns">
-            <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()">👁️ Ver</button>
-            <button class="btn btn-outline btn-sm" onclick="copiarLink()">📋 Copiar link</button>
+            <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()"><span class="material-icons" style="font-size:16px">visibility</span> Ver</button>
+            <button class="btn btn-outline btn-sm" onclick="copiarLink()"><span class="material-icons" style="font-size:16px">content_copy</span> Copiar link</button>
           </div>
         </div>
       </div>
@@ -242,17 +244,17 @@
         <div class="stat">
           <div class="stat-num" id="statProductos">—</div>
           <div class="stat-label">Productos</div>
-          <div class="stat-icon">📦</div>
+          <div class="stat-icon"><span class="material-icons" style="font-size:26px">inventory_2</span></div>
         </div>
         <div class="stat">
           <div class="stat-num" id="statCategorias">—</div>
           <div class="stat-label">Categorías</div>
-          <div class="stat-icon">🏷️</div>
+          <div class="stat-icon"><span class="material-icons" style="font-size:26px">label</span></div>
         </div>
         <div class="stat" style="cursor:pointer" onclick="showPanel('pedidos',document.querySelectorAll('.nav-item')[3])">
           <div class="stat-num" id="statPedidos">—</div>
           <div class="stat-label">Pedidos nuevos</div>
-          <div class="stat-icon">📋</div>
+          <div class="stat-icon"><span class="material-icons" style="font-size:26px">receipt_long</span></div>
         </div>
       </div>
 
@@ -270,7 +272,7 @@
             <div class="paso-item">
               <h4>Cargá tu primer producto o subí un PDF</h4>
               <div class="paso-btns">
-                <button class="btn btn-outline btn-sm" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])">Cargar PDF</button>
+                <button class="btn btn-outline btn-sm" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])"><span class="material-icons" style="font-size:15px">upload_file</span> Cargar PDF</button>
                 <button class="paso-link" onclick="abrirModalProducto()">Cargar producto →</button>
               </div>
             </div>
@@ -297,7 +299,7 @@
         <h2>Productos</h2>
         <div class="tabla-acciones">
           <input class="input-buscar" type="text" placeholder="Buscar..." id="buscarProd" oninput="filtrarTabla()"/>
-          <button class="btn btn-primary" onclick="abrirModalProducto()">+ Agregar</button>
+          <button class="btn btn-primary" onclick="abrirModalProducto()"><span class="material-icons" style="font-size:16px">add</span> Agregar</button>
         </div>
       </div>
       <div class="loading" id="loadingProd"><div class="spinner"></div><div>Cargando...</div></div>
@@ -348,10 +350,10 @@
           <div class="form-group">
             <label>Logo de la empresa</label>
             <div style="display:flex;align-items:center;gap:12px">
-              <div id="logoPreview" style="width:64px;height:64px;border-radius:10px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;overflow:hidden">🏥</div>
+              <div id="logoPreview" style="width:64px;height:64px;border-radius:10px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><span class="material-icons" style="font-size:28px;color:#aaa">business</span></div>
               <div>
                 <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputLogo').click()" id="btnSubirLogo">📁 Elegir logo</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputLogo').click()" id="btnSubirLogo"><span class="material-icons" style="font-size:15px">upload</span> Elegir logo</button>
                 <div style="font-size:.75rem;color:#666;margin-top:4px">PNG o JPG, máx 2MB</div>
               </div>
             </div>
@@ -373,7 +375,7 @@
             <input type="email" id="cfgEmail" placeholder="contacto@empresa.com"/>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar cambios</button>
+        <button class="btn btn-primary" onclick="guardarConfig()"><span class="material-icons" style="font-size:16px">save</span> Guardar cambios</button>
       </div>
     </div>
 
@@ -430,10 +432,10 @@
     <div class="form-group">
       <label>Foto del producto</label>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <div id="fotoPreview" style="width:80px;height:80px;border-radius:10px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">📷</div>
+        <div id="fotoPreview" style="width:80px;height:80px;border-radius:10px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-icons" style="font-size:28px;color:#aaa">photo_camera</span></div>
         <div style="flex:1">
           <input type="file" id="inputFotoProducto" accept="image/*" style="display:none" onchange="subirFotoProducto(this)"/>
-          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('inputFotoProducto').click()" id="btnSubirFoto">📁 Elegir foto</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('inputFotoProducto').click()" id="btnSubirFoto"><span class="material-icons" style="font-size:15px">upload</span> Elegir foto</button>
           <div style="font-size:.78rem;color:#666;margin-top:6px">JPG, PNG, WEBP — máx 5MB</div>
           <input type="hidden" id="prodImagen"/>
         </div>
@@ -534,7 +536,7 @@
       const cant = (p.productos || []).length
       const esPend = p.estado === 'Pendiente'
       return `<div class="pedido-row">
-        <div class="pedido-avatar">👤</div>
+        <div class="pedido-avatar"><span class="material-icons" style="font-size:22px;color:#999">person</span></div>
         <div class="pedido-info">
           <div class="pedido-nombre">${p.nombre_cliente}</div>
           <div class="pedido-items">${cant} item${cant !== 1 ? 's' : ''}</div>
@@ -550,7 +552,7 @@
   function renderTabla(lista) {
     const wrap = document.getElementById('tablaWrap')
     if (!lista.length) {
-      wrap.innerHTML = `<div class="empty-state"><div class="icon">📦</div><p>No hay productos todavía.<br>Agregá uno o cargá un PDF.</p></div>`
+      wrap.innerHTML = `<div class="empty-state"><div class="icon"><span class="material-icons" style="font-size:3rem;color:#ccc">inventory_2</span></div><p>No hay productos todavía.<br>Agregá uno o cargá un PDF.</p></div>`
       return
     }
     const rows = lista.map(p => `
@@ -558,15 +560,15 @@
         <td>
           ${p.imagen_url
             ? `<img src="${p.imagen_url}" style="width:48px;height:48px;object-fit:contain;border-radius:8px;padding:2px;border:1px solid #e3e3e3" onerror="this.style.display='none'">`
-            : `<div style="width:48px;height:48px;background:#f1f1f1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">🏥</div>`}
+            : `<div style="width:48px;height:48px;background:#f1f1f1;border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="material-icons" style="font-size:22px;color:#bbb">medical_services</span></div>`}
         </td>
         <td><strong>${p.nombre}</strong>${p.codigo ? `<br><span style="font-size:.75rem;color:#666">${p.codigo}</span>` : ''}</td>
         <td>${p.categoria || '—'}</td>
         <td>${p.precio || 'Consultar'}</td>
         <td><span class="badge ${p.stock === 'Disponible' ? 'badge-disp' : p.stock === 'Sin stock' ? 'badge-sin' : 'badge-cons'}">${p.stock || 'Consultar'}</span></td>
         <td><div class="td-actions">
-          <button class="btn btn-outline btn-sm" onclick='editarProducto(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️</button>
-          <button class="btn btn-red btn-sm" onclick="eliminarProducto('${p.id}')">🗑️</button>
+          <button class="btn btn-outline btn-sm" onclick='editarProducto(${JSON.stringify(p).replace(/'/g,"&#39;")})'><span class="material-icons" style="font-size:16px">edit</span></button>
+          <button class="btn btn-red btn-sm" onclick="eliminarProducto('${p.id}')"><span class="material-icons" style="font-size:16px">delete</span></button>
         </div></td>
       </tr>`).join('')
     wrap.innerHTML = `
@@ -596,7 +598,7 @@
     document.getElementById('prodDesc').value = ''
     document.getElementById('prodStock').value = 'Disponible'
     document.getElementById('prodImagen').value = ''
-    document.getElementById('fotoPreview').innerHTML = '📷'
+    document.getElementById('fotoPreview').innerHTML = '<span class="material-icons" style="font-size:28px;color:#aaa">photo_camera</span>'
     document.getElementById('modalProdTitle').textContent = 'Agregar producto'
     document.getElementById('btnGuardarProd').textContent = 'Guardar'
     document.getElementById('modalProducto').classList.add('activo')
@@ -729,7 +731,7 @@
     document.getElementById('loadingPedidos').style.display = 'none'
 
     if (!pedidos || !pedidos.length) {
-      document.getElementById('pedidosWrap').innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Todavía no recibiste pedidos.</p></div>'
+      document.getElementById('pedidosWrap').innerHTML = '<div class="empty-state"><div class="icon"><span class="material-icons" style="font-size:3rem;color:#ccc">receipt_long</span></div><p>Todavía no recibiste pedidos.</p></div>'
       return
     }
 
@@ -834,7 +836,7 @@
         <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
           <strong>✅ Se encontraron ${productos.length} productos</strong>
           <button class="btn btn-primary" onclick="importarProductos(${JSON.stringify(productos).replace(/"/g,'&quot;')})">
-            ⬇️ Importar seleccionados
+            <span class="material-icons" style="font-size:16px">download</span> Importar seleccionados
           </button>
         </div>
         <div style="max-height:400px;overflow-y:auto">${productosHTML}</div>`
