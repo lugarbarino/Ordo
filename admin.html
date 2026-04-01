@@ -160,9 +160,10 @@
           <label>🔗 Link de tu catálogo para clientes</label>
           <div class="link-url" id="linkUrl">—</div>
         </div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline btn-sm" onclick="copiarLink()">📋 Copiar</button>
           <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()">👁️ Ver</button>
+          <button class="btn btn-green btn-sm" onclick="compartirWhatsApp()">💬 Compartir</button>
         </div>
       </div>
       <div style="background:white;border-radius:12px;padding:24px;border:1.5px solid var(--borde)">
@@ -628,6 +629,12 @@
   }
   function abrirCatalogo() {
     if (EMPRESA?.slug) window.open(`catalogo.html?slug=${EMPRESA.slug}`, '_blank')
+  }
+  function compartirWhatsApp() {
+    const url = document.getElementById('linkUrl').textContent
+    const nombre = EMPRESA?.nombre || 'nuestro catálogo'
+    const texto = `¡Hola! Te comparto el catálogo de ${nombre}: ${url}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank')
   }
 
   async function salir() {
