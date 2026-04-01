@@ -273,18 +273,26 @@
       <label>Descripción</label>
       <textarea id="prodDesc" placeholder="Descripción del producto..." style="min-height:70px"></textarea>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Stock</label>
-        <select id="prodStock">
-          <option>Disponible</option>
-          <option>Consultar</option>
-          <option>Sin stock</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>URL de imagen</label>
-        <input type="text" id="prodImagen" placeholder="https://..."/>
+    <div class="form-group">
+      <label>Stock</label>
+      <select id="prodStock">
+        <option>Disponible</option>
+        <option>Consultar</option>
+        <option>Sin stock</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Foto del producto</label>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div id="fotoPreview" style="width:80px;height:80px;border-radius:10px;background:var(--gris);border:1.5px solid var(--borde);display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0">📷</div>
+        <div style="flex:1">
+          <input type="file" id="inputFotoProducto" accept="image/*" style="display:none" onchange="subirFotoProducto(this)"/>
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('inputFotoProducto').click()" id="btnSubirFoto">
+            📁 Elegir foto
+          </button>
+          <div style="font-size:.78rem;color:var(--suave);margin-top:6px">JPG, PNG, WEBP — máx 5MB</div>
+          <input type="hidden" id="prodImagen"/>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -639,6 +647,35 @@
     await cargarProductos()
     actualizarDashboard()
     showPanel('productos', document.querySelectorAll('.nav-item')[1])
+  }
+
+  async function subirFotoProducto(input) {
+    const file = input.files[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { notif('La foto no puede superar 5MB', 'err'); return }
+
+    const btn = document.getElementById('btnSubirFoto')
+    btn.textContent = '⏳ Subiendo...'
+    btn.disabled = true
+
+    const ext = file.name.split('.').pop()
+    const nombre = `${Date.now()}.${ext}`
+
+    const { data, error } = await db.storage
+      .from('imagenes')
+      .upload(nombre, file, { contentType: file.type, upsert: true })
+
+    btn.textContent = '📁 Elegir foto'
+    btn.disabled = false
+
+    if (error) { notif('Error al subir la foto: ' + error.message, 'err'); return }
+
+    const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
+    const url = urlData.publicUrl
+
+    document.getElementById('prodImagen').value = url
+    document.getElementById('fotoPreview').innerHTML = `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:10px"/>`
+    notif('✅ Foto subida')
   }
 
   function notif(msg, tipo = 'ok') {
