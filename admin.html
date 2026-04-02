@@ -172,30 +172,26 @@
     .spinner{display:inline-block;width:36px;height:36px;border:4px solid #e3e3e3;border-top-color:#3872fa;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    @media(max-width:900px){
-      .sidebar{width:60px}
-      .sidebar-logo .logo-text,.empresa-selector,.nav-section,.nav-item span:not(.icon),.user-email,.btn-salir,.user-avatar-wrap .user-info-wrap{display:none}
-      .nav-item{padding:12px;justify-content:center}
-      .dash-layout{grid-template-columns:1fr}
-      .pasos-grid{grid-template-columns:1fr}
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .dash-hero{padding:20px 20px 0;min-height:140px}
-      .content{padding:16px}
-    }
     /* hamburger overlay */
     .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:149}
     .mob-overlay.activo{display:block}
     .btn-hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:#111}
 
-    @media(max-width:640px){
+    @media(max-width:900px){
       .btn-hamburger{display:flex;align-items:center;justify-content:center}
       .sidebar{
-        position:fixed;left:-288px;top:0;height:100vh;z-index:150;
-        transition:left .25s ease;box-shadow:none;
+        position:fixed;left:-288px;top:0;height:100vh;width:288px;z-index:150;
+        transition:left .25s ease;box-shadow:none;display:flex;
       }
       .sidebar.mob-open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
       .main{width:100%}
       .topbar{padding:12px 16px;display:flex;align-items:center;gap:12px}
+      .nav-item{padding:12px 30px;justify-content:flex-start}
+      .dash-layout{grid-template-columns:1fr}
+      .pasos-grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:repeat(2,1fr)}
+      .dash-hero{padding:20px 20px 0;min-height:140px}
+      .content{padding:16px}
       .topbar h1{flex:1}
       .content{padding:12px}
       .dash-layout{grid-template-columns:1fr;gap:12px}
