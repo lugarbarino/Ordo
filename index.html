@@ -3,148 +3,268 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CatálogoApp — Creá tu catálogo digital</title>
+  <title>Ordo — Tu catálogo digital listo en minutos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --azul:#1a4d8f;--azul2:#2d6cc0;--celeste:#e8f0fc;
-      --gris:#f5f6f8;--borde:#dde3ed;--texto:#1e2a3a;--suave:#6b7a90;--verde:#1a8f5a;
+      --verde-dark:#1e453b;
+      --verde-mid:#295e4f;
+      --verde-accent:#318870;
+      --bg:#f8f8f8;
+      --text-dark:#373c42;
+      --text-muted:#545454;
     }
-    body{font-family:'Segoe UI',Arial,sans-serif;color:var(--texto);background:white}
+    body{font-family:'Inter',sans-serif;color:var(--text-dark);background:var(--bg)}
 
-    /* NAV */
-    nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;border-bottom:1px solid var(--borde);position:sticky;top:0;background:white;z-index:100}
-    .logo{font-size:1.3rem;font-weight:800;color:var(--azul)}
-    .logo span{color:var(--azul2)}
-    .nav-btns{display:flex;gap:12px}
-    .btn{padding:10px 22px;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
-    .btn-outline{background:white;color:var(--azul);border:2px solid var(--azul)}
-    .btn-outline:hover{background:var(--celeste)}
-    .btn-primary{background:var(--azul);color:white}
-    .btn-primary:hover{background:var(--azul2)}
-    .btn-green{background:var(--verde);color:white}
-    .btn-green:hover{opacity:.9}
+    /* ── NAV ── */
+    nav{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:20px 48px;position:sticky;top:0;background:var(--bg);z-index:100;
+    }
+    .logo svg{height:22px;width:auto;display:block}
+    .btn-login{
+      background:#1c1c1c;color:white;border:none;
+      padding:16px 28px;border-radius:14px;font-family:'Inter',sans-serif;
+      font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;
+    }
+    .btn-login:hover{opacity:.82}
 
-    /* HERO */
-    .hero{text-align:center;padding:90px 24px 70px;background:linear-gradient(160deg,#f0f4ff 0%,white 60%)}
-    .hero-badge{display:inline-block;background:var(--celeste);color:var(--azul);font-size:.8rem;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:20px;letter-spacing:.5px}
-    .hero h1{font-size:3rem;font-weight:800;line-height:1.15;margin-bottom:20px;max-width:700px;margin-left:auto;margin-right:auto}
-    .hero h1 span{color:var(--azul2)}
-    .hero p{font-size:1.1rem;color:var(--suave);max-width:520px;margin:0 auto 36px;line-height:1.6}
-    .hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-    .hero-btns .btn{padding:14px 28px;font-size:1rem}
+    /* ── HERO ── */
+    .hero{padding:32px 48px 48px}
+    .hero-card{
+      position:relative;border-radius:12px;overflow:hidden;
+      height:416px;max-width:1035px;margin:0 auto;display:flex;align-items:flex-end;
+    }
+    .hero-bg{
+      position:absolute;inset:0;
+      background-image:url('hero.png');
+      background-size:cover;background-position:center top;
+    }
+    .hero-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(95deg,rgba(0,0,0,.6) 34%,rgba(49,49,49,.31) 73%,rgba(102,102,102,0) 98%);
+    }
+    .hero-content{position:relative;z-index:1;padding:0 67px 52px}
+    .hero-content h1{
+      font-size:43px;font-weight:900;line-height:1.14;color:#fffafa;
+      margin-bottom:18px;text-transform:capitalize;
+    }
+    .hero-content p{
+      font-size:20px;color:#fffafa;max-width:526px;line-height:1.4;margin-bottom:28px;
+    }
+    .hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+    .btn-cta-green{
+      display:flex;align-items:center;gap:12px;
+      background:var(--verde-mid);color:white;border:none;
+      padding:22px 25px;border-radius:13px;font-family:'Inter',sans-serif;
+      font-size:1.05rem;font-weight:600;cursor:pointer;transition:box-shadow .25s,transform .25s;
+      text-transform:capitalize;
+    }
+    .btn-cta-green:hover{box-shadow:0 8px 24px rgba(0,0,0,.22);transform:translateY(-3px)}
+    .btn-cta-outline{
+      background:#fffefe;color:#080b2f;
+      border:none;
+      padding:22px 28px;border-radius:13px;font-family:'Inter',sans-serif;
+      font-size:1.05rem;font-weight:600;cursor:pointer;transition:box-shadow .25s,transform .25s;
+      text-transform:capitalize;
+    }
+    .btn-cta-outline:hover{box-shadow:0 8px 24px rgba(0,0,0,.15);transform:translateY(-3px)}
+    .btn-cta-green .material-symbols-outlined{font-size:22px}
 
-    /* FEATURES */
-    .section{padding:70px 48px}
-    .section-title{text-align:center;font-size:1.9rem;font-weight:800;margin-bottom:10px}
-    .section-sub{text-align:center;color:var(--suave);font-size:1rem;margin-bottom:48px}
-    .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;max-width:1000px;margin:0 auto}
-    .feature-card{background:var(--gris);border-radius:16px;padding:28px 24px;border:1.5px solid var(--borde)}
-    .feature-icon{font-size:2rem;margin-bottom:14px}
-    .feature-card h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
-    .feature-card p{font-size:.88rem;color:var(--suave);line-height:1.6}
+    /* ── FEATURES ── */
+    .features-section{padding:80px 48px}
+    .section-title{
+      text-align:center;font-size:43px;font-weight:900;
+      color:var(--text-dark);text-transform:capitalize;margin-bottom:6px;
+    }
+    .section-sub{
+      text-align:center;font-size:24px;font-weight:400;
+      color:var(--text-dark);margin-bottom:52px;text-transform:capitalize;
+    }
+    .features-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:24px;max-width:1160px;margin:0 auto;
+    }
+    .feature-card{
+      background:white;border-radius:20px;padding:40px 32px 36px;
+      box-shadow:0 4px 34px rgba(0,0,0,.09);
+      transition:box-shadow .25s,transform .25s;
+    }
+    .feature-card:hover{box-shadow:0 12px 48px rgba(0,0,0,.18);transform:translateY(-4px)}
+    .feat-icon{
+      width:51px;height:51px;margin-bottom:18px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .feat-icon .material-symbols-outlined{
+      font-size:38px;color:var(--verde-mid);
+      font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+    }
+    .feature-card h3{font-size:20px;font-weight:900;color:#000;margin-bottom:10px;text-transform:capitalize}
+    .feature-card p{font-size:16px;color:var(--text-muted);line-height:1.5}
 
-    /* COMO FUNCIONA */
-    .steps{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-    .step{display:flex;gap:20px;align-items:flex-start;background:white;border:1.5px solid var(--borde);border-radius:14px;padding:22px 24px}
-    .step-num{background:var(--azul);color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;flex-shrink:0}
-    .step h4{font-size:1rem;font-weight:700;margin-bottom:4px}
-    .step p{font-size:.87rem;color:var(--suave)}
+    /* ── COMO FUNCIONA ── */
+    .steps-section{background:var(--verde-dark);padding:80px 48px 110px}
+    .steps-title{
+      text-align:center;font-size:43px;font-weight:900;
+      color:#e0e0e0;text-transform:capitalize;margin-bottom:64px;
+    }
+    .steps-grid{
+      display:flex;gap:60px;justify-content:center;
+      max-width:1300px;margin:0 auto;
+    }
+    .step-item{
+      flex:1;max-width:359px;display:flex;flex-direction:column;
+      align-items:center;text-align:center;gap:16px;
+    }
+    .step-circle{
+      width:77px;height:77px;border-radius:50%;
+      background:white;border:none;
+      display:flex;align-items:center;justify-content:center;
+      font-size:40px;font-weight:900;color:var(--verde-dark);flex-shrink:0;
+    }
+    .step-item h4{font-size:32px;font-weight:600;color:#e0e0e0;line-height:1.5}
+    .step-item p{font-size:24px;color:#e0e0e0;line-height:1.5}
 
-    /* CTA */
-    .cta{background:var(--azul);color:white;text-align:center;padding:70px 24px}
-    .cta h2{font-size:2rem;font-weight:800;margin-bottom:14px}
-    .cta p{opacity:.8;margin-bottom:28px;font-size:1rem}
-    .cta .btn{padding:14px 32px;font-size:1rem;background:white;color:var(--azul)}
+    /* ── CTA BANNER ── */
+    .cta-banner{
+      position:relative;height:480px;overflow:hidden;
+      display:flex;align-items:center;
+    }
+    .cta-bg{
+      position:absolute;inset:0;
+      background-image:url('banner.png');
+      background-size:cover;background-position:center 30%;
+      filter:brightness(.65);
+    }
+    .cta-card{
+      position:relative;z-index:1;
+      background:white;border-radius:20px;
+      padding:44px 48px;margin-left:clamp(40px,8vw,200px);
+      max-width:380px;
+    }
+    .cta-card h2{font-size:32px;font-weight:900;color:var(--text-dark);margin-bottom:14px}
+    .cta-card p{font-size:16px;color:var(--text-muted);line-height:1.6;margin-bottom:28px}
 
-    /* FOOTER */
-    footer{text-align:center;padding:28px;color:var(--suave);font-size:.85rem;border-top:1px solid var(--borde)}
+    /* ── FOOTER ── */
+    footer{
+      background:var(--bg);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:32px 48px;border-top:1px solid #e0e0e0;
+    }
+    .footer-logo svg{height:18px;width:auto;display:block;opacity:.5}
+    .footer-credit{color:#333;font-size:1rem}
+    .footer-heart{color:#c13e58}
 
-    /* MODAL */
+    /* ── MODAL ── */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
     .modal-overlay.activo{display:flex}
     .modal{background:white;border-radius:18px;padding:36px;width:100%;max-width:420px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-    .modal-cerrar{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--suave)}
+    .modal-cerrar{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#6b7a90}
     .modal h2{font-size:1.4rem;font-weight:800;margin-bottom:6px}
-    .modal-sub{font-size:.88rem;color:var(--suave);margin-bottom:24px}
-
-    /* TABS */
-    .tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--borde)}
-    .tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--suave);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
-    .tab.activo{color:var(--azul);border-bottom-color:var(--azul)}
-
-    /* FORM */
+    .tabs{display:flex;margin-bottom:24px;border-bottom:2px solid #dde3ed}
+    .tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:.9rem;font-weight:600;color:#6b7a90;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:'Inter',sans-serif}
+    .tab.activo{color:var(--verde-mid);border-bottom-color:var(--verde-mid)}
     .form-group{margin-bottom:16px}
-    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--texto)}
-    .form-group input{width:100%;padding:10px 14px;border:1.5px solid var(--borde);border-radius:8px;font-size:.95rem;outline:none;transition:border-color .2s}
-    .form-group input:focus{border-color:var(--azul2)}
-    .btn-block{width:100%;padding:12px;font-size:1rem;margin-top:4px}
+    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--text-dark)}
+    .form-group input{width:100%;padding:10px 14px;border:1.5px solid #dde3ed;border-radius:8px;font-size:.95rem;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
+    .form-group input:focus{border-color:var(--verde-accent)}
+    .btn-block{
+      width:100%;padding:12px;font-size:1rem;margin-top:4px;border:none;
+      border-radius:8px;font-family:'Inter',sans-serif;cursor:pointer;font-weight:600;
+      background:var(--verde-mid);color:white;
+    }
+    .btn-block:hover{opacity:.9}
     .form-error{color:#c0392b;font-size:.83rem;margin-top:8px;display:none}
-    .form-success{color:var(--verde);font-size:.85rem;margin-top:8px;display:none}
-    .divider{text-align:center;color:var(--suave);font-size:.82rem;margin:14px 0;position:relative}
-    .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--borde)}
-    .divider::before{left:0}.divider::after{right:0}
+    .form-success{color:var(--verde-mid);font-size:.85rem;margin-top:8px;display:none}
 
-    @media(max-width:600px){
-      nav{padding:16px 20px}.hero h1{font-size:2rem}.section{padding:48px 20px}
-      nav .logo-text{display:none}
+    /* ── RESPONSIVE ── */
+    @media(max-width:960px){
+      .features-grid{grid-template-columns:repeat(2,1fr)}
+      .steps-grid{flex-direction:column;align-items:center}
+      .step-item{max-width:460px}
+      .step-item h4{font-size:24px}.step-item p{font-size:18px}
+      nav{padding:16px 20px}
+    }
+    @media(max-width:640px){
+      .features-grid{grid-template-columns:1fr}
+      .hero{padding:20px 16px 32px}
+      .hero-content{padding:0 24px 40px}
+      .hero-content h1{font-size:28px}
+      .hero-content p{font-size:16px}
+      .hero-btns{padding:0 24px}
+      .section-title{font-size:28px}.section-sub{font-size:18px}
+      .steps-title{font-size:28px}
+      footer{flex-direction:column;gap:16px;text-align:center}
     }
   </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <div class="logo">📋 Catálogo<span>App</span></div>
-  <div class="nav-btns">
-    <button class="btn btn-outline" onclick="abrirModal('login')">Iniciar sesión</button>
-    <button class="btn btn-primary" onclick="abrirModal('registro')">Crear cuenta gratis</button>
+  <div class="logo">
+    <svg width="101" height="26" viewBox="0 0 101 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><g clip-path="url(#b)"><path d="M99.737 12.733c0 2.76-.537 5.088-1.61 6.984-1.073 1.888-2.522 3.32-4.345 4.297-1.823.968-3.857 1.452-6.1 1.452-2.26 0-4.301-.488-6.124-1.464-1.816-.984-3.26-2.421-4.333-4.309-1.065-1.896-1.598-4.216-1.598-6.96 0-2.76.533-5.084 1.598-6.972C78.298 3.865 79.742 2.433 81.558 1.465 83.381.488 85.422 0 87.682 0c2.243 0 4.277.488 6.1 1.465 1.823.968 3.272 2.4 4.345 4.296 1.073 1.888 1.61 4.212 1.61 6.972Z" fill="#000"/><path d="M60.31 25.128H50.77V.339h9.441c2.55 0 4.753.496 6.609 1.489 1.864.984 3.3 2.404 4.309 4.26 1.017 1.848 1.525 4.063 1.525 6.645 0 2.582-.504 4.801-1.513 6.657-1.009 1.848-2.437 3.268-4.285 4.261-1.848.984-4.03 1.477-6.548 1.477Zm-2.809-5.713h2.566c1.227 0 2.272-.198 3.135-.593.871-.396 1.533-1.077 1.985-2.046.46-.968.69-2.316.69-4.043 0-1.727-.234-3.074-.702-4.043-.46-.968-1.138-1.65-2.033-2.045-.888-.395-1.977-.593-3.268-.593h-2.373v11.363Z" fill="#000"/><path d="M27.079 25.128V.339h10.7c1.839 0 3.449.335 4.829 1.004 1.38.67 2.453 1.634 3.22 2.893.766 1.259 1.15 2.768 1.15 4.527 0 1.775-.396 3.272-1.187 4.49-.782 1.22-1.884 2.14-3.304 2.761-1.412.621-3.062.932-4.95.932h-6.391v-5.229h5.035c.791 0 1.465-.097 2.022-.29.565-.202.996-.521 1.295-.956.306-.436.46-1.005.46-1.707 0-.71-.154-1.287-.46-1.731-.299-.452-.73-.782-1.295-.992-.557-.218-1.23-.327-2.022-.327h-2.372v19.414h-6.73Zm14.525-11.378 6.197 11.378h-7.31l-6.052-11.378h7.165Z" fill="#000"/><path d="M24.108 12.733c0 2.76-.536 5.088-1.61 6.984-1.072 1.888-2.52 3.32-4.344 4.297-1.824.968-3.857 1.452-6.1 1.452-2.26 0-4.301-.488-6.124-1.464C4.114 23.018 2.67 21.581 1.597 19.693.532 17.797 0 15.477 0 12.733c0-2.76.532-5.084 1.597-6.972C2.67 3.865 4.114 2.433 5.93 1.465 7.753.488 9.794 0 12.053 0c2.243 0 4.276.488 6.1 1.465 1.823.968 3.272 2.4 4.344 4.296 1.074 1.888 1.61 4.212 1.61 6.972Z" fill="#000"/></g></g><defs><clipPath id="a"><rect width="100.28" height="26" fill="white"/></clipPath><clipPath id="b"><rect width="100.286" height="26" fill="white" transform="translate(-0.003)"/></clipPath></defs></svg>
   </div>
+  <button class="btn-login" onclick="abrirModal('login')">Iniciar Sesión</button>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">✨ Nuevo — Carga tu catálogo desde PDF con IA</div>
-  <h1>Tu catálogo digital<br/><span>listo en minutos</span></h1>
-  <p>Subí tu PDF, la IA extrae todos tus productos automáticamente. Tus clientes lo ven online, sin poder editar nada.</p>
-  <div class="hero-btns">
-    <button class="btn btn-primary" onclick="abrirModal('registro')">🚀 Empezar gratis</button>
-    <button class="btn btn-outline" onclick="window.open('catalogo.html?slug=demo','_blank')">Ver demo</button>
+  <div class="hero-card">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Tu catálogo digital<br/>listo en minutos</h1>
+      <p>Subí tu PDF, la IA extrae todos tus productos automáticamente. Tus clientes lo ven online, sin poder editar nada.</p>
+      <div class="hero-btns">
+        <button class="btn-cta-green" onclick="abrirModal('registro')">
+          <span class="material-symbols-outlined">dashboard</span>
+          Creá tu Catalogo
+        </button>
+        <button class="btn-cta-outline" onclick="window.open('catalogo.html?slug=demo','_blank')">
+          Ver demo
+        </button>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- FEATURES -->
-<section class="section" style="background:var(--gris)">
-  <div class="section-title">Todo lo que necesitás</div>
-  <div class="section-sub">Sin técnicos, sin complicaciones</div>
-  <div class="features">
+<section class="features-section">
+  <h2 class="section-title">Todo lo que necesitas</h2>
+  <p class="section-sub">Sin técnicos, sin complicaciones</p>
+  <div class="features-grid">
     <div class="feature-card">
-      <div class="feature-icon">🤖</div>
+      <div class="feat-icon"><span class="material-symbols-outlined">smart_toy</span></div>
       <h3>IA extrae tus productos</h3>
       <p>Subís tu catálogo en PDF y la inteligencia artificial identifica todos los productos automáticamente.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔗</div>
+      <div class="feat-icon"><span class="material-symbols-outlined">link</span></div>
       <h3>Link propio para tus clientes</h3>
       <p>Recibís un link único <strong>catalogoapp.com/tu-empresa</strong> para compartir con clientes.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🛍️</div>
+      <div class="feat-icon"><span class="material-symbols-outlined">shopping_cart</span></div>
       <h3>Catálogo siempre actualizado</h3>
       <p>Agregás, editás o eliminás productos cuando quieras. Los clientes siempre ven la última versión.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🎨</div>
+      <div class="feat-icon"><span class="material-symbols-outlined">brush</span></div>
       <h3>Con tu marca</h3>
       <p>Logo, colores y descripción de tu empresa. Tu catálogo se ve profesional desde el primer día.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔒</div>
-      <h3>Solo lectura para clientes</h3>
+      <div class="feat-icon"><span class="material-symbols-outlined">lock</span></div>
+      <h3>Seguro</h3>
       <p>Tus clientes ven el catálogo pero no pueden modificar nada. Vos tenés el control total.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📱</div>
+      <div class="feat-icon"><span class="material-symbols-outlined">smartphone</span></div>
       <h3>Funciona en celular</h3>
       <p>El catálogo se adapta a cualquier pantalla. Tus clientes lo ven perfecto desde el celular.</p>
     </div>
@@ -152,53 +272,56 @@
 </section>
 
 <!-- COMO FUNCIONA -->
-<section class="section">
-  <div class="section-title">¿Cómo funciona?</div>
-  <div class="section-sub">3 pasos y listo</div>
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div>
-        <h4>Creás tu cuenta y configurás tu empresa</h4>
-        <p>Nombre, logo, descripción y el link único para tus clientes. Tarda 2 minutos.</p>
-      </div>
+<section class="steps-section">
+  <h2 class="steps-title">¿Cómo funciona?</h2>
+  <div class="steps-grid">
+    <div class="step-item">
+      <div class="step-circle">1</div>
+      <h4>Creás tu cuenta y configurás tu empresa</h4>
+      <p>Nombre, logo, descripción y el link único para tus clientes. Tarda 2 minutos.</p>
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div>
-        <h4>Subís tu catálogo en PDF</h4>
-        <p>La IA lee el PDF y extrae todos los productos automáticamente. Revisás y confirmás.</p>
-      </div>
+    <div class="step-item">
+      <div class="step-circle">2</div>
+      <h4>Subís tu catálogo en PDF</h4>
+      <p>La IA lee el PDF y extrae todos los productos automáticamente. Revisás, editás y/o confirmás.</p>
     </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div>
-        <h4>Compartís el link con tus clientes</h4>
-        <p>Tus clientes entran al link y ven el catálogo completo con buscador y filtros. Solo lectura.</p>
-      </div>
+    <div class="step-item">
+      <div class="step-circle">3</div>
+      <h4>Compartís el link con tus clientes</h4>
+      <p>Tus clientes entran al link y ven el catálogo completo con buscador y filtros. Y te mandan su pedido de presupuesto.</p>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta">
-  <h2>Empezá hoy, gratis</h2>
-  <p>Sin tarjeta de crédito. Sin instalaciones. Listo en 5 minutos.</p>
-  <button class="btn" onclick="abrirModal('registro')">Crear mi catálogo →</button>
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="cta-bg"></div>
+  <div class="cta-card">
+    <h2>Empezá Hoy</h2>
+    <p>Subís tu catálogo en PDF o crealo a mano y tenés tu catálogo hoy mismo.</p>
+    <button class="btn-cta-green" onclick="abrirModal('registro')" style="width:100%;justify-content:center">
+      <span class="material-symbols-outlined">dashboard</span>
+      Creá Tu Catalogo
+    </button>
+  </div>
 </section>
 
-<footer>© 2025 CatálogoApp · Hecho con ❤️ en Argentina</footer>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <svg width="101" height="26" viewBox="0 0 101 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#c)"><g clip-path="url(#d)"><path d="M99.737 12.733c0 2.76-.537 5.088-1.61 6.984-1.073 1.888-2.522 3.32-4.345 4.297-1.823.968-3.857 1.452-6.1 1.452-2.26 0-4.301-.488-6.124-1.464-1.816-.984-3.26-2.421-4.333-4.309-1.065-1.896-1.598-4.216-1.598-6.96 0-2.76.533-5.084 1.598-6.972C78.298 3.865 79.742 2.433 81.558 1.465 83.381.488 85.422 0 87.682 0c2.243 0 4.277.488 6.1 1.465 1.823.968 3.272 2.4 4.345 4.296 1.073 1.888 1.61 4.212 1.61 6.972Z" fill="currentColor"/><path d="M60.31 25.128H50.77V.339h9.441c2.55 0 4.753.496 6.609 1.489 1.864.984 3.3 2.404 4.309 4.26 1.017 1.848 1.525 4.063 1.525 6.645 0 2.582-.504 4.801-1.513 6.657-1.009 1.848-2.437 3.268-4.285 4.261-1.848.984-4.03 1.477-6.548 1.477Zm-2.809-5.713h2.566c1.227 0 2.272-.198 3.135-.593.871-.396 1.533-1.077 1.985-2.046.46-.968.69-2.316.69-4.043 0-1.727-.234-3.074-.702-4.043-.46-.968-1.138-1.65-2.033-2.045-.888-.395-1.977-.593-3.268-.593h-2.373v11.363Z" fill="currentColor"/><path d="M27.079 25.128V.339h10.7c1.839 0 3.449.335 4.829 1.004 1.38.67 2.453 1.634 3.22 2.893.766 1.259 1.15 2.768 1.15 4.527 0 1.775-.396 3.272-1.187 4.49-.782 1.22-1.884 2.14-3.304 2.761-1.412.621-3.062.932-4.95.932h-6.391v-5.229h5.035c.791 0 1.465-.097 2.022-.29.565-.202.996-.521 1.295-.956.306-.436.46-1.005.46-1.707 0-.71-.154-1.287-.46-1.731-.299-.452-.73-.782-1.295-.992-.557-.218-1.23-.327-2.022-.327h-2.372v19.414h-6.73Zm14.525-11.378 6.197 11.378h-7.31l-6.052-11.378h7.165Z" fill="currentColor"/><path d="M24.108 12.733c0 2.76-.536 5.088-1.61 6.984-1.072 1.888-2.52 3.32-4.344 4.297-1.824.968-3.857 1.452-6.1 1.452-2.26 0-4.301-.488-6.124-1.464C4.114 23.018 2.67 21.581 1.597 19.693.532 17.797 0 15.477 0 12.733c0-2.76.532-5.084 1.597-6.972C2.67 3.865 4.114 2.433 5.93 1.465 7.753.488 9.794 0 12.053 0c2.243 0 4.276.488 6.1 1.465 1.823.968 3.272 2.4 4.344 4.296 1.074 1.888 1.61 4.212 1.61 6.972Z" fill="currentColor"/></g></g><defs><clipPath id="c"><rect width="100.28" height="26" fill="white"/></clipPath><clipPath id="d"><rect width="100.286" height="26" fill="white" transform="translate(-0.003)"/></clipPath></defs></svg>
+  </div>
+  <div class="footer-credit">Hecho con <span class="footer-heart">❤</span>️ en Argentina</div>
+</footer>
 
 <!-- MODAL AUTH -->
 <div class="modal-overlay" id="modalOverlay" onclick="cerrarModalClick(event)">
   <div class="modal">
     <button class="modal-cerrar" onclick="cerrarModal()">✕</button>
-
     <div class="tabs">
       <button class="tab" id="tabLogin" onclick="switchTab('login')">Iniciar sesión</button>
       <button class="tab" id="tabRegistro" onclick="switchTab('registro')">Crear cuenta</button>
     </div>
-
     <!-- LOGIN -->
     <div id="panelLogin">
       <div class="form-group">
@@ -210,9 +333,8 @@
         <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"/>
       </div>
       <div class="form-error" id="loginError"></div>
-      <button class="btn btn-primary btn-block" onclick="login()" id="btnLogin">Iniciar sesión</button>
+      <button class="btn-block" onclick="login()" id="btnLogin">Iniciar sesión</button>
     </div>
-
     <!-- REGISTRO -->
     <div id="panelRegistro" style="display:none">
       <div class="form-group">
@@ -225,7 +347,7 @@
       </div>
       <div class="form-error" id="regError"></div>
       <div class="form-success" id="regSuccess"></div>
-      <button class="btn btn-green btn-block" onclick="registro()" id="btnRegistro">Crear cuenta gratis</button>
+      <button class="btn-block" onclick="registro()" id="btnRegistro">Crear cuenta gratis</button>
     </div>
   </div>
 </div>
@@ -236,7 +358,6 @@
   const { createClient } = supabase
   const db = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-  // Si ya está logueado → admin
   db.auth.getSession().then(({ data }) => {
     if (data.session) window.location.href = 'admin.html'
   })
@@ -251,7 +372,6 @@
   function cerrarModalClick(e) {
     if (e.target === document.getElementById('modalOverlay')) cerrarModal()
   }
-
   function switchTab(tab) {
     document.getElementById('tabLogin').classList.toggle('activo', tab === 'login')
     document.getElementById('tabRegistro').classList.toggle('activo', tab === 'registro')
@@ -297,7 +417,6 @@
       err.style.display = 'block'
       btn.textContent = 'Crear cuenta gratis'; btn.disabled = false
     } else {
-      // Mostrar mensaje de confirmación en el modal
       document.querySelector('.modal').innerHTML = `
         <div style="text-align:center;padding:20px 10px">
           <div style="font-size:3rem;margin-bottom:16px">📧</div>
