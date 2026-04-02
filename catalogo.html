@@ -102,14 +102,33 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     @media(max-width:768px){
-      .hero{margin:14px 16px;padding:32px 24px;min-height:220px}
-      .hero-title{font-size:1.8rem}
-      .filter-bar,.contenedor{padding-left:16px;padding-right:16px}
-      .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+      .header-logo{width:180px;height:80px}
+      .hero{margin:12px auto;padding:28px 24px;height:260px;max-width:calc(100% - 24px)}
+      .hero-title{font-size:2rem}
+      .hero-desc{font-size:.9rem;line-height:1.5}
+      .hero-content{width:100%}
+      .filter-bar{padding:10px 16px;height:auto;flex-wrap:wrap;gap:8px}
+      .pill-group{order:1;width:100%}
+      .search-box{order:2;min-width:0;flex:1;margin-left:0}
+      .contador{order:3;margin-left:auto}
+      .contenedor{padding:14px 16px}
+      .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
     }
     @media(max-width:480px){
-      .grid{grid-template-columns:1fr 1fr;gap:12px}
-      .tarjeta-img{height:150px}
+      .header{padding:16px 0 0}
+      .header-logo{width:140px;height:62px}
+      .hero{height:200px;padding:20px 18px;margin:10px auto;border-radius:10px}
+      .hero-title{font-size:1.5rem;margin-bottom:8px}
+      .hero-desc{font-size:.82rem}
+      .filter-bar{padding:8px 12px}
+      .contenedor{padding:12px}
+      .grid{grid-template-columns:1fr 1fr;gap:10px}
+      .tarjeta-img{height:130px}
+      .tarjeta-body{padding:10px 10px 12px}
+      .tarjeta-nombre{font-size:.8rem}
+      .tarjeta-desc{font-size:.75rem;margin-bottom:8px}
+      .btn-add{height:48px;font-size:.78rem}
+      .carrito-fab{bottom:16px;right:16px;height:52px;padding:0 16px;font-size:.84rem}
     }
   </style>
 </head>
