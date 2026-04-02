@@ -173,7 +173,7 @@
     @keyframes spin{to{transform:rotate(360deg)}}
 
     @media(max-width:900px){
-      .sidebar{width:64px}
+      .sidebar{width:60px}
       .sidebar-logo .logo-text,.empresa-selector,.nav-section,.nav-item span:not(.icon),.user-email,.btn-salir,.user-avatar-wrap .user-info-wrap{display:none}
       .nav-item{padding:12px;justify-content:center}
       .dash-layout{grid-template-columns:1fr}
@@ -181,6 +181,37 @@
       .stats{grid-template-columns:repeat(2,1fr)}
       .dash-hero{padding:20px 20px 0;min-height:140px}
       .content{padding:16px}
+    }
+    @media(max-width:640px){
+      body{flex-direction:column}
+      .sidebar{
+        width:100%;height:auto;flex-direction:row;
+        border-right:none;border-bottom:1px solid #f1f1f1;
+        position:sticky;top:0;z-index:50;
+      }
+      .sidebar-logo{height:52px;padding:0 16px;border-bottom:none}
+      .sidebar-logo .logo-text{display:block;height:20px}
+      .sidebar-nav{display:flex;flex-direction:row;padding:0;flex:1;overflow-x:auto}
+      .nav-section{display:none}
+      .nav-item{padding:10px 14px;flex-direction:column;gap:2px;font-size:.6rem;min-width:56px}
+      .nav-item span:not(.icon){display:block;font-size:.58rem}
+      .nav-item .icon{width:auto}
+      .sidebar-bottom{display:none}
+      .main{min-height:0}
+      .topbar{padding:12px 16px}
+      .content{padding:12px}
+      .dash-layout{grid-template-columns:1fr;gap:12px}
+      .dash-hero{padding:20px;min-height:160px;border-radius:10px}
+      .dash-hero-title{font-size:1.1rem}
+      .dash-hero-desc{font-size:.78rem;margin-bottom:14px}
+      .stats{grid-template-columns:1fr;gap:10px}
+      .stat{padding:16px 18px}
+      .stat-num{font-size:1.5rem}
+      .pasos-grid{grid-template-columns:1fr;gap:10px}
+      .paso-item{min-height:120px;padding:18px}
+      .pedidos-dash-card{padding:16px}
+      table{font-size:.8rem}
+      th,td{padding:8px 10px}
     }
   </style>
 </head>
