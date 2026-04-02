@@ -182,23 +182,21 @@
       .dash-hero{padding:20px 20px 0;min-height:140px}
       .content{padding:16px}
     }
+    /* hamburger overlay */
+    .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:149}
+    .mob-overlay.activo{display:block}
+    .btn-hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:#111}
+
     @media(max-width:640px){
-      body{flex-direction:column}
+      .btn-hamburger{display:flex;align-items:center;justify-content:center}
       .sidebar{
-        width:100%;height:auto;flex-direction:row;
-        border-right:none;border-bottom:1px solid #f1f1f1;
-        position:sticky;top:0;z-index:50;
+        position:fixed;left:-288px;top:0;height:100vh;z-index:150;
+        transition:left .25s ease;box-shadow:none;
       }
-      .sidebar-logo{height:52px;padding:0 16px;border-bottom:none}
-      .sidebar-logo .logo-text{display:block;height:20px}
-      .sidebar-nav{display:flex;flex-direction:row;padding:0;flex:1;overflow-x:auto}
-      .nav-section{display:none}
-      .nav-item{padding:10px 14px;flex-direction:column;gap:2px;font-size:.6rem;min-width:56px}
-      .nav-item span:not(.icon){display:block;font-size:.58rem}
-      .nav-item .icon{width:auto}
-      .sidebar-bottom{display:none}
-      .main{min-height:0}
-      .topbar{padding:12px 16px}
+      .sidebar.mob-open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
+      .main{width:100%}
+      .topbar{padding:12px 16px;display:flex;align-items:center;gap:12px}
+      .topbar h1{flex:1}
       .content{padding:12px}
       .dash-layout{grid-template-columns:1fr;gap:12px}
       .dash-hero{padding:20px;min-height:160px;border-radius:10px}
@@ -216,6 +214,9 @@
   </style>
 </head>
 <body>
+
+<!-- MOB OVERLAY -->
+<div class="mob-overlay" id="mobOverlay" onclick="cerrarSidebar()"></div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -254,6 +255,9 @@
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
+    <button class="btn-hamburger" onclick="abrirSidebar()">
+      <span class="material-icons" style="font-size:26px">menu</span>
+    </button>
     <h1 id="topbarTitle">Dashboard</h1>
     <div id="topbarActions"></div>
   </div>
@@ -817,6 +821,7 @@
     const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
     if (panel === 'pedidos') cargarPedidos()
+    cerrarSidebar()
   }
 
   async function cargarPedidos() {
@@ -868,6 +873,15 @@
   }
   function abrirCatalogo() {
     if (EMPRESA?.slug) window.open(`catalogo.html?slug=${EMPRESA.slug}`, '_blank')
+  }
+
+  function abrirSidebar() {
+    document.querySelector('.sidebar').classList.add('mob-open')
+    document.getElementById('mobOverlay').classList.add('activo')
+  }
+  function cerrarSidebar() {
+    document.querySelector('.sidebar').classList.remove('mob-open')
+    document.getElementById('mobOverlay').classList.remove('activo')
   }
 
   async function salir() {
