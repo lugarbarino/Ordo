@@ -53,10 +53,10 @@
     .panel.activo{display:block}
 
     /* DASHBOARD HERO */
-    .dash-hero{border-radius:12px;padding:32px 56px 0;background:linear-gradient(268deg,#e3e4e6 0%,#f1f1f1 94%);display:flex;align-items:flex-end;justify-content:space-between;min-height:190px;overflow:hidden;max-width:900px;width:100%}
-    .dash-hero-label{font-size:.75rem;color:#111;margin-bottom:10px}
-    .dash-hero-title{font-size:1.45rem;font-weight:700;color:#111;line-height:1.35;margin-bottom:12px}
-    .dash-hero-desc{font-size:.85rem;color:#333;margin-bottom:20px;max-width:320px;line-height:1.5}
+    .dash-hero{border-radius:12px;padding:32px 40px;background:linear-gradient(110deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.3) 60%,transparent 100%),url('banner-dash.png') center/cover no-repeat;display:flex;align-items:center;justify-content:space-between;min-height:190px;overflow:hidden;max-width:900px;width:100%;position:relative}
+    .dash-hero-label{font-size:.75rem;color:rgba(255,255,255,.7);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+    .dash-hero-title{font-size:1.45rem;font-weight:700;color:#fff;line-height:1.35;margin-bottom:12px}
+    .dash-hero-desc{font-size:.85rem;color:rgba(255,255,255,.75);margin-bottom:20px;max-width:320px;line-height:1.5}
     .dash-hero-btns{display:flex;gap:10px;margin-bottom:32px}
 
     /* STATS */
@@ -65,7 +65,7 @@
     .stat{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3;position:relative}
     .stat-num{font-size:2rem;font-weight:800;color:#111;margin-bottom:4px}
     .stat-label{font-size:1rem;font-weight:500;color:#666}
-    .stat-icon{position:absolute;right:20px;top:20px;width:48px;height:48px;background:#e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+    .stat-icon{position:absolute;right:20px;top:20px;width:48px;height:48px;background:#eef3ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#3872fa}
 
     /* DASH LAYOUT */
     .dash-layout{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
@@ -76,9 +76,11 @@
     .pasos-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
     .pasos-card-header h3{font-size:1.05rem;font-weight:700}
     .pasos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .paso-item{background:#f1f1f1;border-radius:12px;padding:24px;display:flex;flex-direction:column;min-height:160px}
-    .paso-item h4{font-size:1rem;font-weight:600;color:#111;line-height:1.4;flex:1}
-    .paso-link{font-size:.75rem;font-weight:600;color:#2b2b36;text-decoration:underline;cursor:pointer;margin-top:12px;display:inline-block;background:none;border:none;padding:0;font-family:inherit}
+    .paso-item{background:#263859;border-radius:12px;padding:24px;display:flex;flex-direction:column;min-height:160px}
+    .paso-icon{font-size:1.4rem;color:rgba(255,255,255,.85);margin-bottom:16px}
+    .paso-item h4{font-size:1rem;font-weight:600;color:#fff;line-height:1.4;flex:1}
+    .paso-link{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.7);text-decoration:underline;cursor:pointer;margin-top:12px;display:inline-block;background:none;border:none;padding:0;font-family:inherit}
+    .btn-hero-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)}.btn-hero-outline:hover{background:rgba(255,255,255,.1)}
     .paso-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 
     /* PEDIDOS CARD (dashboard) */
@@ -186,7 +188,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <img src="ordo-logo.svg" alt="Ordo" class="logo-text" style="height:26px;width:auto"/>
+    <svg class="logo-text" width="101" height="26" viewBox="0 0 101 26" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#al)"><g clip-path="url(#bl)"><path d="M99.737 12.733c0 2.76-.537 5.088-1.61 6.984-1.073 1.888-2.522 3.32-4.345 4.297-1.823.968-3.857 1.452-6.1 1.452-2.26 0-4.301-.488-6.124-1.464-1.816-.984-3.26-2.421-4.333-4.309-1.065-1.896-1.598-4.216-1.598-6.96 0-2.76.533-5.084 1.598-6.972C78.298 3.865 79.742 2.433 81.558 1.465 83.381.488 85.422 0 87.682 0c2.243 0 4.277.488 6.1 1.465 1.823.968 3.272 2.4 4.345 4.296 1.073 1.888 1.61 4.212 1.61 6.972Z" fill="#000"/><path d="M60.31 25.128H50.77V.339h9.441c2.55 0 4.753.496 6.609 1.489 1.864.984 3.3 2.404 4.309 4.26 1.017 1.848 1.525 4.063 1.525 6.645 0 2.582-.504 4.801-1.513 6.657-1.009 1.848-2.437 3.268-4.285 4.261-1.848.984-4.03 1.477-6.548 1.477Zm-2.809-5.713h2.566c1.227 0 2.272-.198 3.135-.593.871-.396 1.533-1.077 1.985-2.046.46-.968.69-2.316.69-4.043 0-1.727-.234-3.074-.702-4.043-.46-.968-1.138-1.65-2.033-2.045-.888-.395-1.977-.593-3.268-.593h-2.373v11.363Z" fill="#000"/><path d="M27.079 25.128V.339h10.7c1.839 0 3.449.335 4.829 1.004 1.38.67 2.453 1.634 3.22 2.893.766 1.259 1.15 2.768 1.15 4.527 0 1.775-.396 3.272-1.187 4.49-.782 1.22-1.884 2.14-3.304 2.761-1.412.621-3.062.932-4.95.932h-6.391v-5.229h5.035c.791 0 1.465-.097 2.022-.29.565-.202.996-.521 1.295-.956.306-.436.46-1.005.46-1.707 0-.71-.154-1.287-.46-1.731-.299-.452-.73-.782-1.295-.992-.557-.218-1.23-.327-2.022-.327h-2.372v19.414h-6.73Zm14.525-11.378 6.197 11.378h-7.31l-6.052-11.378h7.165Z" fill="#000"/><path d="M24.108 12.733c0 2.76-.536 5.088-1.61 6.984-1.072 1.888-2.52 3.32-4.344 4.297-1.824.968-3.857 1.452-6.1 1.452-2.26 0-4.301-.488-6.124-1.464C4.114 23.018 2.67 21.581 1.597 19.693.532 17.797 0 15.477 0 12.733c0-2.76.532-5.084 1.597-6.972C2.67 3.865 4.114 2.433 5.93 1.465 7.753.488 9.794 0 12.053 0c2.243 0 4.276.488 6.1 1.465 1.823.968 3.272 2.4 4.344 4.296 1.074 1.888 1.61 4.212 1.61 6.972Z" fill="#000"/></g></g><defs><clipPath id="al"><rect width="100.28" height="26" fill="white"/></clipPath><clipPath id="bl"><rect width="100.286" height="26" fill="white" transform="translate(-0.003)"/></clipPath></defs></svg>
   </div>
 
   <div class="empresa-selector" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">
@@ -238,14 +240,14 @@
         <div class="dash-left">
 
           <!-- Hero banner: compartí tu catálogo -->
-          <div class="dash-hero" id="dashHero" style="display:none">
+          <div class="dash-hero" id="dashHero">
             <div>
               <div class="dash-hero-label">Compartí tu catálogo</div>
               <h2 class="dash-hero-title">Tu catálogo con <span id="heroProductos">0</span> productos<br>ya está disponible</h2>
               <p class="dash-hero-desc">Compartí tu link con tus clientes y recibí tus pedidos de presupuesto</p>
               <div class="dash-hero-btns">
                 <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()"><span class="material-icons" style="font-size:16px">visibility</span> Ver</button>
-                <button class="btn btn-outline btn-sm" onclick="copiarLink()"><span class="material-icons" style="font-size:16px">content_copy</span> Copiar link</button>
+                <button class="btn btn-hero-outline btn-sm" onclick="copiarLink()"><span class="material-icons" style="font-size:16px">content_copy</span> Copiar link</button>
               </div>
             </div>
           </div>
@@ -279,18 +281,18 @@
             </div>
             <div class="pasos-grid">
               <div class="paso-item">
-                <h4>Configurá<br>tu empresa</h4>
+                <span class="material-icons paso-icon">business</span>
+                <h4>Configurá tu empresa</h4>
                 <button class="paso-link" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">Empresa →</button>
               </div>
               <div class="paso-item">
-                <h4>Cargá tu primer producto o subí un PDF</h4>
-                <div class="paso-btns">
-                  <button class="btn btn-outline btn-sm" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])"><span class="material-icons" style="font-size:15px">upload_file</span> Cargar PDF</button>
-                  <button class="paso-link" onclick="abrirModalProducto()">Cargar producto →</button>
-                </div>
+                <span class="material-icons paso-icon">inventory_2</span>
+                <h4>Cargá tu primer producto</h4>
+                <button class="paso-link" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])">Cargar PDF →</button>
               </div>
               <div class="paso-item">
-                <h4>Compartí el link<br>con tus clientes</h4>
+                <span class="material-icons paso-icon">link</span>
+                <h4>Compartí el link con tus clientes</h4>
                 <button class="paso-link" onclick="copiarLink()">Compartir link →</button>
               </div>
             </div>
