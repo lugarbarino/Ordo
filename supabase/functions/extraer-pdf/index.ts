@@ -12,7 +12,6 @@ serve(async (req) => {
   }
 
   try {
-    // Verificar que el usuario esté logueado
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'No autorizado' }), {
@@ -33,15 +32,54 @@ serve(async (req) => {
       })
     }
 
-    // Recibir el PDF en base64
-    const { pdfBase64 } = await req.json()
+    const { pdfBase64, pageImages = [] } = await req.json()
     if (!pdfBase64) {
       return new Response(JSON.stringify({ error: 'PDF requerido' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
 
-    // Llamar a Claude API
+    const hasImages = pageImages.length > 0
+
+    // Build content: PDF document first
+    const content: any[] = [
+      {
+        type: 'document',
+        source: {
+          type: 'base64',
+          media_type: 'application/pdf',
+          data: pdfBase64,
+        }
+      }
+    ]
+
+    // Add page images (cap at 30 to avoid timeouts)
+    const pagesToSend = pageImages.slice(0, 30)
+    pagesToSend.forEach((img: string, i: number) => {
+      content.push({ type: 'text', text: `--- Página ${i + 1} ---` })
+      content.push({
+        type: 'image',
+        source: { type: 'base64', media_type: 'image/jpeg', data: img }
+      })
+    })
+
+    content.push({
+      type: 'text',
+      text: `Analizá este catálogo de productos y extraé TODOS los productos que encuentres.
+
+Para cada producto devolvé:
+- nombre: nombre completo del producto
+- descripcion: descripción breve de para qué sirve (1 oración)
+- categoria: categoría o tipo de producto
+- codigo: código o número de referencia si tiene, sino dejá vacío
+- precio: precio si aparece, sino "Consultar"
+- stock: "Disponible" por defecto
+${hasImages ? `- pagina: índice de página (0 = primera) donde aparece la imagen principal del producto. Usá -1 si no tiene imagen visible.` : ''}
+
+Devolvé SOLO un JSON válido con este formato exacto, sin texto adicional antes ni después:
+{"productos": [{"nombre": "...", "descripcion": "...", "categoria": "...", "codigo": "...", "precio": "Consultar", "stock": "Disponible"${hasImages ? ', "pagina": 0' : ''}}]}`
+    })
+
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -50,36 +88,9 @@ serve(async (req) => {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 4096,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'document',
-              source: {
-                type: 'base64',
-                media_type: 'application/pdf',
-                data: pdfBase64,
-              }
-            },
-            {
-              type: 'text',
-              text: `Analizá este catálogo de productos y extraé TODOS los productos que encuentres.
-
-Para cada producto devolvé:
-- nombre: nombre completo del producto
-- descripcion: descripción breve de para qué sirve (1 oración)
-- categoria: categoría o tipo de instrumento
-- codigo: código o número de referencia si tiene, sino dejá vacío
-- precio: precio si aparece, sino "Consultar"
-- stock: "Disponible" por defecto
-
-Devolvé SOLO un JSON válido con este formato exacto, sin texto adicional antes ni después:
-{"productos": [{"nombre": "...", "descripcion": "...", "categoria": "...", "codigo": "...", "precio": "Consultar", "stock": "Disponible"}]}`
-            }
-          ]
-        }]
+        model: 'claude-sonnet-4-5',
+        max_tokens: 8192,
+        messages: [{ role: 'user', content }]
       })
     })
 
@@ -92,7 +103,6 @@ Devolvé SOLO un JSON válido con este formato exacto, sin texto adicional antes
       })
     }
 
-    // Extraer el JSON de la respuesta
     const text = claudeData.content[0].text
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {

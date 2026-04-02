@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
   <style>.material-icons{font-size:20px;line-height:1;vertical-align:middle}</style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -886,6 +887,34 @@
   }
 
   // PDF con Claude
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+
+  function arrayBufferToBase64(buffer) {
+    let binary = ''
+    const bytes = new Uint8Array(buffer)
+    const chunk = 8192
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk))
+    }
+    return btoa(binary)
+  }
+
+  async function renderPDFPages(arrayBuffer) {
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+    const pages = []
+    for (let i = 1; i <= pdf.numPages; i++) {
+      document.getElementById('pdfLoadingTxt').textContent = `🖼️ Procesando página ${i} de ${pdf.numPages}...`
+      const page = await pdf.getPage(i)
+      const viewport = page.getViewport({ scale: 1.2 })
+      const canvas = document.createElement('canvas')
+      canvas.width = viewport.width
+      canvas.height = viewport.height
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise
+      pages.push(canvas.toDataURL('image/jpeg', 0.75).split(',')[1])
+    }
+    return pages
+  }
+
   async function procesarPDF(input) {
     const file = input.files[0]
     if (!file) return
@@ -894,15 +923,18 @@
     document.getElementById('pdfStatus').style.display = 'block'
     document.getElementById('pdfLoading').style.display = 'block'
     document.getElementById('pdfResultado').style.display = 'none'
-    document.getElementById('pdfLoadingTxt').textContent = `🤖 Leyendo "${file.name}" con IA...`
+    document.getElementById('pdfLoadingTxt').textContent = `📄 Cargando "${file.name}"...`
 
     try {
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result.split(',')[1])
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
+      const arrayBuffer = await file.arrayBuffer()
+
+      // Render pages as images
+      const pageImages = await renderPDFPages(arrayBuffer)
+      window._pageImages = pageImages
+
+      // Convert PDF to base64
+      document.getElementById('pdfLoadingTxt').textContent = '🤖 Analizando con IA...'
+      const pdfBase64 = arrayBufferToBase64(arrayBuffer)
 
       const { data: { session } } = await db.auth.getSession()
 
@@ -912,7 +944,7 @@
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ pdfBase64: base64 })
+        body: JSON.stringify({ pdfBase64, pageImages })
       })
 
       const data = await res.json()
@@ -927,25 +959,35 @@
         return
       }
 
-      let productosHTML = productos.map((p, i) => `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e3e3e3">
-          <input type="checkbox" id="chk${i}" checked style="width:18px;height:18px;cursor:pointer"/>
-          <div style="flex:1">
+      const conImagen = productos.filter(p => p.pagina >= 0).length
+      let productosHTML = productos.map((p, i) => {
+        const thumb = (p.pagina >= 0 && pageImages[p.pagina])
+          ? `<img src="data:image/jpeg;base64,${pageImages[p.pagina]}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #e3e3e3;flex-shrink:0">`
+          : `<div style="width:52px;height:52px;background:#f1f1f1;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><span class="material-icons" style="color:#ccc;font-size:22px">image_not_supported</span></div>`
+        return `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e3e3e3">
+          <input type="checkbox" id="chk${i}" checked style="width:18px;height:18px;cursor:pointer;flex-shrink:0"/>
+          ${thumb}
+          <div style="flex:1;min-width:0">
             <strong style="font-size:.9rem">${p.nombre}</strong>
             <span style="font-size:.78rem;color:#666;margin-left:8px">${p.categoria || ''}</span>
-            ${p.codigo ? `<span style="font-size:.75rem;color:#666;margin-left:6px">[${p.codigo}]</span>` : ''}
-            ${p.descripcion ? `<div style="font-size:.8rem;color:#666;margin-top:2px">${p.descripcion}</div>` : ''}
+            ${p.codigo ? `<span style="font-size:.75rem;color:#999;margin-left:6px">[${p.codigo}]</span>` : ''}
+            ${p.descripcion ? `<div style="font-size:.8rem;color:#666;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.descripcion}</div>` : ''}
           </div>
-        </div>`).join('')
+        </div>`
+      }).join('')
 
       document.getElementById('pdfResultado').innerHTML = `
-        <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-          <strong>✅ Se encontraron ${productos.length} productos</strong>
-          <button class="btn btn-primary" onclick="importarProductos(${JSON.stringify(productos).replace(/"/g,'&quot;')})">
+        <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div>
+            <strong>✅ ${productos.length} productos encontrados</strong>
+            ${conImagen > 0 ? `<span style="font-size:.8rem;color:#1a8f5a;margin-left:8px">• ${conImagen} con imagen</span>` : ''}
+          </div>
+          <button class="btn btn-primary" onclick="importarProductos()">
             <span class="material-icons" style="font-size:16px">download</span> Importar seleccionados
           </button>
         </div>
-        <div style="max-height:400px;overflow-y:auto">${productosHTML}</div>`
+        <div style="max-height:420px;overflow-y:auto">${productosHTML}</div>`
 
       window._productosExtraidos = productos
 
@@ -957,11 +999,32 @@
     input.value = ''
   }
 
-  async function importarProductos(productos) {
+  async function importarProductos() {
     if (!EMPRESA) return
+    const productos = window._productosExtraidos || []
     const checkboxes = document.querySelectorAll('[id^="chk"]')
     const seleccionados = productos.filter((_, i) => checkboxes[i]?.checked)
     if (!seleccionados.length) { notif('Seleccioná al menos un producto', 'err'); return }
+
+    notif('⏳ Importando...')
+
+    // Upload page images to Storage, get URLs (deduplicated by page index)
+    const pageImages = window._pageImages || []
+    const pageUrls = {}
+    for (const p of seleccionados) {
+      const pg = p.pagina ?? -1
+      if (pg >= 0 && pageImages[pg] && !pageUrls[pg]) {
+        try {
+          const blob = await (await fetch(`data:image/jpeg;base64,${pageImages[pg]}`)).blob()
+          const nombre = `pdf_${EMPRESA.id}_${Date.now()}_p${pg}.jpg`
+          const { error } = await db.storage.from('imagenes').upload(nombre, blob, { contentType: 'image/jpeg', upsert: true })
+          if (!error) {
+            const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
+            pageUrls[pg] = urlData.publicUrl
+          }
+        } catch (e) { console.warn('No se pudo subir imagen página', pg, e) }
+      }
+    }
 
     const filas = seleccionados.map(p => ({
       empresa_id: EMPRESA.id,
@@ -971,13 +1034,17 @@
       codigo: p.codigo || '',
       precio: p.precio || 'Consultar',
       stock: p.stock || 'Disponible',
+      imagen_url: pageUrls[p.pagina ?? -1] || '',
     }))
 
     const { error } = await db.from('productos').insert(filas)
     if (error) { notif('Error al importar: ' + error.message, 'err'); return }
 
-    notif(`✅ ${filas.length} productos importados`)
+    const conImg = filas.filter(f => f.imagen_url).length
+    notif(`✅ ${filas.length} productos importados${conImg ? ` · ${conImg} con imagen` : ''}`)
     document.getElementById('pdfStatus').style.display = 'none'
+    window._pageImages = []
+    window._productosExtraidos = []
     await cargarProductos()
     actualizarDashboard()
     showPanel('productos', document.querySelectorAll('.nav-item')[2])
