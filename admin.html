@@ -1347,21 +1347,59 @@
 
     try {
       const body = { platform }
-      if (platform === 'mercadolibre') body.nickname = document.getElementById('mlNickname').value.trim()
-      if (platform === 'tiendanube')   { body.store_id = document.getElementById('tnStoreId').value.trim(); body.token = document.getElementById('tnToken').value.trim() }
-      if (platform === 'woocommerce')  { body.url = document.getElementById('wcUrl').value.trim(); body.consumer_key = document.getElementById('wcKey').value.trim(); body.consumer_secret = document.getElementById('wcSecret').value.trim() }
-      if (platform === 'shopify')      { body.shop = document.getElementById('shopifyShop').value.trim(); body.token = document.getElementById('shopifyToken').value.trim() }
+      let productos = []
 
-      const { data: { session } } = await db.auth.getSession()
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/importar-catalogo`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Error al conectar')
+      if (platform === 'mercadolibre') {
+        // ML API is public + CORS-enabled — call directly from browser
+        const nickname = document.getElementById('mlNickname').value.trim()
+        if (!nickname) throw new Error('Ingresá el nickname del vendedor')
+        resultadoEl.innerHTML = '<div class="loading"><div class="spinner"></div><div>Buscando vendedor...</div></div>'
 
-      const productos = data.productos || []
+        const userRes = await fetch(`https://api.mercadolibre.com/users/search?nickname=${encodeURIComponent(nickname)}`)
+        const userData = await userRes.json()
+        if (!userData.results?.length) throw new Error(`Vendedor "${nickname}" no encontrado en MercadoLibre`)
+        const sellerId = userData.results[0].id
+
+        let offset = 0
+        while (true) {
+          resultadoEl.innerHTML = `<div class="loading"><div class="spinner"></div><div>Cargando productos... (${productos.length} hasta ahora)</div></div>`
+          const res = await fetch(`https://api.mercadolibre.com/sites/MLA/search?seller_id=${sellerId}&limit=50&offset=${offset}`)
+          const data = await res.json()
+          const items = data.results || []
+          if (!items.length) break
+          for (const item of items) {
+            productos.push({
+              nombre: item.title,
+              descripcion: '',
+              categoria: '',
+              codigo: item.id,
+              precio: `$${item.price}`,
+              stock: (item.available_quantity || 0) > 0 ? 'Disponible' : 'Sin stock',
+              imagen_url: (item.thumbnail || '').replace('-I.jpg', '-O.jpg'),
+            })
+          }
+          if (items.length < 50) break
+          offset += 50
+          if (offset >= 300) break
+        }
+        if (!productos.length) throw new Error('No se encontraron productos para este vendedor')
+
+      } else {
+        // Other platforms go through edge function
+        if (platform === 'tiendanube')  { body.store_id = document.getElementById('tnStoreId').value.trim(); body.token = document.getElementById('tnToken').value.trim() }
+        if (platform === 'woocommerce') { body.url = document.getElementById('wcUrl').value.trim(); body.consumer_key = document.getElementById('wcKey').value.trim(); body.consumer_secret = document.getElementById('wcSecret').value.trim() }
+        if (platform === 'shopify')     { body.shop = document.getElementById('shopifyShop').value.trim(); body.token = document.getElementById('shopifyToken').value.trim() }
+
+        const { data: { session } } = await db.auth.getSession()
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/importar-catalogo`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Error al conectar')
+        productos = data.productos || []
+      }
       if (!productos.length) { resultadoEl.innerHTML = '<div style="color:#c0392b">No se encontraron productos.</div>'; return }
 
       mostrarResultadosImport(productos, resultadoId)
