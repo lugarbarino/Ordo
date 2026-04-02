@@ -128,14 +128,19 @@
     .empty-state .icon{font-size:3rem;margin-bottom:12px}
 
     /* FORM CONFIG */
-    .config-form{background:white;border-radius:14px;padding:28px;border:1px solid #e3e3e3;max-width:600px}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .form-group{margin-bottom:18px}
-    .form-group label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px}
-    .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit}
-    .form-group input:focus,.form-group textarea:focus{border-color:#3872fa}
-    .form-group textarea{resize:vertical;min-height:80px}
+    .config-form{background:white;border-radius:14px;padding:32px;border:1px solid #e3e3e3;max-width:520px}
+    .form-group{margin-bottom:22px}
+    .form-group label{display:block;font-size:.88rem;font-weight:700;margin-bottom:6px;color:#1e2a3a}
+    .form-group input,.form-group select{width:100%;padding:11px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit;box-sizing:border-box}
+    .form-group input:focus{border-color:var(--p,#285576)}
     .form-hint{font-size:.78rem;color:#666;margin-top:4px}
+    .cfg-media-row{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:stretch;min-height:110px}
+    .cfg-preview{border:1.5px solid #e3e3e3;border-radius:10px;background:#f9f9f9;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .cfg-preview img{width:100%;height:100%;object-fit:contain}
+    .cfg-upload-btn{border:1.5px solid #B0B2CF;border-radius:10px;background:white;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1e2a3a;font-family:inherit;transition:background .15s;padding:0 16px;height:60px}
+    .cfg-upload-btn:hover{background:#f5f5f5}
+    @keyframes cfg-spin{to{transform:rotate(360deg)}}
+    .cfg-spinning{animation:cfg-spin .8s linear infinite;display:inline-block}
 
     /* MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
@@ -181,7 +186,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <span class="logo-text">ORDO</span>
+    <img src="ordo-logo.svg" alt="Ordo" class="logo-text" style="height:26px;width:auto"/>
   </div>
 
   <div class="empresa-selector" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">
@@ -307,7 +312,6 @@
     <!-- PRODUCTOS -->
     <div class="panel" id="panelProductos">
       <div class="tabla-header">
-        <h2>Productos</h2>
         <div class="tabla-acciones">
           <input class="input-buscar" type="text" placeholder="Buscar..." id="buscarProd" oninput="filtrarTabla()"/>
           <button class="btn btn-primary" onclick="abrirModalProducto()"><span class="material-icons" style="font-size:16px">add</span> Agregar</button>
@@ -319,7 +323,6 @@
 
     <!-- PDF -->
     <div class="panel" id="panelPdf">
-      <h2 style="margin-bottom:20px">Cargar catálogo desde PDF con IA 🤖</h2>
       <div class="pdf-zone" onclick="document.getElementById('inputPDF').click()" id="pdfZone">
         <div class="icon">📄</div>
         <h3>Hacé clic o arrastrá tu PDF acá</h3>
@@ -340,61 +343,84 @@
 
     <!-- CONFIG -->
     <div class="panel" id="panelConfig">
-      <h2 style="margin-bottom:20px">Configuración de mi empresa</h2>
       <div class="config-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre de la empresa *</label>
-            <input type="text" id="cfgNombre" placeholder="Ej: Instrumental Médico SA"/>
-          </div>
-          <div class="form-group">
-            <label>Slug (URL pública) *</label>
-            <input type="text" id="cfgSlug" placeholder="instrumental-medico" oninput="limpiarSlug()"/>
-            <div class="form-hint" id="slugPreview">Tu link: —</div>
-          </div>
-        </div>
+
         <div class="form-group">
-          <label>Descripción</label>
-          <textarea id="cfgDesc" placeholder="Breve descripción de tu empresa o catálogo..."></textarea>
+          <label>Nombre para el link publico de tu catalogo</label>
+          <input type="text" id="cfgSlug" placeholder="nombre-de-tu-catalogo" oninput="limpiarSlug()"/>
+          <div class="form-hint" id="slugPreview">Tu link: —</div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Logo de la empresa</label>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div id="logoPreview" style="width:64px;height:64px;border-radius:10px;background:#f1f1f1;border:1px solid #e3e3e3;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden"><span class="material-icons" style="font-size:28px;color:#aaa">business</span></div>
-              <div>
-                <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('inputLogo').click()" id="btnSubirLogo"><span class="material-icons" style="font-size:15px">upload</span> Elegir logo</button>
-                <div style="font-size:.75rem;color:#666;margin-top:4px">PNG o JPG, máx 2MB</div>
-              </div>
+
+        <div class="form-group">
+          <label>Titulo</label>
+          <input type="text" id="cfgNombre" placeholder="Frase que represente tu producto"/>
+        </div>
+
+        <div class="form-group">
+          <label>Parrafo</label>
+          <input type="text" id="cfgDesc" placeholder="Explica un poco mas tu servicio"/>
+        </div>
+
+        <div class="form-group">
+          <label>Logo de la empresa</label>
+          <div style="font-size:.8rem;color:#6b7a90;margin-bottom:10px">Usa una version sin fondo, en png, que se vea en fondo claro.</div>
+          <div class="cfg-media-row">
+            <div class="cfg-preview" id="logoPreview">
+              <span class="material-icons" style="font-size:32px;color:#d8dee6">business</span>
             </div>
-            <input type="hidden" id="cfgLogo"/>
+            <button type="button" class="cfg-upload-btn" id="btnSubirLogo" onclick="document.getElementById('inputLogo').click()">
+              <span class="material-icons" style="font-size:18px">upload_file</span> Subir Logo
+            </button>
           </div>
-          <div class="form-group">
-            <label>Color principal</label>
-            <input type="color" id="cfgColor" value="#3872fa" style="height:44px;padding:4px"/>
+          <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
+          <input type="hidden" id="cfgLogo"/>
+          <div class="form-hint">PNG recomendado · máx 2MB</div>
+        </div>
+
+        <div class="form-group">
+          <label>Imagen de fondo del banner</label>
+          <div class="cfg-media-row">
+            <div class="cfg-preview" id="bannerPreview">
+              <span class="material-icons" style="font-size:32px;color:#d8dee6">image</span>
+            </div>
+            <button type="button" class="cfg-upload-btn" id="btnSubirBanner" onclick="document.getElementById('inputBanner').click()">
+              <span class="material-icons" style="font-size:18px">upload_file</span> Subir Imagen
+            </button>
+          </div>
+          <input type="file" id="inputBanner" accept="image/*" style="display:none" onchange="subirBanner(this)"/>
+          <input type="hidden" id="cfgBanner"/>
+          <div class="form-hint">JPG o PNG · máx 5MB · se recomienda formato horizontal (1000×450px)</div>
+        </div>
+
+        <div class="form-group">
+          <label>Color principal</label>
+          <div class="cfg-media-row" style="min-height:70px">
+            <div id="colorPreview" style="border-radius:10px;background:#3872fa"></div>
+            <div style="position:relative;display:flex">
+              <button type="button" class="cfg-upload-btn" style="flex:1" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
+              <input type="color" id="cfgColor" value="#3872fa" style="position:absolute;top:50%;left:50%;width:0;height:0;opacity:0;pointer-events:none" oninput="document.getElementById('colorPreview').style.background=this.value"/>
+            </div>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>📱 WhatsApp para pedidos</label>
-            <input type="text" id="cfgWhatsapp" placeholder="Ej: 5491112345678"/>
-            <div class="form-hint">Código de país + número, sin espacios ni +</div>
-          </div>
-          <div class="form-group">
-            <label>📧 Email para pedidos</label>
-            <input type="email" id="cfgEmail" placeholder="contacto@empresa.com"/>
-          </div>
+
+        <div class="form-group">
+          <label>Mail para recibir los presupuestos</label>
+          <div style="font-size:.8rem;color:#6b7a90;margin-bottom:8px">Tambien se van a guardar en el tab de pedidos</div>
+          <input type="email" id="cfgEmail" placeholder="tumail@gmail.com"/>
         </div>
-        <button class="btn btn-primary" onclick="guardarConfig()"><span class="material-icons" style="font-size:16px">save</span> Guardar cambios</button>
+
+        <input type="hidden" id="cfgWhatsapp"/>
+
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="guardarConfig()" style="padding:14px 28px;border-radius:12px;font-size:.95rem">
+            <span class="material-icons" style="font-size:16px">save</span> Guardar
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- PEDIDOS -->
     <div class="panel" id="panelPedidos">
-      <div class="tabla-header">
-        <h2>Pedidos de presupuesto</h2>
-      </div>
       <div class="loading" id="loadingPedidos"><div class="spinner"></div><div>Cargando...</div></div>
       <div id="pedidosWrap"></div>
     </div>
@@ -490,11 +516,16 @@
       document.getElementById('cfgSlug').value   = EMPRESA.slug || ''
       document.getElementById('cfgDesc').value   = EMPRESA.descripcion || ''
       document.getElementById('cfgLogo').value    = EMPRESA.logo_url || ''
+      document.getElementById('cfgBanner').value  = EMPRESA.banner_url || ''
+      if (EMPRESA.banner_url) {
+        document.getElementById('bannerPreview').innerHTML = `<img src="${EMPRESA.banner_url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`
+      }
       document.getElementById('cfgColor').value   = EMPRESA.color || '#3872fa'
+      document.getElementById('colorPreview').style.background = EMPRESA.color || '#3872fa'
       document.getElementById('cfgWhatsapp').value = EMPRESA.whatsapp || ''
       document.getElementById('cfgEmail').value    = EMPRESA.email_contacto || ''
       if (EMPRESA.logo_url) {
-        document.getElementById('logoPreview').innerHTML = `<img src="${EMPRESA.logo_url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
+        document.getElementById('logoPreview').innerHTML = `<img src="${EMPRESA.logo_url}" style="width:100%;height:100%;object-fit:contain;border-radius:10px"/>`
         document.getElementById('sidebarAvatar').innerHTML = `<img src="${EMPRESA.logo_url}"/>`
       }
       if (EMPRESA.nombre) {
@@ -728,6 +759,7 @@
       slug,
       descripcion:   document.getElementById('cfgDesc').value.trim(),
       logo_url:      document.getElementById('cfgLogo').value.trim(),
+      banner_url:    document.getElementById('cfgBanner').value.trim(),
       color:         document.getElementById('cfgColor').value,
       whatsapp:      document.getElementById('cfgWhatsapp').value.trim(),
       email_contacto: document.getElementById('cfgEmail').value.trim(),
@@ -939,13 +971,33 @@
     notif('✅ Foto subida')
   }
 
+  async function subirBanner(input) {
+    const file = input.files[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { notif('La imagen no puede superar 5MB', 'err'); return }
+    const btn = document.getElementById('btnSubirBanner')
+    btn.innerHTML = '<span class="material-icons cfg-spinning">sync</span> Subiendo...'
+    btn.disabled = true
+    const ext = file.name.split('.').pop()
+    const nombre = `banner_${Date.now()}.${ext}`
+    const { data, error } = await db.storage.from('imagenes').upload(nombre, file, { contentType: file.type, upsert: true })
+    btn.innerHTML = '<span class="material-icons" style="font-size:18px">upload_file</span> Subir Imagen'
+    btn.disabled = false
+    if (error) { notif('Error al subir: ' + error.message, 'err'); return }
+    const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
+    const url = urlData.publicUrl
+    document.getElementById('cfgBanner').value = url
+    document.getElementById('bannerPreview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`
+    notif('✅ Imagen de banner subida')
+  }
+
   async function subirLogo(input) {
     const file = input.files[0]
     if (!file) return
     if (file.size > 2 * 1024 * 1024) { notif('El logo no puede superar 2MB', 'err'); return }
 
     const btn = document.getElementById('btnSubirLogo')
-    btn.textContent = '⏳ Subiendo...'
+    btn.innerHTML = '<span class="material-icons cfg-spinning">sync</span> Subiendo...'
     btn.disabled = true
 
     const ext = file.name.split('.').pop()
@@ -955,7 +1007,7 @@
       .from('imagenes')
       .upload(nombre, file, { contentType: file.type, upsert: true })
 
-    btn.textContent = '📁 Elegir logo'
+    btn.innerHTML = '<span class="material-icons" style="font-size:18px">upload_file</span> Subir Logo'
     btn.disabled = false
 
     if (error) { notif('Error al subir el logo: ' + error.message, 'err'); return }
@@ -964,7 +1016,7 @@
     const url = urlData.publicUrl
 
     document.getElementById('cfgLogo').value = url
-    document.getElementById('logoPreview').innerHTML = `<img src="${url}" style="width:64px;height:64px;object-fit:contain;border-radius:8px"/>`
+    document.getElementById('logoPreview').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;border-radius:10px"/>`
     notif('✅ Logo subido')
   }
 
