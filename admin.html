@@ -312,7 +312,6 @@
     <!-- PRODUCTOS -->
     <div class="panel" id="panelProductos">
       <div class="tabla-header">
-        <h2>Productos</h2>
         <div class="tabla-acciones">
           <input class="input-buscar" type="text" placeholder="Buscar..." id="buscarProd" oninput="filtrarTabla()"/>
           <button class="btn btn-primary" onclick="abrirModalProducto()"><span class="material-icons" style="font-size:16px">add</span> Agregar</button>
@@ -324,7 +323,6 @@
 
     <!-- PDF -->
     <div class="panel" id="panelPdf">
-      <h2 style="margin-bottom:20px">Cargar catálogo desde PDF con IA 🤖</h2>
       <div class="pdf-zone" onclick="document.getElementById('inputPDF').click()" id="pdfZone">
         <div class="icon">📄</div>
         <h3>Hacé clic o arrastrá tu PDF acá</h3>
@@ -346,8 +344,6 @@
     <!-- CONFIG -->
     <div class="panel" id="panelConfig">
       <div class="config-form">
-        <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:6px">Tu empresa</h2>
-        <p style="color:#6b7a90;font-size:.9rem;margin-bottom:28px">Con estos datos se va a armar tu catalogo público</p>
 
         <div class="form-group">
           <label>Nombre para el link publico de tu catalogo</label>
@@ -425,9 +421,6 @@
 
     <!-- PEDIDOS -->
     <div class="panel" id="panelPedidos">
-      <div class="tabla-header">
-        <h2>Pedidos de presupuesto</h2>
-      </div>
       <div class="loading" id="loadingPedidos"><div class="spinner"></div><div>Cargando...</div></div>
       <div id="pedidosWrap"></div>
     </div>
