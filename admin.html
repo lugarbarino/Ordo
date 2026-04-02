@@ -137,8 +137,10 @@
     .cfg-media-row{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:stretch;min-height:110px}
     .cfg-preview{border:1.5px solid #e3e3e3;border-radius:10px;background:#f9f9f9;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .cfg-preview img{width:100%;height:100%;object-fit:contain}
-    .cfg-upload-btn{border:1.5px solid #1e2a3a;border-radius:10px;background:white;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1e2a3a;font-family:inherit;transition:background .15s;padding:0 16px}
+    .cfg-upload-btn{border:1.5px solid #B0B2CF;border-radius:10px;background:white;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;color:#1e2a3a;font-family:inherit;transition:background .15s;padding:0 16px;height:60px}
     .cfg-upload-btn:hover{background:#f5f5f5}
+    @keyframes cfg-spin{to{transform:rotate(360deg)}}
+    .cfg-spinning{animation:cfg-spin .8s linear infinite;display:inline-block}
 
     /* MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
@@ -370,7 +372,7 @@
             <div class="cfg-preview" id="logoPreview">
               <span class="material-icons" style="font-size:32px;color:#d8dee6">business</span>
             </div>
-            <button type="button" class="cfg-upload-btn" onclick="document.getElementById('inputLogo').click()">
+            <button type="button" class="cfg-upload-btn" id="btnSubirLogo" onclick="document.getElementById('inputLogo').click()">
               <span class="material-icons" style="font-size:18px">upload_file</span> Subir Logo
             </button>
           </div>
@@ -383,7 +385,7 @@
             <div class="cfg-preview" id="bannerPreview">
               <span class="material-icons" style="font-size:32px;color:#d8dee6">image</span>
             </div>
-            <button type="button" class="cfg-upload-btn" onclick="document.getElementById('inputBanner').click()">
+            <button type="button" class="cfg-upload-btn" id="btnSubirBanner" onclick="document.getElementById('inputBanner').click()">
               <span class="material-icons" style="font-size:18px">upload_file</span> Subir Imagen
             </button>
           </div>
@@ -978,12 +980,12 @@
     if (!file) return
     if (file.size > 5 * 1024 * 1024) { notif('La imagen no puede superar 5MB', 'err'); return }
     const btn = document.getElementById('btnSubirBanner')
-    btn.textContent = '⏳ Subiendo...'
+    btn.innerHTML = '<span class="material-icons cfg-spinning">sync</span> Subiendo...'
     btn.disabled = true
     const ext = file.name.split('.').pop()
     const nombre = `banner_${Date.now()}.${ext}`
     const { data, error } = await db.storage.from('imagenes').upload(nombre, file, { contentType: file.type, upsert: true })
-    btn.innerHTML = '<span class="material-icons" style="font-size:15px">upload</span> Elegir imagen'
+    btn.innerHTML = '<span class="material-icons" style="font-size:18px">upload_file</span> Subir Imagen'
     btn.disabled = false
     if (error) { notif('Error al subir: ' + error.message, 'err'); return }
     const { data: urlData } = db.storage.from('imagenes').getPublicUrl(nombre)
@@ -999,7 +1001,7 @@
     if (file.size > 2 * 1024 * 1024) { notif('El logo no puede superar 2MB', 'err'); return }
 
     const btn = document.getElementById('btnSubirLogo')
-    btn.textContent = '⏳ Subiendo...'
+    btn.innerHTML = '<span class="material-icons cfg-spinning">sync</span> Subiendo...'
     btn.disabled = true
 
     const ext = file.name.split('.').pop()
@@ -1009,7 +1011,7 @@
       .from('imagenes')
       .upload(nombre, file, { contentType: file.type, upsert: true })
 
-    btn.textContent = '📁 Elegir logo'
+    btn.innerHTML = '<span class="material-icons" style="font-size:18px">upload_file</span> Subir Logo'
     btn.disabled = false
 
     if (error) { notif('Error al subir el logo: ' + error.message, 'err'); return }
