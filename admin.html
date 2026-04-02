@@ -76,10 +76,11 @@
     .pasos-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
     .pasos-card-header h3{font-size:1.05rem;font-weight:700}
     .pasos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .paso-item{background:#263859;border-radius:12px;padding:24px;display:flex;flex-direction:column;min-height:160px}
-    .paso-icon{font-size:1.4rem;color:rgba(255,255,255,.85);margin-bottom:16px}
-    .paso-item h4{font-size:1rem;font-weight:600;color:#fff;line-height:1.4;flex:1}
-    .paso-link{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.7);text-decoration:underline;cursor:pointer;margin-top:12px;display:inline-block;background:none;border:none;padding:0;font-family:inherit}
+    .paso-item{border-radius:12px;padding:24px;display:flex;flex-direction:column;min-height:160px}
+    .paso-icon{font-size:1.4rem;margin-bottom:16px}
+    .paso-item{cursor:pointer;transition:box-shadow .2s,transform .2s;border:none;text-align:left}
+    .paso-item:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.18)}
+    .paso-item h4{font-size:1rem;font-weight:600;line-height:1.4;flex:1}
     .btn-hero-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)}.btn-hero-outline:hover{background:rgba(255,255,255,.1)}
     .paso-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 
@@ -280,21 +281,18 @@
               <h3>Primeros pasos</h3>
             </div>
             <div class="pasos-grid">
-              <div class="paso-item">
-                <span class="material-icons paso-icon">business</span>
-                <h4>Configurá tu empresa</h4>
-                <button class="paso-link" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">Empresa →</button>
-              </div>
-              <div class="paso-item">
-                <span class="material-icons paso-icon">inventory_2</span>
-                <h4>Cargá tu primer producto</h4>
-                <button class="paso-link" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])">Cargar PDF →</button>
-              </div>
-              <div class="paso-item">
-                <span class="material-icons paso-icon">link</span>
-                <h4>Compartí el link con tus clientes</h4>
-                <button class="paso-link" onclick="copiarLink()">Compartir link →</button>
-              </div>
+              <button class="paso-item" style="background:#35425F" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">
+                <span class="material-icons paso-icon" style="color:rgba(255,255,255,.85)">business</span>
+                <h4 style="color:#fff">Configurá tu empresa</h4>
+              </button>
+              <button class="paso-item" style="background:#495A82" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])">
+                <span class="material-icons paso-icon" style="color:rgba(255,255,255,.85)">inventory_2</span>
+                <h4 style="color:#fff">Cargá tu primer producto</h4>
+              </button>
+              <button class="paso-item" style="background:#AAB8D8" onclick="copiarLink()">
+                <span class="material-icons paso-icon" style="color:#35425F">link</span>
+                <h4 style="color:#35425F">Compartí el link con tus clientes</h4>
+              </button>
             </div>
           </div>
 
