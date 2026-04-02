@@ -85,6 +85,20 @@
     .btn-hero-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)}.btn-hero-outline:hover{background:rgba(255,255,255,.1)}
     .paso-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
 
+    /* IMPORT TABS */
+    .import-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+    .import-tab-btn{padding:7px 16px;border-radius:8px;border:1px solid #e3e3e3;background:white;font-size:.83rem;font-weight:500;cursor:pointer;color:#555;transition:all .15s}
+    .import-tab-btn.activo{background:#111;color:#fff;border-color:#111}
+    .import-tab-panel{display:none}
+    .import-tab-panel.activo{display:block}
+    .import-field{margin-bottom:14px}
+    .import-field label{display:block;font-size:.8rem;font-weight:600;color:#444;margin-bottom:5px}
+    .import-field input{width:100%;padding:9px 12px;border:1px solid #e3e3e3;border-radius:8px;font-size:.88rem;font-family:inherit}
+    .import-field input:focus{outline:none;border-color:#111}
+    .import-drop{border:2px dashed #e3e3e3;border-radius:12px;padding:32px;text-align:center;cursor:pointer;background:#fafafa;transition:border-color .15s}
+    .import-drop:hover{border-color:#111}
+    .import-drop p{font-size:.85rem;color:#666;margin-top:6px}
+
     /* PEDIDOS CARD (dashboard) */
     .pedidos-dash-card{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3;overflow:hidden}
     .pedidos-dash-card h3{font-size:1.05rem;font-weight:700;margin-bottom:16px}
@@ -233,6 +247,7 @@
     <button class="nav-item activo" onclick="showPanel('dashboard',this)"><span class="icon"><span class="material-icons">dashboard</span></span><span>Dashboard</span></button>
     <div class="nav-section">CATÁLOGO</div>
     <button class="nav-item" onclick="showPanel('pdf',this)"><span class="icon"><span class="material-icons">picture_as_pdf</span></span><span>Cargar PDF</span></button>
+    <button class="nav-item" onclick="showPanel('importar',this)"><span class="icon"><span class="material-icons">sync</span></span><span>Importar</span></button>
     <button class="nav-item" onclick="showPanel('productos',this)"><span class="icon"><span class="material-icons">inventory_2</span></span><span>Productos</span></button>
     <button class="nav-item" onclick="showPanel('pedidos',this)"><span class="icon"><span class="material-icons">receipt_long</span></span><span>Pedidos</span></button>
     <button class="nav-item" onclick="showPanel('config',this)"><span class="icon"><span class="material-icons">business</span></span><span>Mi empresa</span></button>
@@ -370,6 +385,113 @@
       </div>
       <div style="background:#eef3ff;border-radius:10px;padding:16px 20px;font-size:.85rem;margin-top:16px;color:#1e2a3a">
         💡 <strong>¿Cómo funciona?</strong> Subís tu catálogo en PDF → la IA lee todas las páginas → te muestra los productos encontrados → confirmás cuáles importar.
+      </div>
+    </div>
+
+    <!-- IMPORTAR -->
+    <div class="panel" id="panelImportar">
+      <div class="import-tabs">
+        <button class="import-tab-btn activo" data-tab="csv" onclick="switchImportTab('csv')">📄 CSV / Excel</button>
+        <button class="import-tab-btn" data-tab="mercadolibre" onclick="switchImportTab('mercadolibre')"><img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.72/mercadolibre/logo__large_plus@2x.png" style="height:14px;vertical-align:middle"> MercadoLibre</button>
+        <button class="import-tab-btn" data-tab="tiendanube" onclick="switchImportTab('tiendanube')">☁️ Tiendanube</button>
+        <button class="import-tab-btn" data-tab="woocommerce" onclick="switchImportTab('woocommerce')">🛒 WooCommerce</button>
+        <button class="import-tab-btn" data-tab="shopify" onclick="switchImportTab('shopify')">🛍️ Shopify</button>
+      </div>
+
+      <!-- CSV -->
+      <div class="import-tab-panel activo" id="importTab_csv">
+        <div class="import-drop" onclick="document.getElementById('inputCSV').click()" id="csvDrop">
+          <div style="font-size:2rem">📊</div>
+          <strong>Hacé clic o arrastrá tu CSV acá</strong>
+          <p>Columnas soportadas: nombre, descripcion, categoria, codigo, precio, stock, imagen_url</p>
+        </div>
+        <input type="file" id="inputCSV" accept=".csv,.txt" style="display:none" onchange="procesarCSV(this)"/>
+        <div id="csvStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
+          <div id="csvResultado"></div>
+        </div>
+      </div>
+
+      <!-- MERCADO LIBRE -->
+      <div class="import-tab-panel" id="importTab_mercadolibre">
+        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
+          <div class="import-field">
+            <label>Nickname del vendedor en MercadoLibre</label>
+            <input type="text" id="mlNickname" placeholder="ej: MI_TIENDA_123"/>
+          </div>
+          <button class="btn btn-primary" onclick="importarDesdePlataforma('mercadolibre')">
+            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
+          </button>
+        </div>
+        <div id="mlStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
+          <div id="mlResultado"></div>
+        </div>
+      </div>
+
+      <!-- TIENDANUBE -->
+      <div class="import-tab-panel" id="importTab_tiendanube">
+        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
+          <div class="import-field">
+            <label>ID de tu tienda</label>
+            <input type="text" id="tnStoreId" placeholder="ej: 123456"/>
+          </div>
+          <div class="import-field">
+            <label>Access Token</label>
+            <input type="password" id="tnToken" placeholder="Tu token de API de Tiendanube"/>
+          </div>
+          <p style="font-size:.78rem;color:#888;margin-bottom:14px">Encontralo en Tiendanube → Mis aplicaciones → Tu app → Access Token</p>
+          <button class="btn btn-primary" onclick="importarDesdePlataforma('tiendanube')">
+            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
+          </button>
+        </div>
+        <div id="tnStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
+          <div id="tnResultado"></div>
+        </div>
+      </div>
+
+      <!-- WOOCOMMERCE -->
+      <div class="import-tab-panel" id="importTab_woocommerce">
+        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
+          <div class="import-field">
+            <label>URL de tu tienda</label>
+            <input type="text" id="wcUrl" placeholder="https://mitienda.com"/>
+          </div>
+          <div class="import-field">
+            <label>Consumer Key</label>
+            <input type="text" id="wcKey" placeholder="ck_xxxxxxxxxxxxxxxx"/>
+          </div>
+          <div class="import-field">
+            <label>Consumer Secret</label>
+            <input type="password" id="wcSecret" placeholder="cs_xxxxxxxxxxxxxxxx"/>
+          </div>
+          <p style="font-size:.78rem;color:#888;margin-bottom:14px">WooCommerce → Ajustes → Avanzado → API REST → Agregar clave</p>
+          <button class="btn btn-primary" onclick="importarDesdePlataforma('woocommerce')">
+            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
+          </button>
+        </div>
+        <div id="wcStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
+          <div id="wcResultado"></div>
+        </div>
+      </div>
+
+      <!-- SHOPIFY -->
+      <div class="import-tab-panel" id="importTab_shopify">
+        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
+          <div class="import-field">
+            <label>URL de tu tienda</label>
+            <input type="text" id="shopifyShop" placeholder="mitienda.myshopify.com"/>
+          </div>
+          <div class="import-field">
+            <label>Access Token</label>
+            <input type="password" id="shopifyToken" placeholder="shpat_xxxxxxxxxxxxxxxx"/>
+          </div>
+          <p style="font-size:.78rem;color:#888;margin-bottom:14px">Shopify → Configuración → Apps → Desarrollar apps → Crear app privada</p>
+          <button class="btn btn-primary" onclick="importarDesdePlataforma('shopify')">
+            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
+          </button>
+        </div>
+        <div id="shopifyStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
+          <div id="shopifyResultado"></div>
+        </div>
       </div>
     </div>
 
@@ -815,7 +937,7 @@
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('activo'))
     document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1)).classList.add('activo')
     if (btn) btn.classList.add('activo')
-    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
+    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', importar: 'Importar productos', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
     if (panel === 'pedidos') cargarPedidos()
     cerrarSidebar()
@@ -1034,7 +1156,7 @@
       codigo: p.codigo || '',
       precio: p.precio || 'Consultar',
       stock: p.stock || 'Disponible',
-      imagen_url: pageUrls[p.pagina ?? -1] || '',
+      imagen_url: p.imagen_url || pageUrls[p.pagina ?? -1] || '',
     }))
 
     const { error } = await db.from('productos').insert(filas)
@@ -1135,6 +1257,150 @@
     n.style.display = 'block'
     setTimeout(() => n.style.display = 'none', 3000)
   }
+
+  // ─── IMPORTAR ───────────────────────────────────────────────
+
+  function switchImportTab(tab) {
+    document.querySelectorAll('.import-tab-btn').forEach(b => b.classList.remove('activo'))
+    document.querySelectorAll('.import-tab-panel').forEach(p => p.classList.remove('activo'))
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('activo')
+    document.getElementById(`importTab_${tab}`).classList.add('activo')
+  }
+
+  // — CSV —
+  function parseCSVLine(line, sep) {
+    const vals = []
+    let cur = '', inQ = false
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQ = !inQ }
+      else if (line[i] === sep && !inQ) { vals.push(cur); cur = '' }
+      else { cur += line[i] }
+    }
+    vals.push(cur)
+    return vals.map(v => v.trim().replace(/^"|"$/g, ''))
+  }
+
+  function parsearCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim())
+    if (lines.length < 2) throw new Error('El CSV necesita al menos encabezados y una fila de datos')
+    const sep = lines[0].includes(';') ? ';' : ','
+    const headers = parseCSVLine(lines[0], sep).map(h => h.toLowerCase())
+    const col = (...opts) => { for (const o of opts) { const i = headers.indexOf(o); if (i >= 0) return i } return -1 }
+    const cols = {
+      nombre:      col('nombre','name','producto','product','title','titulo'),
+      descripcion: col('descripcion','description','descripción','desc'),
+      categoria:   col('categoria','category','categoría','tipo','type'),
+      codigo:      col('codigo','code','sku','ref','referencia','código','cod'),
+      precio:      col('precio','price','importe','valor'),
+      stock:       col('stock','disponibilidad','availability','inventario'),
+      imagen_url:  col('imagen_url','image_url','imagen','image','foto','photo','img'),
+    }
+    if (cols.nombre < 0) throw new Error('No encontré columna de nombre. Columnas: ' + headers.join(', '))
+    const productos = []
+    for (let i = 1; i < lines.length; i++) {
+      const v = parseCSVLine(lines[i], sep)
+      const g = (c) => c >= 0 ? (v[c] || '') : ''
+      const nombre = g(cols.nombre)
+      if (!nombre) continue
+      productos.push({
+        nombre,
+        descripcion: g(cols.descripcion),
+        categoria:   g(cols.categoria),
+        codigo:      g(cols.codigo),
+        precio:      g(cols.precio) || 'Consultar',
+        stock:       g(cols.stock)  || 'Disponible',
+        imagen_url:  g(cols.imagen_url),
+      })
+    }
+    return productos
+  }
+
+  function procesarCSV(input) {
+    const file = input.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const productos = parsearCSV(e.target.result)
+        document.getElementById('csvStatus').style.display = 'block'
+        mostrarResultadosImport(productos, 'csvResultado')
+        window._productosExtraidos = productos
+        window._pageImages = []
+      } catch(err) {
+        document.getElementById('csvStatus').style.display = 'block'
+        document.getElementById('csvResultado').innerHTML = `<div style="color:#c0392b">❌ ${err.message}</div>`
+      }
+    }
+    reader.readAsText(file)
+    input.value = ''
+  }
+
+  // — Plataformas —
+  async function importarDesdePlataforma(platform) {
+    const statusId = platform === 'mercadolibre' ? 'mlStatus' : platform === 'tiendanube' ? 'tnStatus' : platform === 'woocommerce' ? 'wcStatus' : 'shopifyStatus'
+    const resultadoId = platform === 'mercadolibre' ? 'mlResultado' : platform === 'tiendanube' ? 'tnResultado' : platform === 'woocommerce' ? 'wcResultado' : 'shopifyResultado'
+
+    const statusEl = document.getElementById(statusId)
+    const resultadoEl = document.getElementById(resultadoId)
+    statusEl.style.display = 'block'
+    resultadoEl.innerHTML = '<div class="loading"><div class="spinner"></div><div>Conectando...</div></div>'
+
+    try {
+      const body = { platform }
+      if (platform === 'mercadolibre') body.nickname = document.getElementById('mlNickname').value.trim()
+      if (platform === 'tiendanube')   { body.store_id = document.getElementById('tnStoreId').value.trim(); body.token = document.getElementById('tnToken').value.trim() }
+      if (platform === 'woocommerce')  { body.url = document.getElementById('wcUrl').value.trim(); body.consumer_key = document.getElementById('wcKey').value.trim(); body.consumer_secret = document.getElementById('wcSecret').value.trim() }
+      if (platform === 'shopify')      { body.shop = document.getElementById('shopifyShop').value.trim(); body.token = document.getElementById('shopifyToken').value.trim() }
+
+      const { data: { session } } = await db.auth.getSession()
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/importar-catalogo`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Error al conectar')
+
+      const productos = data.productos || []
+      if (!productos.length) { resultadoEl.innerHTML = '<div style="color:#c0392b">No se encontraron productos.</div>'; return }
+
+      mostrarResultadosImport(productos, resultadoId)
+      window._productosExtraidos = productos
+      window._pageImages = []
+    } catch(err) {
+      resultadoEl.innerHTML = `<div style="color:#c0392b">❌ ${err.message}</div>`
+    }
+  }
+
+  function mostrarResultadosImport(productos, resultadoId) {
+    const html = productos.map((p, i) => {
+      const thumb = p.imagen_url
+        ? `<img src="${p.imagen_url}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #e3e3e3;flex-shrink:0" onerror="this.style.display='none'">`
+        : `<div style="width:52px;height:52px;background:#f1f1f1;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><span class="material-icons" style="color:#ccc;font-size:20px">image_not_supported</span></div>`
+      return `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f1f1">
+        <input type="checkbox" id="chk${i}" checked style="width:18px;height:18px;cursor:pointer;flex-shrink:0"/>
+        ${thumb}
+        <div style="flex:1;min-width:0">
+          <strong style="font-size:.9rem">${p.nombre}</strong>
+          ${p.categoria ? `<span style="font-size:.78rem;color:#888;margin-left:8px">${p.categoria}</span>` : ''}
+          ${p.codigo ? `<span style="font-size:.75rem;color:#aaa;margin-left:6px">[${p.codigo}]</span>` : ''}
+          ${p.descripcion ? `<div style="font-size:.8rem;color:#666;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.descripcion}</div>` : ''}
+        </div>
+        <span style="font-size:.82rem;color:#555;white-space:nowrap">${p.precio}</span>
+      </div>`
+    }).join('')
+
+    document.getElementById(resultadoId).innerHTML = `
+      <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <strong>✅ ${productos.length} productos encontrados</strong>
+        <button class="btn btn-primary" onclick="importarProductos()">
+          <span class="material-icons" style="font-size:16px">download</span> Importar seleccionados
+        </button>
+      </div>
+      <div style="max-height:420px;overflow-y:auto">${html}</div>`
+  }
+
 
   init()
 </script>
