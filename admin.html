@@ -415,8 +415,9 @@
       <div class="import-tab-panel" id="importTab_mercadolibre">
         <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
           <div class="import-field">
-            <label>Nickname del vendedor en MercadoLibre</label>
-            <input type="text" id="mlNickname" placeholder="ej: MI_TIENDA_123"/>
+            <label>Seller ID del vendedor</label>
+            <input type="text" id="mlNickname" placeholder="ej: 123456789" type="number"/>
+            <div style="font-size:.78rem;color:#888;margin-top:6px">Encontralo en cualquier publicación del vendedor: hacé clic derecho → Ver código fuente → buscá "seller_id"</div>
           </div>
           <button class="btn btn-primary" onclick="importarDesdePlataforma('mercadolibre')">
             <span class="material-icons" style="font-size:16px">sync</span> Importar productos
@@ -1351,14 +1352,9 @@
 
       if (platform === 'mercadolibre') {
         // ML API is public + CORS-enabled — call directly from browser
-        const nickname = document.getElementById('mlNickname').value.trim()
-        if (!nickname) throw new Error('Ingresá el nickname del vendedor')
-        resultadoEl.innerHTML = '<div class="loading"><div class="spinner"></div><div>Buscando vendedor...</div></div>'
-
-        const userRes = await fetch(`https://api.mercadolibre.com/users/search?nickname=${encodeURIComponent(nickname)}`)
-        const userData = await userRes.json()
-        if (!userData.results?.length) throw new Error(`Vendedor "${nickname}" no encontrado en MercadoLibre`)
-        const sellerId = userData.results[0].id
+        const sellerId = document.getElementById('mlNickname').value.trim()
+        if (!sellerId) throw new Error('Ingresá el Seller ID del vendedor')
+        resultadoEl.innerHTML = '<div class="loading"><div class="spinner"></div><div>Conectando con MercadoLibre...</div></div>'
 
         let offset = 0
         while (true) {
@@ -1382,7 +1378,7 @@
           offset += 50
           if (offset >= 300) break
         }
-        if (!productos.length) throw new Error('No se encontraron productos para este vendedor')
+        if (!productos.length) throw new Error('No se encontraron productos para este Seller ID. Verificá que el número sea correcto.')
 
       } else {
         // Other platforms go through edge function
