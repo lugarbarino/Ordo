@@ -17,11 +17,11 @@
     body{font-family:'Inter',sans-serif;color:var(--texto);background:#f8f9fa;display:flex;min-height:100vh}
 
     /* SIDEBAR */
-    .sidebar{width:288px;background:white;border-right:2px solid #f1f1f1;display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0;overflow-y:auto}
-    .sidebar-logo{height:72px;display:flex;align-items:center;padding:0 32px;border-bottom:1px solid #f1f1f1}
+    .sidebar{width:220px;background:white;border-right:2px solid #f1f1f1;display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0;overflow-y:auto}
+    .sidebar-logo{height:60px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid #f1f1f1}
     .sidebar-logo .logo-text{font-size:1.25rem;font-weight:800;color:#111;letter-spacing:2px}
 
-    .empresa-selector{margin:14px 20px;border:1px solid #e3e3e3;border-radius:8px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px}
+    .empresa-selector{margin:10px 12px;border:1px solid #e3e3e3;border-radius:8px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;gap:10px}
     .empresa-avatar{width:32px;height:32px;border-radius:50%;background:#3872fa;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:white;flex-shrink:0;overflow:hidden}
     .empresa-avatar img{width:32px;height:32px;object-fit:cover;border-radius:50%}
     .empresa-info{flex:1;min-width:0}
@@ -29,14 +29,14 @@
     .empresa-tipo{font-size:.72rem;color:#666}
 
     .sidebar-nav{flex:1;padding:12px 0}
-    .nav-section{font-size:.7rem;font-weight:700;color:#666;letter-spacing:1.2px;text-transform:uppercase;padding:16px 32px 6px}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 30px;cursor:pointer;font-size:.88rem;font-weight:500;transition:background .15s;border:none;background:none;color:#333;width:100%;text-align:left;position:relative}
+    .nav-section{font-size:.7rem;font-weight:700;color:#666;letter-spacing:1.2px;text-transform:uppercase;padding:14px 20px 5px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;font-size:.88rem;font-weight:500;transition:background .15s;border:none;background:none;color:#333;width:100%;text-align:left;position:relative}
     .nav-item:hover{background:#f8f9fa;color:#111}
     .nav-item.activo{color:#111;font-weight:600}
     .nav-item.activo::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:4px;background:#111;border-radius:0 4px 4px 0}
     .nav-item .icon{font-size:1rem;width:20px;display:flex;align-items:center;justify-content:center}
 
-    .sidebar-bottom{padding:16px 24px 24px;border-top:1px solid #e3e3e3}
+    .sidebar-bottom{padding:12px 16px 16px;border-top:1px solid #e3e3e3}
     .user-avatar-wrap{display:flex;align-items:center;gap:10px;padding-top:12px}
     .user-avatar{width:40px;height:40px;border-radius:50%;background:#726d76;flex-shrink:0}
     .user-email{font-size:.8rem;color:#484848;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -180,13 +180,13 @@
     @media(max-width:900px){
       .btn-hamburger{display:flex;align-items:center;justify-content:center}
       .sidebar{
-        position:fixed;left:-288px;top:0;height:100vh;width:288px;z-index:150;
+        position:fixed;left:-220px;top:0;height:100vh;width:220px;z-index:150;
         transition:left .25s ease;box-shadow:none;display:flex;
       }
       .sidebar.mob-open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
       .main{width:100%}
       .topbar{padding:12px 16px;display:flex;align-items:center;gap:12px}
-      .nav-item{padding:12px 30px;justify-content:flex-start}
+      .nav-item{padding:12px 20px;justify-content:flex-start}
       .dash-layout{grid-template-columns:1fr}
       .pasos-grid{grid-template-columns:1fr}
       .stats{grid-template-columns:repeat(2,1fr)}
