@@ -1361,6 +1361,7 @@
           resultadoEl.innerHTML = `<div class="loading"><div class="spinner"></div><div>Cargando productos... (${productos.length} hasta ahora)</div></div>`
           const res = await fetch(`https://api.mercadolibre.com/sites/MLA/search?seller_id=${sellerId}&limit=50&offset=${offset}`)
           const data = await res.json()
+          console.log('ML response:', JSON.stringify(data).slice(0, 500))
           const items = data.results || []
           if (!items.length) break
           for (const item of items) {
