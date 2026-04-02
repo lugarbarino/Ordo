@@ -395,9 +395,11 @@
           <label>Color principal</label>
           <div class="cfg-media-row" style="min-height:70px">
             <div id="colorPreview" style="border-radius:10px;background:#3872fa"></div>
-            <button type="button" class="cfg-upload-btn" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
+            <div style="position:relative;display:flex">
+              <button type="button" class="cfg-upload-btn" style="flex:1" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
+              <input type="color" id="cfgColor" value="#3872fa" style="position:absolute;top:50%;left:50%;width:0;height:0;opacity:0;pointer-events:none" oninput="document.getElementById('colorPreview').style.background=this.value"/>
+            </div>
           </div>
-          <input type="color" id="cfgColor" value="#3872fa" style="display:none" oninput="document.getElementById('colorPreview').style.background=this.value"/>
         </div>
 
         <div class="form-group">
