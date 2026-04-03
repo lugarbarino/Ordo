@@ -247,7 +247,6 @@
     <button class="nav-item activo" onclick="showPanel('dashboard',this)"><span class="icon"><span class="material-icons">dashboard</span></span><span>Dashboard</span></button>
     <div class="nav-section">CATÁLOGO</div>
     <button class="nav-item" onclick="showPanel('pdf',this)"><span class="icon"><span class="material-icons">picture_as_pdf</span></span><span>Cargar PDF</span></button>
-    <button class="nav-item" onclick="showPanel('importar',this)"><span class="icon"><span class="material-icons">sync</span></span><span>Importar productos</span></button>
     <button class="nav-item" onclick="showPanel('productos',this)"><span class="icon"><span class="material-icons">inventory_2</span></span><span>Productos</span></button>
     <button class="nav-item" onclick="showPanel('pedidos',this)"><span class="icon"><span class="material-icons">receipt_long</span></span><span>Pedidos</span></button>
     <button class="nav-item" onclick="showPanel('config',this)"><span class="icon"><span class="material-icons">business</span></span><span>Mi empresa</span></button>
@@ -370,37 +369,34 @@
 
     <!-- PDF -->
     <div class="panel" id="panelPdf">
-      <div class="pdf-zone" onclick="document.getElementById('inputPDF').click()" id="pdfZone">
-        <div class="icon">📄</div>
-        <h3>Hacé clic o arrastrá tu PDF acá</h3>
-        <p>La IA extrae todos los productos automáticamente</p>
+      <div class="import-tabs" style="margin-bottom:20px">
+        <button class="import-tab-btn activo" data-tab="pdf" onclick="switchPdfTab('pdf')">📄 PDF con IA</button>
+        <button class="import-tab-btn" data-tab="csv" onclick="switchPdfTab('csv')">📊 CSV / Excel</button>
       </div>
-      <input type="file" id="inputPDF" accept=".pdf" onchange="procesarPDF(this)"/>
-      <div id="pdfStatus" style="display:none;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
-        <div class="loading" id="pdfLoading" style="display:block;padding:20px">
-          <div class="spinner"></div>
-          <div id="pdfLoadingTxt">Leyendo PDF con IA...</div>
+
+      <!-- PDF TAB -->
+      <div id="pdfTab_pdf">
+        <div class="pdf-zone" onclick="document.getElementById('inputPDF').click()" id="pdfZone">
+          <div class="icon">📄</div>
+          <h3>Hacé clic o arrastrá tu PDF acá</h3>
+          <p>La IA extrae todos los productos automáticamente</p>
         </div>
-        <div id="pdfResultado" style="display:none"></div>
-      </div>
-      <div style="background:#eef3ff;border-radius:10px;padding:16px 20px;font-size:.85rem;margin-top:16px;color:#1e2a3a">
-        💡 <strong>¿Cómo funciona?</strong> Subís tu catálogo en PDF → la IA lee todas las páginas → te muestra los productos encontrados → confirmás cuáles importar.
-      </div>
-    </div>
-
-    <!-- IMPORTAR -->
-    <div class="panel" id="panelImportar">
-      <div class="import-tabs">
-        <button class="import-tab-btn activo" data-tab="csv" onclick="switchImportTab('csv')">📄 CSV / Excel</button>
-        <button class="import-tab-btn" data-tab="mercadolibre" onclick="switchImportTab('mercadolibre')"><img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.72/mercadolibre/logo__large_plus@2x.png" style="height:14px;vertical-align:middle"> MercadoLibre</button>
-        <button class="import-tab-btn" data-tab="tiendanube" onclick="switchImportTab('tiendanube')">☁️ Tiendanube</button>
-        <button class="import-tab-btn" data-tab="woocommerce" onclick="switchImportTab('woocommerce')">🛒 WooCommerce</button>
-        <button class="import-tab-btn" data-tab="shopify" onclick="switchImportTab('shopify')">🛍️ Shopify</button>
+        <input type="file" id="inputPDF" accept=".pdf" onchange="procesarPDF(this)"/>
+        <div id="pdfStatus" style="display:none;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;margin-top:16px">
+          <div class="loading" id="pdfLoading" style="display:block;padding:20px">
+            <div class="spinner"></div>
+            <div id="pdfLoadingTxt">Leyendo PDF con IA...</div>
+          </div>
+          <div id="pdfResultado" style="display:none"></div>
+        </div>
+        <div style="background:#eef3ff;border-radius:10px;padding:16px 20px;font-size:.85rem;margin-top:16px;color:#1e2a3a">
+          💡 <strong>¿Cómo funciona?</strong> Subís tu catálogo en PDF → la IA lee todas las páginas → te muestra los productos encontrados → confirmás cuáles importar.
+        </div>
       </div>
 
-      <!-- CSV -->
-      <div class="import-tab-panel activo" id="importTab_csv">
-        <div class="import-drop" onclick="document.getElementById('inputCSV').click()" id="csvDrop">
+      <!-- CSV TAB -->
+      <div id="pdfTab_csv" style="display:none">
+        <div class="import-drop" onclick="document.getElementById('inputCSV').click()">
           <div style="font-size:2rem">📊</div>
           <strong>Hacé clic o arrastrá tu CSV acá</strong>
           <p>Columnas soportadas: nombre, descripcion, categoria, codigo, precio, stock, imagen_url</p>
@@ -409,92 +405,12 @@
         <div id="csvStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
           <div id="csvResultado"></div>
         </div>
-      </div>
-
-      <!-- MERCADO LIBRE -->
-      <div class="import-tab-panel" id="importTab_mercadolibre">
-        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
-          <div class="import-field">
-            <label>Seller ID del vendedor</label>
-            <input type="text" id="mlNickname" placeholder="ej: 123456789" type="number"/>
-            <div style="font-size:.78rem;color:#888;margin-top:6px">Encontralo en cualquier publicación del vendedor: hacé clic derecho → Ver código fuente → buscá "seller_id"</div>
-          </div>
-          <button class="btn btn-primary" onclick="importarDesdePlataforma('mercadolibre')">
-            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
-          </button>
-        </div>
-        <div id="mlStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
-          <div id="mlResultado"></div>
-        </div>
-      </div>
-
-      <!-- TIENDANUBE -->
-      <div class="import-tab-panel" id="importTab_tiendanube">
-        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
-          <div class="import-field">
-            <label>ID de tu tienda</label>
-            <input type="text" id="tnStoreId" placeholder="ej: 123456"/>
-          </div>
-          <div class="import-field">
-            <label>Access Token</label>
-            <input type="password" id="tnToken" placeholder="Tu token de API de Tiendanube"/>
-          </div>
-          <p style="font-size:.78rem;color:#888;margin-bottom:14px">Encontralo en Tiendanube → Mis aplicaciones → Tu app → Access Token</p>
-          <button class="btn btn-primary" onclick="importarDesdePlataforma('tiendanube')">
-            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
-          </button>
-        </div>
-        <div id="tnStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
-          <div id="tnResultado"></div>
-        </div>
-      </div>
-
-      <!-- WOOCOMMERCE -->
-      <div class="import-tab-panel" id="importTab_woocommerce">
-        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
-          <div class="import-field">
-            <label>URL de tu tienda</label>
-            <input type="text" id="wcUrl" placeholder="https://mitienda.com"/>
-          </div>
-          <div class="import-field">
-            <label>Consumer Key</label>
-            <input type="text" id="wcKey" placeholder="ck_xxxxxxxxxxxxxxxx"/>
-          </div>
-          <div class="import-field">
-            <label>Consumer Secret</label>
-            <input type="password" id="wcSecret" placeholder="cs_xxxxxxxxxxxxxxxx"/>
-          </div>
-          <p style="font-size:.78rem;color:#888;margin-bottom:14px">WooCommerce → Ajustes → Avanzado → API REST → Agregar clave</p>
-          <button class="btn btn-primary" onclick="importarDesdePlataforma('woocommerce')">
-            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
-          </button>
-        </div>
-        <div id="wcStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
-          <div id="wcResultado"></div>
-        </div>
-      </div>
-
-      <!-- SHOPIFY -->
-      <div class="import-tab-panel" id="importTab_shopify">
-        <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3;max-width:480px">
-          <div class="import-field">
-            <label>URL de tu tienda</label>
-            <input type="text" id="shopifyShop" placeholder="mitienda.myshopify.com"/>
-          </div>
-          <div class="import-field">
-            <label>Access Token</label>
-            <input type="password" id="shopifyToken" placeholder="shpat_xxxxxxxxxxxxxxxx"/>
-          </div>
-          <p style="font-size:.78rem;color:#888;margin-bottom:14px">Shopify → Configuración → Apps → Desarrollar apps → Crear app privada</p>
-          <button class="btn btn-primary" onclick="importarDesdePlataforma('shopify')">
-            <span class="material-icons" style="font-size:16px">sync</span> Importar productos
-          </button>
-        </div>
-        <div id="shopifyStatus" style="display:none;margin-top:16px;background:white;border-radius:12px;padding:24px;border:1px solid #e3e3e3">
-          <div id="shopifyResultado"></div>
+        <div style="background:#eef3ff;border-radius:10px;padding:16px 20px;font-size:.85rem;margin-top:16px;color:#1e2a3a">
+          💡 <strong>Formato:</strong> Exportá desde Excel como CSV. Las columnas pueden estar en cualquier orden — las detectamos automáticamente.
         </div>
       </div>
     </div>
+
 
     <!-- CONFIG -->
     <div class="panel" id="panelConfig">
@@ -938,7 +854,7 @@
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('activo'))
     document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1)).classList.add('activo')
     if (btn) btn.classList.add('activo')
-    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', importar: 'Importar productos', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
+    const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
     if (panel === 'pedidos') cargarPedidos()
     cerrarSidebar()
@@ -1260,6 +1176,13 @@
   }
 
   // ─── IMPORTAR ───────────────────────────────────────────────
+
+  function switchPdfTab(tab) {
+    document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('activo'))
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('activo')
+    document.getElementById('pdfTab_pdf').style.display = tab === 'pdf' ? 'block' : 'none'
+    document.getElementById('pdfTab_csv').style.display = tab === 'csv' ? 'block' : 'none'
+  }
 
   function switchImportTab(tab) {
     document.querySelectorAll('.import-tab-btn').forEach(b => b.classList.remove('activo'))
