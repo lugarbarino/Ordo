@@ -413,35 +413,29 @@
 
 
     <!-- CONFIG -->
-    <div class="panel" id="panelConfig">
-      <div class="config-form">
+    <div class="panel" id="panelConfig" style="margin:-28px -32px;min-height:100vh">
+      <div style="background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url('bg_empresa.png') center/cover;padding:40px 32px 28px">
+        <h2 style="color:#fff;font-size:1.5rem;font-weight:700;margin-bottom:4px">Tu empresa</h2>
+        <p style="color:rgba(255,255,255,.75);font-size:.9rem">Con estos datos se va armar tu catálogo público</p>
+      </div>
+      <div style="padding:32px;max-width:680px">
+
+        <div class="form-group">
+          <label>Nombre de tu empresa</label>
+          <input type="text" id="cfgNombre" placeholder="Nombre de tu empresa"/>
+        </div>
 
         <div class="form-group">
           <label>Nombre para el link publico de tu catalogo</label>
-          <input type="text" id="cfgSlug" placeholder="nombre-de-tu-catalogo" oninput="limpiarSlug()"/>
+          <input type="text" id="cfgSlug" placeholder="tumarca" oninput="limpiarSlug()"/>
           <div class="form-hint" id="slugPreview">Tu link: —</div>
         </div>
 
         <div class="form-group">
-          <label>Titulo</label>
-          <input type="text" id="cfgNombre" placeholder="Frase que represente tu producto"/>
-        </div>
-
-        <div class="form-group">
-          <label>Parrafo</label>
-          <input type="text" id="cfgDesc" placeholder="Explica un poco mas tu servicio"/>
-        </div>
-
-        <div class="form-group">
           <label>Logo de la empresa</label>
-          <div style="font-size:.8rem;color:#6b7a90;margin-bottom:10px">Usa una version sin fondo, en png, que se vea en fondo claro.</div>
-          <div class="cfg-media-row">
-            <div class="cfg-preview" id="logoPreview">
-              <span class="material-icons" style="font-size:32px;color:#d8dee6">business</span>
-            </div>
-            <button type="button" class="cfg-upload-btn" id="btnSubirLogo" onclick="document.getElementById('inputLogo').click()">
-              <span class="material-icons" style="font-size:18px">upload_file</span> Subir Logo
-            </button>
+          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:10px">Usa una version sin fondo, en png, que se vea bien en fondo claro.</div>
+          <div class="cfg-preview" id="logoPreview" style="width:100%;max-width:300px;height:160px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('inputLogo').click()">
+            <span class="material-icons" style="font-size:32px;color:#d8dee6">business</span>
           </div>
           <input type="file" id="inputLogo" accept="image/*" style="display:none" onchange="subirLogo(this)"/>
           <input type="hidden" id="cfgLogo"/>
@@ -449,14 +443,30 @@
         </div>
 
         <div class="form-group">
+          <label>Mail para recibir los presupuestos</label>
+          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:8px">Tambien se van a guardar en pedidos.</div>
+          <input type="email" id="cfgEmail" placeholder="tumail@gmail.com"/>
+        </div>
+
+        <div class="form-group">
+          <label>Color principal de tu marca</label>
+          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:10px">Para detalles claves de tu catalogo</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div id="colorPreview" style="flex:1;height:52px;border-radius:10px;background:#3872fa;cursor:pointer" onclick="document.getElementById('cfgColor').click()"></div>
+            <button type="button" class="cfg-upload-btn" style="white-space:nowrap" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
+            <input type="color" id="cfgColor" value="#3872fa" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none" oninput="document.getElementById('colorPreview').style.background=this.value"/>
+          </div>
+        </div>
+
+        <div style="margin:28px 0 20px">
+          <h3 style="font-size:1.3rem;font-weight:700;color:#111">Banner</h3>
+        </div>
+
+        <div class="form-group">
           <label>Imagen de fondo del banner</label>
-          <div class="cfg-media-row">
-            <div class="cfg-preview" id="bannerPreview">
-              <span class="material-icons" style="font-size:32px;color:#d8dee6">image</span>
-            </div>
-            <button type="button" class="cfg-upload-btn" id="btnSubirBanner" onclick="document.getElementById('inputBanner').click()">
-              <span class="material-icons" style="font-size:18px">upload_file</span> Subir Imagen
-            </button>
+          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:10px">Buscá una imagen de buena calidad, asi queda profesional tu catalogo.</div>
+          <div class="cfg-preview" id="bannerPreview" style="width:100%;max-width:400px;height:200px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('inputBanner').click()">
+            <span class="material-icons" style="font-size:32px;color:#d8dee6">image</span>
           </div>
           <input type="file" id="inputBanner" accept="image/*" style="display:none" onchange="subirBanner(this)"/>
           <input type="hidden" id="cfgBanner"/>
@@ -464,25 +474,18 @@
         </div>
 
         <div class="form-group">
-          <label>Color principal</label>
-          <div class="cfg-media-row" style="min-height:70px">
-            <div id="colorPreview" style="border-radius:10px;background:#3872fa"></div>
-            <div style="position:relative;display:flex">
-              <button type="button" class="cfg-upload-btn" style="flex:1" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
-              <input type="color" id="cfgColor" value="#3872fa" style="position:absolute;top:50%;left:50%;width:0;height:0;opacity:0;pointer-events:none" oninput="document.getElementById('colorPreview').style.background=this.value"/>
-            </div>
-          </div>
+          <label>Titulo</label>
+          <input type="text" id="cfgTitulo" placeholder="Frase que represente tu producto"/>
         </div>
 
         <div class="form-group">
-          <label>Mail para recibir los presupuestos</label>
-          <div style="font-size:.8rem;color:#6b7a90;margin-bottom:8px">Tambien se van a guardar en el tab de pedidos</div>
-          <input type="email" id="cfgEmail" placeholder="tumail@gmail.com"/>
+          <label>Parrafo</label>
+          <input type="text" id="cfgDesc" placeholder="Explica un poco mas tu servicio"/>
         </div>
 
         <input type="hidden" id="cfgWhatsapp"/>
 
-        <div style="display:flex;justify-content:flex-end">
+        <div style="display:flex;justify-content:flex-end;margin-top:8px">
           <button class="btn btn-primary" onclick="guardarConfig()" style="padding:14px 28px;border-radius:12px;font-size:.95rem">
             <span class="material-icons" style="font-size:16px">save</span> Guardar
           </button>
@@ -584,6 +587,7 @@
     EMPRESA = data
     if (EMPRESA) {
       document.getElementById('cfgNombre').value = EMPRESA.nombre || ''
+      document.getElementById('cfgTitulo').value = EMPRESA.titulo || ''
       document.getElementById('cfgSlug').value   = EMPRESA.slug || ''
       document.getElementById('cfgDesc').value   = EMPRESA.descripcion || ''
       document.getElementById('cfgLogo').value    = EMPRESA.logo_url || ''
@@ -822,12 +826,14 @@
   async function guardarConfig() {
     const nombre = document.getElementById('cfgNombre').value.trim()
     const slug   = document.getElementById('cfgSlug').value.trim()
+    const titulo = document.getElementById('cfgTitulo').value.trim()
     if (!nombre || !slug) { notif('Nombre y slug son obligatorios', 'err'); return }
 
     const datos = {
       user_id:       USER.id,
       nombre,
       slug,
+      titulo,
       descripcion:   document.getElementById('cfgDesc').value.trim(),
       logo_url:      document.getElementById('cfgLogo').value.trim(),
       banner_url:    document.getElementById('cfgBanner').value.trim(),
