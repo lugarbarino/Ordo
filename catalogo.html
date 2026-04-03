@@ -236,7 +236,7 @@
     }
 
     // Hero
-    document.getElementById('heroNombre').textContent = empresa.nombre
+    document.getElementById('heroNombre').textContent = empresa.titulo || empresa.nombre
     if (empresa.descripcion) document.getElementById('heroDesc').textContent = empresa.descripcion
     const heroBg = document.getElementById('heroBg')
     heroBg.style.background = color
