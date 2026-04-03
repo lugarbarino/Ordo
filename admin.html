@@ -52,8 +52,7 @@
     /* PANELS */
     .panel{display:none}
     .panel.activo{display:block}
-    #panelConfig.activo{display:flex;align-items:flex-start;justify-content:center}
-    #configBgFixed{position:fixed;left:220px;right:0;top:0;bottom:0;z-index:0;background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('bg_empresa.png') center/cover no-repeat;pointer-events:none}
+    #panelConfig.activo{display:block}
 
     /* DASHBOARD HERO */
     .dash-hero{border-radius:12px;padding:32px 40px;background:linear-gradient(110deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.3) 60%,transparent 100%),url('banner-dash.png') center/cover no-repeat;display:flex;align-items:center;justify-content:space-between;min-height:190px;overflow:hidden;width:100%;position:relative}
@@ -223,7 +222,6 @@
       .pedidos-dash-card{padding:16px}
       table{font-size:.8rem}
       th,td{padding:8px 10px}
-      #configBgFixed{left:0}
     }
   </style>
 </head>
@@ -417,12 +415,16 @@
 
 
     <!-- CONFIG -->
-    <div class="panel" id="panelConfig" style="margin:-28px -32px;min-height:calc(100vh);position:relative;padding:48px 24px">
-      <div id="configBgFixed"></div>
-      <div style="width:100%;max-width:620px;position:relative;z-index:1">
-        <h2 style="font-size:1.4rem;font-weight:700;margin-bottom:4px;color:#fff">Tu empresa</h2>
-        <p style="color:rgba(255,255,255,.75);font-size:.88rem;margin-bottom:20px">Con estos datos se va armar tu catálogo público</p>
-        <div style="background:white;border-radius:16px;padding:40px;box-shadow:0 8px 40px rgba(0,0,0,.18)">
+    <div class="panel" id="panelConfig" style="margin:-28px -32px">
+      <!-- Banner 300px -->
+      <div style="height:300px;background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),url('bg_empresa.png') center/cover no-repeat;display:flex;flex-direction:column;justify-content:flex-end;padding:32px 40px">
+        <h2 style="font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:6px">Tu empresa</h2>
+        <p style="color:rgba(255,255,255,.75);font-size:.88rem">Con estos datos se va armar tu catálogo público</p>
+      </div>
+      <!-- Form sobre fondo gris -->
+      <div style="padding:32px;display:flex;justify-content:center">
+      <div style="width:100%;max-width:620px">
+        <div style="background:white;border-radius:16px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,.08)">
         <div>
 
         <div class="form-group">
@@ -497,7 +499,8 @@
         </div>
         </div>
       </div>
-    </div>
+      </div>
+      </div>
     </div>
 
     <!-- PEDIDOS -->
@@ -869,8 +872,6 @@
     if (btn) btn.classList.add('activo')
     const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
-    const configBg = document.getElementById('configBgFixed')
-    if (configBg) configBg.style.display = panel === 'config' ? 'block' : 'none'
     if (panel === 'pedidos') cargarPedidos()
     cerrarSidebar()
   }
