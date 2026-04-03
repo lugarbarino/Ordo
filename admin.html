@@ -53,6 +53,7 @@
     .panel{display:none}
     .panel.activo{display:block}
     #panelConfig.activo{display:flex;align-items:flex-start;justify-content:center}
+    #configBgFixed{position:fixed;left:220px;right:0;top:0;bottom:0;z-index:0;background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('bg_empresa.png') center/cover no-repeat;pointer-events:none}
 
     /* DASHBOARD HERO */
     .dash-hero{border-radius:12px;padding:32px 40px;background:linear-gradient(110deg,rgba(0,0,0,.65) 0%,rgba(0,0,0,.3) 60%,transparent 100%),url('banner-dash.png') center/cover no-repeat;display:flex;align-items:center;justify-content:space-between;min-height:190px;overflow:hidden;width:100%;position:relative}
@@ -149,10 +150,10 @@
     /* FORM CONFIG */
     .config-form{background:white;border-radius:14px;padding:32px;border:1px solid #e3e3e3;max-width:520px}
     .form-group{margin-bottom:22px}
-    .form-group label{display:block;font-size:.88rem;font-weight:700;margin-bottom:6px;color:#1e2a3a}
-    .form-group input,.form-group select{width:100%;padding:11px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit;box-sizing:border-box}
+    .form-group label{display:block;font-size:20px;font-weight:700;margin-bottom:6px;color:#1e2a3a}
+    .form-group input,.form-group select{width:100%;padding:11px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:16px;outline:none;transition:border-color .2s;font-family:inherit;box-sizing:border-box}
     .form-group input:focus{border-color:var(--p,#285576)}
-    .form-hint{font-size:.78rem;color:#666;margin-top:4px}
+    .form-hint{font-size:14px;color:#666;margin-top:4px}
     .cfg-media-row{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:stretch;min-height:110px}
     .cfg-preview{border:1.5px solid #e3e3e3;border-radius:10px;background:#f9f9f9;display:flex;align-items:center;justify-content:center;overflow:hidden}
     .cfg-preview img{width:100%;height:100%;object-fit:contain}
@@ -222,6 +223,7 @@
       .pedidos-dash-card{padding:16px}
       table{font-size:.8rem}
       th,td{padding:8px 10px}
+      #configBgFixed{left:0}
     }
   </style>
 </head>
@@ -415,8 +417,9 @@
 
 
     <!-- CONFIG -->
-    <div class="panel" id="panelConfig" style="margin:-28px -32px;min-height:calc(100vh);background:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('bg_empresa.png') center/cover no-repeat fixed;padding:48px 24px">
-      <div style="width:100%;max-width:620px">
+    <div class="panel" id="panelConfig" style="margin:-28px -32px;min-height:calc(100vh);position:relative;padding:48px 24px">
+      <div id="configBgFixed"></div>
+      <div style="width:100%;max-width:620px;position:relative;z-index:1">
         <h2 style="font-size:1.4rem;font-weight:700;margin-bottom:4px;color:#fff">Tu empresa</h2>
         <p style="color:rgba(255,255,255,.75);font-size:.88rem;margin-bottom:20px">Con estos datos se va armar tu catálogo público</p>
         <div style="background:white;border-radius:16px;padding:40px;box-shadow:0 8px 40px rgba(0,0,0,.18)">
@@ -435,7 +438,7 @@
 
         <div class="form-group">
           <label>Logo de la empresa</label>
-          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:10px">Usa una version sin fondo, en png, que se vea bien en fondo claro.</div>
+          <div style="font-size:16px;color:#6b7a90;margin-bottom:10px">Usa una version sin fondo, en png, que se vea bien en fondo claro.</div>
           <div class="cfg-preview" id="logoPreview" style="width:100%;max-width:300px;height:160px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('inputLogo').click()">
             <span class="material-icons" style="font-size:32px;color:#d8dee6">business</span>
           </div>
@@ -446,13 +449,13 @@
 
         <div class="form-group">
           <label>Mail para recibir los presupuestos</label>
-          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:8px">Tambien se van a guardar en pedidos.</div>
+          <div style="font-size:16px;color:#6b7a90;margin-bottom:8px">Tambien se van a guardar en pedidos.</div>
           <input type="email" id="cfgEmail" placeholder="tumail@gmail.com"/>
         </div>
 
         <div class="form-group">
           <label>Color principal de tu marca</label>
-          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:10px">Para detalles claves de tu catalogo</div>
+          <div style="font-size:16px;color:#6b7a90;margin-bottom:10px">Para detalles claves de tu catalogo</div>
           <div style="display:flex;gap:12px;align-items:center">
             <div id="colorPreview" style="flex:1;height:52px;border-radius:10px;background:#3872fa;cursor:pointer" onclick="document.getElementById('cfgColor').click()"></div>
             <button type="button" class="cfg-upload-btn" style="white-space:nowrap" onclick="document.getElementById('cfgColor').click()">Elegir Color</button>
@@ -461,12 +464,12 @@
         </div>
 
         <div style="margin:28px 0 20px">
-          <h3 style="font-size:1.3rem;font-weight:700;color:#111">Banner</h3>
+          <h3 style="font-size:20px;font-weight:700;color:#111">Banner</h3>
         </div>
 
         <div class="form-group">
           <label>Imagen de fondo del banner</label>
-          <div style="font-size:.82rem;color:#6b7a90;margin-bottom:10px">Buscá una imagen de buena calidad, asi queda profesional tu catalogo.</div>
+          <div style="font-size:16px;color:#6b7a90;margin-bottom:10px">Buscá una imagen de buena calidad, asi queda profesional tu catalogo.</div>
           <div class="cfg-preview" id="bannerPreview" style="width:100%;max-width:400px;height:200px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('inputBanner').click()">
             <span class="material-icons" style="font-size:32px;color:#d8dee6">image</span>
           </div>
@@ -494,6 +497,7 @@
         </div>
         </div>
       </div>
+    </div>
     </div>
 
     <!-- PEDIDOS -->
@@ -865,6 +869,8 @@
     if (btn) btn.classList.add('activo')
     const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
+    const configBg = document.getElementById('configBgFixed')
+    if (configBg) configBg.style.display = panel === 'config' ? 'block' : 'none'
     if (panel === 'pedidos') cargarPedidos()
     cerrarSidebar()
   }
