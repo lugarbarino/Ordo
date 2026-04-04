@@ -227,11 +227,6 @@
     .mob-overlay.activo{display:block}
     .btn-hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:#111}
 
-    /* Tablet */
-    @media(max-width:1100px) and (min-width:601px){
-      .dash-layout{grid-template-columns:1fr 1fr;grid-template-areas:"banner pedidos""stats stats""pasos pasos"}
-    }
-
     @media(max-width:900px){
       .btn-hamburger{display:flex;align-items:center;justify-content:center}
       .sidebar{position:fixed;left:-220px;top:0;height:100vh;width:220px;z-index:150;transition:left .25s ease;box-shadow:none;display:flex}
@@ -249,6 +244,13 @@
       .pedidos-dash-card{padding:16px}
       table{font-size:.8rem}
       th,td{padding:8px 10px}
+    }
+
+    /* Mobile */
+    /* Tablet */
+    @media(max-width:1100px) and (min-width:601px){
+      .dash-layout{grid-template-columns:1fr 1fr;grid-template-areas:"banner pedidos""stats stats""pasos pasos";align-items:stretch}
+      .dash-hero{height:100%;min-height:unset;box-sizing:border-box}
     }
 
     /* Mobile */
