@@ -126,11 +126,23 @@
     .btn-red{background:#fde8e8;color:#c0392b;border:none}.btn-red:hover{background:#fbd5d5}
     .btn-sm{padding:7px 14px;font-size:.82rem}
 
+    /* BULK BAR */
+    .bulk-bar{display:none;align-items:center;gap:12px;background:white;color:#333;padding:10px 16px;border-radius:8px;margin-bottom:12px;font-size:.88rem;border:1px solid #e3e3e3}
+    .bulk-bar.activo{display:flex}
+    .bulk-bar span{flex:1;font-weight:500}
+    .bulk-bar .btn-bulk-del{background:#fde8e8;color:#c0392b;border:none;border-radius:6px;padding:7px 14px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .bulk-bar .btn-bulk-del:hover{background:#fbd5d5}
+    .bulk-bar .btn-bulk-cancel{background:none;border:none;color:#999;cursor:pointer;font-size:.82rem;font-family:inherit}
+    .bulk-bar .btn-bulk-cancel:hover{color:#333}
+    td input[type=checkbox],th input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#3872fa}
+
     /* TABLA PRODUCTOS */
     .tabla-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
     .tabla-header h2{font-size:1.1rem;font-weight:700}
     .tabla-acciones{display:flex;gap:10px;align-items:center}
-    .input-buscar{padding:9px 14px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.88rem;outline:none;min-width:200px;font-family:inherit}
+    .buscar-wrap{position:relative;display:inline-flex;align-items:center}
+    .buscar-wrap .material-icons{position:absolute;left:10px;font-size:18px;color:#aaa;pointer-events:none}
+    .input-buscar{padding:9px 14px 9px 34px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.88rem;outline:none;min-width:200px;font-family:inherit}
     .input-buscar:focus{border-color:#3872fa}
     table{width:100%;background:white;border-radius:12px;overflow:hidden;border-collapse:collapse;border:1px solid #e3e3e3}
     th{background:#f8f9fa;padding:12px 16px;text-align:left;font-size:.78rem;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.4px}
@@ -359,10 +371,16 @@
     <!-- PRODUCTOS -->
     <div class="panel" id="panelProductos">
       <div class="tabla-header">
-        <div class="tabla-acciones">
+        <div class="buscar-wrap">
+          <span class="material-icons">search</span>
           <input class="input-buscar" type="text" placeholder="Buscar..." id="buscarProd" oninput="filtrarTabla()"/>
-          <button class="btn btn-primary" onclick="abrirModalProducto()"><span class="material-icons" style="font-size:16px">add</span> Agregar</button>
         </div>
+        <button class="btn btn-primary" onclick="abrirModalProducto()"><span class="material-icons" style="font-size:16px">add</span> Agregar</button>
+      </div>
+      <div class="bulk-bar" id="bulkBar">
+        <span id="bulkCount"></span>
+        <button class="btn-bulk-del" onclick="eliminarSeleccionados()"><span class="material-icons" style="font-size:16px">delete</span> Eliminar seleccionados</button>
+        <button class="btn-bulk-cancel" onclick="limpiarSeleccion()">Cancelar</button>
       </div>
       <div class="loading" id="loadingProd"><div class="spinner"></div><div>Cargando...</div></div>
       <div id="tablaWrap"></div>
@@ -681,6 +699,7 @@
     }
     const rows = lista.map(p => `
       <tr>
+        <td style="width:36px"><input type="checkbox" class="chk-prod" value="${p.id}" onchange="actualizarBulkBar()"/></td>
         <td>
           ${p.imagen_url
             ? `<img src="${p.imagen_url}" style="width:48px;height:48px;object-fit:contain;border-radius:8px;padding:2px;border:1px solid #e3e3e3" onerror="this.style.display='none'">`
@@ -691,17 +710,59 @@
         <td>${p.precio || 'Consultar'}</td>
         <td><span class="badge ${p.stock === 'Disponible' ? 'badge-disp' : p.stock === 'Sin stock' ? 'badge-sin' : 'badge-cons'}">${p.stock || 'Consultar'}</span></td>
         <td><div class="td-actions">
-          <button class="btn btn-secondary btn-sm" onclick="moverProducto('${p.id}',-1)" title="Subir"><span class="material-icons" style="font-size:16px">arrow_upward</span></button>
-          <button class="btn btn-secondary btn-sm" onclick="moverProducto('${p.id}',1)" title="Bajar"><span class="material-icons" style="font-size:16px">arrow_downward</span></button>
-          <button class="btn btn-outline btn-sm" onclick='editarProducto(${JSON.stringify(p).replace(/'/g,"&#39;")})'><span class="material-icons" style="font-size:16px">edit</span></button>
+          <button style="background:none;border:none;cursor:pointer;padding:6px;color:#666;border-radius:6px;transition:background .15s" onmouseover="this.style.background='#f1f1f1'" onmouseout="this.style.background='none'" onclick='editarProducto(${JSON.stringify(p).replace(/'/g,"&#39;")})'><span class="material-icons" style="font-size:18px">edit</span></button>
           <button class="btn btn-red btn-sm" onclick="eliminarProducto('${p.id}')"><span class="material-icons" style="font-size:16px">delete</span></button>
         </div></td>
       </tr>`).join('')
     wrap.innerHTML = `
       <table>
-        <thead><tr><th></th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+        <thead><tr>
+          <th style="width:36px"><input type="checkbox" id="chkAll" onchange="toggleTodos(this.checked)" title="Seleccionar todos"/></th>
+          <th></th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th>
+        </tr></thead>
         <tbody>${rows}</tbody>
       </table>`
+  }
+
+  function toggleTodos(checked) {
+    document.querySelectorAll('.chk-prod').forEach(c => c.checked = checked)
+    actualizarBulkBar()
+  }
+
+  function actualizarBulkBar() {
+    const sel = document.querySelectorAll('.chk-prod:checked')
+    const bar = document.getElementById('bulkBar')
+    const chkAll = document.getElementById('chkAll')
+    if (sel.length > 0) {
+      bar.classList.add('activo')
+      document.getElementById('bulkCount').textContent = `${sel.length} producto${sel.length !== 1 ? 's' : ''} seleccionado${sel.length !== 1 ? 's' : ''}`
+    } else {
+      bar.classList.remove('activo')
+    }
+    if (chkAll) {
+      const total = document.querySelectorAll('.chk-prod').length
+      chkAll.indeterminate = sel.length > 0 && sel.length < total
+      chkAll.checked = sel.length === total
+    }
+  }
+
+  function limpiarSeleccion() {
+    document.querySelectorAll('.chk-prod').forEach(c => c.checked = false)
+    const chkAll = document.getElementById('chkAll')
+    if (chkAll) { chkAll.checked = false; chkAll.indeterminate = false }
+    document.getElementById('bulkBar').classList.remove('activo')
+  }
+
+  async function eliminarSeleccionados() {
+    const ids = [...document.querySelectorAll('.chk-prod:checked')].map(c => c.value)
+    if (!ids.length) return
+    if (!confirm(`¿Eliminás ${ids.length} producto${ids.length !== 1 ? 's' : ''}?`)) return
+    const { error } = await db.from('productos').delete().in('id', ids)
+    if (error) { notif('Error al eliminar: ' + error.message, 'err'); return }
+    notif(`Eliminado${ids.length !== 1 ? 's' : ''} ${ids.length} producto${ids.length !== 1 ? 's' : ''}`)
+    limpiarSeleccion()
+    await cargarProductos()
+    actualizarDashboard()
   }
 
   function filtrarTabla() {
