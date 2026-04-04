@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
   <style>.material-icons{font-size:20px;line-height:1;vertical-align:middle}</style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -569,8 +570,8 @@
     <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
       <button class="btn btn-secondary" onclick="cerrarModal('modalPresupuesto')">Cancelar</button>
       <button class="btn btn-primary" onclick="enviarPresupuesto()">
-        <span class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">send</span>
-        Enviar por email
+        <span class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">download</span>
+        Descargar PDF
       </button>
     </div>
   </div>
@@ -1095,32 +1096,95 @@
     const pedido = (window._pedidosCache || []).find(p => p.id === _presupPedidoId)
     if (!pedido) return
 
-    const inputs = document.querySelectorAll('.presup-precio')
     const prods = (pedido.productos || [])
     const nota = document.getElementById('presupNota').value.trim()
+    const totalInputs = prods.map((_, i) => parseFloat(document.getElementById(`presupPrecio${i}`)?.value)).filter(v => !isNaN(v))
+    const total = totalInputs.length ? totalInputs.reduce((a, b) => a + b, 0) : null
+    const empresa = EMPRESA?.nombre || ''
+    const fecha = new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })
 
-    let lineas = prods.map((x, i) => {
-      const precio = parseFloat(document.getElementById(`presupPrecio${i}`).value)
+    const { jsPDF } = window.jspdf
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+    const W = doc.internal.pageSize.getWidth()
+    let y = 40
+
+    // Logo
+    if (EMPRESA?.logo_url) {
+      try {
+        const resp = await fetch(EMPRESA.logo_url)
+        const blob = await resp.blob()
+        const b64 = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(blob) })
+        const ext = EMPRESA.logo_url.split('.').pop().split('?')[0].toUpperCase().replace('JPG','JPEG')
+        doc.addImage(b64, ext === 'PNG' || ext === 'JPEG' ? ext : 'PNG', 40, y, 120, 50, '', 'FAST')
+        y += 70
+      } catch(e) { y += 10 }
+    }
+
+    // Empresa y fecha
+    doc.setFontSize(10).setTextColor(120)
+    doc.text(empresa, 40, y)
+    doc.text(fecha, W - 40, y, { align: 'right' })
+    y += 24
+
+    // Título
+    doc.setFontSize(22).setTextColor(20).setFont(undefined, 'bold')
+    doc.text('Presupuesto', 40, y)
+    y += 32
+
+    // Línea separadora
+    doc.setDrawColor(220).setLineWidth(1)
+    doc.line(40, y, W - 40, y)
+    y += 20
+
+    // Cliente
+    doc.setFontSize(11).setTextColor(60).setFont(undefined, 'normal')
+    doc.text(`Cliente: ${pedido.nombre_cliente}`, 40, y)
+    y += 16
+    if (pedido.email_cliente) { doc.text(`Email: ${pedido.email_cliente}`, 40, y); y += 16 }
+    if (pedido.telefono_cliente) { doc.text(`Tel: ${pedido.telefono_cliente}`, 40, y); y += 16 }
+    y += 10
+
+    // Encabezado tabla
+    doc.setFillColor(245, 246, 250).rect(40, y, W - 80, 22, 'F')
+    doc.setFontSize(9).setTextColor(100).setFont(undefined, 'bold')
+    doc.text('Producto', 50, y + 14)
+    doc.text('Cant.', W - 180, y + 14, { align: 'right' })
+    doc.text('Precio', W - 50, y + 14, { align: 'right' })
+    y += 28
+
+    // Filas
+    doc.setFont(undefined, 'normal').setTextColor(30).setFontSize(10)
+    prods.forEach((x, i) => {
+      const precio = parseFloat(document.getElementById(`presupPrecio${i}`)?.value)
       const precioStr = isNaN(precio) ? 'A confirmar' : precio.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })
-      return `• ${x.nombre} x${x.cantidad} — ${precioStr}`
+      if (y > 750) { doc.addPage(); y = 40 }
+      doc.text(x.nombre, 50, y)
+      doc.text(String(x.cantidad), W - 180, y, { align: 'right' })
+      doc.text(precioStr, W - 50, y, { align: 'right' })
+      doc.setDrawColor(235).setLineWidth(0.5)
+      doc.line(40, y + 6, W - 40, y + 6)
+      y += 22
     })
 
-    const totalInputs = [...inputs].map(inp => parseFloat(inp.value)).filter(v => !isNaN(v))
-    const total = totalInputs.length ? totalInputs.reduce((a, b) => a + b, 0) : null
-    const totalStr = total !== null ? total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }) : ''
+    // Total
+    if (total !== null) {
+      y += 8
+      doc.setFont(undefined, 'bold').setFontSize(12).setTextColor(20)
+      doc.text('Total estimado', 50, y)
+      doc.text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), W - 50, y, { align: 'right' })
+      y += 24
+    }
 
-    const empresa = EMPRESA?.nombre || 'Nosotros'
-    const asunto = encodeURIComponent(`Presupuesto de ${empresa}`)
-    let cuerpo = `Hola ${pedido.nombre_cliente},\n\nTe enviamos el presupuesto para los productos que solicitaste:\n\n`
-    cuerpo += lineas.join('\n')
-    if (total !== null) cuerpo += `\n\nTotal estimado: ${totalStr}`
-    if (nota) cuerpo += `\n\n${nota}`
-    cuerpo += `\n\nSaludos,\n${empresa}`
+    // Nota
+    if (nota) {
+      y += 8
+      doc.setFont(undefined, 'italic').setFontSize(10).setTextColor(100)
+      const lines = doc.splitTextToSize(nota, W - 80)
+      doc.text(lines, 40, y)
+    }
 
-    const mailto = `mailto:${pedido.email_cliente}?subject=${asunto}&body=${encodeURIComponent(cuerpo)}`
-    window.location.href = mailto
+    doc.save(`Presupuesto - ${pedido.nombre_cliente}.pdf`)
 
-    // Marcar como Respondido
     await cambiarEstadoPedido(_presupPedidoId, 'Respondido')
     cerrarModal('modalPresupuesto')
     cargarPedidos()
