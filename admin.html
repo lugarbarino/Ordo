@@ -453,7 +453,7 @@
 
     <!-- CONFIG -->
     <div class="panel" id="panelConfig" style="margin:-28px -32px">
-      <!-- Banner 300px -->
+      <!-- Banner -->
       <div style="height:420px;background:url('bg_empresa.png') center/cover no-repeat"></div>
       <!-- Título + card -->
       <div style="padding:0 32px 48px;display:flex;justify-content:center;margin-top:-290px">
@@ -971,6 +971,7 @@
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('activo'))
     document.getElementById('panel' + panel.charAt(0).toUpperCase() + panel.slice(1)).classList.add('activo')
     if (btn) btn.classList.add('activo')
+    document.querySelector('.content').style.paddingTop = panel === 'config' ? '0' : ''
     const titles = { dashboard: 'Dashboard', productos: 'Productos', pdf: 'Cargar PDF con IA', pedidos: 'Pedidos de presupuesto', config: 'Mi empresa' }
     document.getElementById('topbarTitle').textContent = titles[panel] || ''
     if (panel === 'pedidos') cargarPedidos()
