@@ -101,7 +101,8 @@
     .import-drop p{font-size:.85rem;color:#666;margin-top:6px}
 
     /* PEDIDOS CARD (dashboard) */
-    .pedidos-dash-card{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3;overflow:hidden}
+    .pedidos-dash-card{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3;overflow:hidden;display:flex;flex-direction:column}
+    #dashPedidosWrap{overflow-y:auto;max-height:280px;flex:1}
     .pedidos-dash-card h3{font-size:1.05rem;font-weight:700;margin-bottom:16px}
     .pedido-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed #e3e3e3}
     .pedido-row:last-child{border-bottom:none}
@@ -317,7 +318,7 @@
         <!-- COLUMNA IZQUIERDA -->
         <div class="dash-left">
 
-          <!-- Hero banner: compartí tu catálogo -->
+          <!-- Hero banner -->
           <div class="dash-hero" id="dashHero">
             <div>
               <div class="dash-hero-label">Compartí tu catálogo</div>
