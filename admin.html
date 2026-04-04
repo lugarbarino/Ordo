@@ -70,8 +70,11 @@
     .stat-icon{position:absolute;right:20px;top:20px;width:48px;height:48px;background:#eef3ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#3872fa}
 
     /* DASH LAYOUT */
-    .dash-layout{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
-    .dash-left{display:flex;flex-direction:column;gap:20px;min-width:0}
+    .dash-layout{display:grid;grid-template-columns:1fr 360px;grid-template-areas:"banner pedidos""stats pedidos""pasos pedidos";gap:20px;align-items:start}
+    .dash-hero{grid-area:banner}
+    .dash-stats{grid-area:stats}
+    .pasos-card{grid-area:pasos}
+    .pedidos-dash-card{grid-area:pedidos}
 
     /* PRIMEROS PASOS */
     .pasos-card{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3}
@@ -101,7 +104,8 @@
     .import-drop p{font-size:.85rem;color:#666;margin-top:6px}
 
     /* PEDIDOS CARD (dashboard) */
-    .pedidos-dash-card{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3;overflow:hidden}
+    .pedidos-dash-card{background:white;border-radius:8px;padding:24px 28px;border:1px solid #e3e3e3;overflow:hidden;display:flex;flex-direction:column}
+    #dashPedidosWrap{overflow-y:auto;max-height:280px;flex:1}
     .pedidos-dash-card h3{font-size:1.05rem;font-weight:700;margin-bottom:16px}
     .pedido-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px dashed #e3e3e3}
     .pedido-row:last-child{border-bottom:none}
@@ -225,33 +229,35 @@
 
     @media(max-width:900px){
       .btn-hamburger{display:flex;align-items:center;justify-content:center}
-      .sidebar{
-        position:fixed;left:-220px;top:0;height:100vh;width:220px;z-index:150;
-        transition:left .25s ease;box-shadow:none;display:flex;
-      }
+      .sidebar{position:fixed;left:-220px;top:0;height:100vh;width:220px;z-index:150;transition:left .25s ease;box-shadow:none;display:flex}
       .sidebar.mob-open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
       .main{width:100%}
       .topbar{display:flex;padding:12px 16px;align-items:center;gap:12px}
       .nav-item{padding:12px 20px;justify-content:flex-start}
-      .dash-layout{grid-template-columns:1fr}
-      .pasos-grid{grid-template-columns:1fr}
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .dash-hero{padding:20px 20px 0;min-height:140px}
-      .content{padding:16px}
-      .topbar h1{flex:1}
       .content{padding:12px}
-      .dash-layout{grid-template-columns:1fr;gap:12px}
       .dash-hero{padding:20px;min-height:160px;border-radius:10px}
       .dash-hero-title{font-size:1.1rem}
       .dash-hero-desc{font-size:.78rem;margin-bottom:14px}
-      .stats{grid-template-columns:1fr;gap:10px}
       .stat{padding:16px 18px}
       .stat-num{font-size:1.5rem}
-      .pasos-grid{grid-template-columns:1fr;gap:10px}
       .paso-item{min-height:120px;padding:18px}
       .pedidos-dash-card{padding:16px}
       table{font-size:.8rem}
       th,td{padding:8px 10px}
+    }
+
+    /* Mobile */
+    /* Tablet */
+    @media(max-width:1100px) and (min-width:601px){
+      .dash-layout{grid-template-columns:1fr 1fr;grid-template-areas:"banner pedidos""stats stats""pasos pasos";align-items:stretch}
+      .dash-hero{height:100%;min-height:unset;box-sizing:border-box}
+    }
+
+    /* Mobile */
+    @media(max-width:600px){
+      .dash-layout{grid-template-columns:1fr;grid-template-areas:"banner""pedidos""stats""pasos";gap:12px}
+      .stats{grid-template-columns:1fr;gap:10px}
+      .pasos-grid{grid-template-columns:1fr;gap:10px}
     }
   </style>
 </head>
@@ -314,68 +320,63 @@
 
       <div class="dash-layout">
 
-        <!-- COLUMNA IZQUIERDA -->
-        <div class="dash-left">
-
-          <!-- Hero banner: compartí tu catálogo -->
-          <div class="dash-hero" id="dashHero">
-            <div>
-              <div class="dash-hero-label">Compartí tu catálogo</div>
-              <h2 class="dash-hero-title">Tu catálogo con <span id="heroProductos">0</span> productos<br>ya está disponible</h2>
-              <p class="dash-hero-desc">Compartí tu link con tus clientes y recibí tus pedidos de presupuesto</p>
-              <div class="dash-hero-btns">
-                <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()"><span class="material-icons" style="font-size:16px">visibility</span> Ver</button>
-                <button class="btn btn-hero-outline btn-sm" onclick="copiarLink()"><span class="material-icons" style="font-size:16px">content_copy</span> Copiar link</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stats: Tu catálogo -->
+        <!-- Banner -->
+        <div class="dash-hero" id="dashHero">
           <div>
-            <div class="dash-title" style="margin-bottom:16px">Tu catálogo</div>
-            <div class="stats">
-              <div class="stat">
-                <div class="stat-num" id="statProductos">—</div>
-                <div class="stat-label">Productos</div>
-                <div class="stat-icon"><span class="material-icons" style="font-size:26px">inventory_2</span></div>
-              </div>
-              <div class="stat">
-                <div class="stat-num" id="statCategorias">—</div>
-                <div class="stat-label">Categorías</div>
-                <div class="stat-icon"><span class="material-icons" style="font-size:26px">label</span></div>
-              </div>
-              <div class="stat" style="cursor:pointer" onclick="showPanel('pedidos',document.querySelectorAll('.nav-item')[3])">
-                <div class="stat-num" id="statPedidos">—</div>
-                <div class="stat-label">Pedidos nuevos</div>
-                <div class="stat-icon"><span class="material-icons" style="font-size:26px">receipt_long</span></div>
-              </div>
+            <div class="dash-hero-label">Compartí tu catálogo</div>
+            <h2 class="dash-hero-title">Tu catálogo con <span id="heroProductos">0</span> productos<br>ya está disponible</h2>
+            <p class="dash-hero-desc">Compartí tu link con tus clientes y recibí tus pedidos de presupuesto</p>
+            <div class="dash-hero-btns">
+              <button class="btn btn-primary btn-sm" onclick="abrirCatalogo()"><span class="material-icons" style="font-size:16px">visibility</span> Ver</button>
+              <button class="btn btn-hero-outline btn-sm" onclick="copiarLink()"><span class="material-icons" style="font-size:16px">content_copy</span> Copiar link</button>
             </div>
           </div>
+        </div>
 
-          <!-- Primeros pasos -->
-          <div class="pasos-card">
-            <div class="pasos-card-header">
-              <h3>Primeros pasos</h3>
+        <!-- Stats -->
+        <div class="dash-stats">
+          <div class="dash-title" style="margin-bottom:16px">Tu catálogo</div>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-num" id="statProductos">—</div>
+              <div class="stat-label">Productos</div>
+              <div class="stat-icon"><span class="material-icons" style="font-size:26px">inventory_2</span></div>
             </div>
-            <div class="pasos-grid">
-              <button class="paso-item" style="background:#35425F" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">
-                <span class="material-icons paso-icon">business</span>
-                <h4 style="color:#fff">Configurá tu empresa</h4>
-              </button>
-              <button class="paso-item" style="background:#495A82" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])">
-                <span class="material-icons paso-icon">inventory_2</span>
-                <h4 style="color:#fff">Cargá tu primer producto</h4>
-              </button>
-              <button class="paso-item" style="background:#AAB8D8" onclick="copiarLink()">
-                <span class="material-icons paso-icon">link</span>
-                <h4 style="color:#35425F">Compartí el link con tus clientes</h4>
-              </button>
+            <div class="stat">
+              <div class="stat-num" id="statCategorias">—</div>
+              <div class="stat-label">Categorías</div>
+              <div class="stat-icon"><span class="material-icons" style="font-size:26px">label</span></div>
+            </div>
+            <div class="stat" style="cursor:pointer" onclick="showPanel('pedidos',document.querySelectorAll('.nav-item')[3])">
+              <div class="stat-num" id="statPedidos">—</div>
+              <div class="stat-label">Pedidos nuevos</div>
+              <div class="stat-icon"><span class="material-icons" style="font-size:26px">receipt_long</span></div>
             </div>
           </div>
+        </div>
 
-        </div><!-- /dash-left -->
+        <!-- Primeros pasos -->
+        <div class="pasos-card">
+          <div class="pasos-card-header">
+            <h3>Primeros pasos</h3>
+          </div>
+          <div class="pasos-grid">
+            <button class="paso-item" style="background:#35425F" onclick="showPanel('config',document.querySelectorAll('.nav-item')[4])">
+              <span class="material-icons paso-icon">business</span>
+              <h4 style="color:#fff">Configurá tu empresa</h4>
+            </button>
+            <button class="paso-item" style="background:#495A82" onclick="showPanel('pdf',document.querySelectorAll('.nav-item')[1])">
+              <span class="material-icons paso-icon">inventory_2</span>
+              <h4 style="color:#fff">Cargá tu primer producto</h4>
+            </button>
+            <button class="paso-item" style="background:#AAB8D8" onclick="copiarLink()">
+              <span class="material-icons paso-icon">link</span>
+              <h4 style="color:#35425F">Compartí el link con tus clientes</h4>
+            </button>
+          </div>
+        </div>
 
-        <!-- COLUMNA DERECHA: Últimos pedidos -->
+        <!-- Últimos pedidos -->
         <div class="pedidos-dash-card">
           <h3>Últimos pedidos</h3>
           <div id="dashPedidosWrap">
