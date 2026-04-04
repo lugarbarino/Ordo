@@ -259,6 +259,12 @@
       .dash-layout{grid-template-columns:1fr;grid-template-areas:"banner""pedidos""stats""pasos";gap:12px}
       .stats{grid-template-columns:1fr;gap:10px}
       .pasos-grid{grid-template-columns:1fr;gap:10px}
+      #cfgBanner{display:none}
+      #panelConfig{margin:-12px!important;background:white}
+      .cfg-content{margin-top:0!important;padding:24px 0 48px!important}
+      .cfg-card{border-radius:0!important;box-shadow:none!important;padding:28px 28px 40px!important}
+      .cfg-title{color:#111!important;text-shadow:none!important;padding-left:28px}
+      .cfg-subtitle{color:#555!important;text-shadow:none!important;padding-left:28px;margin-bottom:0!important}
     }
   </style>
 </head>
@@ -454,13 +460,13 @@
     <!-- CONFIG -->
     <div class="panel" id="panelConfig" style="margin:-28px -32px">
       <!-- Banner -->
-      <div style="height:420px;background:url('bg_empresa.png') center/cover no-repeat"></div>
+      <div id="cfgBanner" style="height:420px;background:url('bg_empresa.png') center/cover no-repeat"></div>
       <!-- Título + card -->
-      <div style="padding:0 32px 48px;display:flex;justify-content:center;margin-top:-290px">
+      <div class="cfg-content" style="padding:0 32px 48px;display:flex;justify-content:center;margin-top:-290px">
       <div style="width:100%;max-width:620px">
-        <h2 style="font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:4px;text-shadow:0 1px 4px rgba(0,0,0,.4)">Tu empresa</h2>
-        <p style="font-size:20px;color:rgba(255,255,255,.85);margin-bottom:16px;text-shadow:0 1px 3px rgba(0,0,0,.4)">Con estos datos se va armar tu catálogo público</p>
-        <div style="background:white;border-radius:16px;padding:40px;box-shadow:0 8px 40px rgba(0,0,0,.15)">
+        <h2 class="cfg-title" style="font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:4px;text-shadow:0 1px 4px rgba(0,0,0,.4)">Tu empresa</h2>
+        <p class="cfg-subtitle" style="font-size:20px;color:rgba(255,255,255,.85);margin-bottom:16px;text-shadow:0 1px 3px rgba(0,0,0,.4)">Con estos datos se va armar tu catálogo público</p>
+        <div class="cfg-card" style="background:white;border-radius:16px;padding:40px;box-shadow:0 8px 40px rgba(0,0,0,.15)">
 
         <div class="form-group">
           <label>Nombre de tu empresa</label>
