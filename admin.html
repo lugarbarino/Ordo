@@ -156,6 +156,24 @@
     .badge-sin{background:#fde8e8;color:#c0392b}
     .td-actions{display:flex;gap:6px}
     .empty-state{text-align:center;padding:60px 20px;color:#666}
+
+    /* ESTADO BADGE PEDIDO */
+    .badge-estado{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
+    .badge-pendiente{background:#fff3e0;color:#b36000}
+    .badge-respondido{background:#e6f7ef;color:#1a8f5a}
+    .badge-visto{background:#f0f0f0;color:#555}
+    .btn-responder{background:#3872fa;color:white;border:none;border-radius:6px;padding:7px 14px;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .btn-responder:hover{background:#2d64e8}
+
+    /* MODAL PRESUPUESTO */
+    .modal-presup{max-width:560px;width:95%;padding:28px}
+    .presup-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f1f1}
+    .presup-item:last-child{border-bottom:none}
+    .presup-precio{width:100px;padding:6px 10px;border:1.5px solid #e3e3e3;border-radius:6px;font-size:.88rem;font-family:inherit;text-align:right}
+    .presup-precio:focus{border-color:#3872fa;outline:none}
+    .presup-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;margin-top:4px;border-top:2px solid #e3e3e3;font-weight:700;font-size:1rem}
+    .presup-nota{width:100%;padding:10px;border:1.5px solid #e3e3e3;border-radius:8px;font-size:.88rem;font-family:inherit;resize:vertical;margin-top:16px}
+    .presup-nota:focus{border-color:#3872fa;outline:none}
     .empty-state .icon{font-size:3rem;margin-bottom:12px}
 
     /* FORM CONFIG */
@@ -525,6 +543,28 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- MODAL PRESUPUESTO -->
+<div class="modal-overlay" id="modalPresupuesto" onclick="cerrarModalClick(event,'modalPresupuesto')">
+  <div class="modal modal-presup">
+    <button class="modal-cerrar" onclick="cerrarModal('modalPresupuesto')">✕</button>
+    <h3>Armar presupuesto</h3>
+    <div id="presupClienteInfo" style="font-size:.85rem;color:#666;margin-bottom:16px"></div>
+    <div id="presupItems"></div>
+    <div class="presup-total">
+      <span>Total</span>
+      <span id="presupTotal">—</span>
+    </div>
+    <textarea class="presup-nota" id="presupNota" rows="3" placeholder="Nota adicional (opcional)..."></textarea>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="cerrarModal('modalPresupuesto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="enviarPresupuesto()">
+        <span class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px">send</span>
+        Enviar por email
+      </button>
+    </div>
   </div>
 </div>
 
@@ -940,6 +980,7 @@
     document.getElementById('loadingPedidos').style.display = 'block'
     document.getElementById('pedidosWrap').innerHTML = ''
     const { data: pedidos } = await db.from('pedidos').select('*').eq('empresa_id', EMPRESA.id).order('created_at', { ascending: false })
+    window._pedidosCache = pedidos || []
     document.getElementById('loadingPedidos').style.display = 'none'
 
     if (!pedidos || !pedidos.length) {
@@ -947,13 +988,12 @@
       return
     }
 
-    const estados = ['Pendiente','Visto','Respondido']
     let html = pedidos.map(p => {
       const prods = (p.productos || []).map(x => {
         const prod = PRODUCTOS.find(pr => String(pr.id) === String(x.id)) || {}
         const img = prod.imagen_url
           ? `<img src="${prod.imagen_url}" style="width:40px;height:40px;object-fit:contain;border-radius:6px;border:1px solid #e3e3e3;flex-shrink:0" onerror="this.style.display='none'">`
-          : `<div style="width:40px;height:40px;background:#f1f1f1;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-icons" style="font-size:18px;color:#bbb">medical_services</span></div>`
+          : `<div style="width:40px;height:40px;background:#f1f1f1;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-icons" style="font-size:18px;color:#bbb">inventory_2</span></div>`
         return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f1f1">
           ${img}
           <div style="flex:1;min-width:0">
@@ -964,7 +1004,10 @@
         </div>`
       }).join('')
       const fecha = new Date(p.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
-      const opts = estados.map(e => `<option value="${e}" ${p.estado===e?'selected':''}>${e}</option>`).join('')
+      const estadoClass = p.estado === 'Respondido' ? 'badge-respondido' : p.estado === 'Visto' ? 'badge-visto' : 'badge-pendiente'
+      const btnResp = p.estado !== 'Respondido'
+        ? `<button class="btn-responder" onclick="abrirPresupuesto('${p.id}')"><span class="material-icons" style="font-size:16px">reply</span> Responder</button>`
+        : `<button class="btn-responder" style="background:#e6f7ef;color:#1a8f5a" onclick="abrirPresupuesto('${p.id}')"><span class="material-icons" style="font-size:16px">forward_to_inbox</span> Reenviar</button>`
       return `<div style="background:white;border-radius:12px;padding:20px 24px;border:1px solid #e3e3e3;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
           <div>
@@ -972,7 +1015,10 @@
             <div style="font-size:.83rem;color:#666">${p.email_cliente||''} ${p.telefono_cliente ? '· '+p.telefono_cliente : ''} ${p.empresa_cliente ? '· '+p.empresa_cliente : ''}</div>
             <div style="font-size:.78rem;color:#666;margin-top:2px">${fecha}</div>
           </div>
-          <select onchange="cambiarEstadoPedido('${p.id}',this.value)" style="padding:6px 10px;border:1px solid #e3e3e3;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;outline:none;font-family:inherit">${opts}</select>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="badge-estado ${estadoClass}">${p.estado||'Pendiente'}</span>
+            ${btnResp}
+          </div>
         </div>
         <div style="margin-bottom:${p.mensaje?'10px':'0'}">${prods}</div>
         ${p.mensaje ? `<div style="font-size:.85rem;color:#666;font-style:italic;border-top:1px solid #e3e3e3;padding-top:8px;margin-top:8px">"${p.mensaje}"</div>` : ''}
@@ -984,6 +1030,91 @@
   async function cambiarEstadoPedido(id, estado) {
     await db.from('pedidos').update({ estado }).eq('id', id)
     actualizarDashboard()
+  }
+
+  let _presupPedidoId = null
+
+  function abrirPresupuesto(pedidoId) {
+    const { data: pedidos } = window._pedidosCache || {}
+    const pedido = (window._pedidosCache || []).find(p => p.id === pedidoId)
+    if (!pedido) return
+    _presupPedidoId = pedidoId
+
+    // Info cliente
+    const info = [pedido.email_cliente, pedido.telefono_cliente, pedido.empresa_cliente].filter(Boolean).join(' · ')
+    document.getElementById('presupClienteInfo').innerHTML = `<strong>${pedido.nombre_cliente}</strong>${info ? ' — ' + info : ''}`
+
+    // Items con campo precio
+    const prods = (pedido.productos || [])
+    document.getElementById('presupItems').innerHTML = prods.map((x, i) => {
+      const prod = PRODUCTOS.find(pr => String(pr.id) === String(x.id)) || {}
+      const img = prod.imagen_url
+        ? `<img src="${prod.imagen_url}" style="width:36px;height:36px;object-fit:contain;border-radius:5px;border:1px solid #e3e3e3" onerror="this.style.display='none'">`
+        : `<div style="width:36px;height:36px;background:#f1f1f1;border-radius:5px;display:flex;align-items:center;justify-content:center"><span class="material-icons" style="font-size:16px;color:#bbb">inventory_2</span></div>`
+      return `<div class="presup-item">
+        ${img}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.88rem;font-weight:600">${x.nombre}</div>
+          <div style="font-size:.75rem;color:#999">x${x.cantidad}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:.8rem;color:#999">$</span>
+          <input class="presup-precio" type="number" min="0" step="0.01" placeholder="0.00" data-idx="${i}" oninput="actualizarTotalPresup()" id="presupPrecio${i}">
+        </div>
+      </div>`
+    }).join('')
+
+    document.getElementById('presupNota').value = ''
+    document.getElementById('presupTotal').textContent = '—'
+    document.getElementById('modalPresupuesto').classList.add('activo')
+  }
+
+  function actualizarTotalPresup() {
+    const inputs = document.querySelectorAll('.presup-precio')
+    let total = 0
+    let alguno = false
+    inputs.forEach(inp => {
+      const val = parseFloat(inp.value)
+      if (!isNaN(val)) { total += val; alguno = true }
+    })
+    document.getElementById('presupTotal').textContent = alguno
+      ? total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })
+      : '—'
+  }
+
+  async function enviarPresupuesto() {
+    const pedido = (window._pedidosCache || []).find(p => p.id === _presupPedidoId)
+    if (!pedido) return
+
+    const inputs = document.querySelectorAll('.presup-precio')
+    const prods = (pedido.productos || [])
+    const nota = document.getElementById('presupNota').value.trim()
+
+    let lineas = prods.map((x, i) => {
+      const precio = parseFloat(document.getElementById(`presupPrecio${i}`).value)
+      const precioStr = isNaN(precio) ? 'A confirmar' : precio.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })
+      return `• ${x.nombre} x${x.cantidad} — ${precioStr}`
+    })
+
+    const totalInputs = [...inputs].map(inp => parseFloat(inp.value)).filter(v => !isNaN(v))
+    const total = totalInputs.length ? totalInputs.reduce((a, b) => a + b, 0) : null
+    const totalStr = total !== null ? total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }) : ''
+
+    const empresa = EMPRESA?.nombre || 'Nosotros'
+    const asunto = encodeURIComponent(`Presupuesto de ${empresa}`)
+    let cuerpo = `Hola ${pedido.nombre_cliente},\n\nTe enviamos el presupuesto para los productos que solicitaste:\n\n`
+    cuerpo += lineas.join('\n')
+    if (total !== null) cuerpo += `\n\nTotal estimado: ${totalStr}`
+    if (nota) cuerpo += `\n\n${nota}`
+    cuerpo += `\n\nSaludos,\n${empresa}`
+
+    const mailto = `mailto:${pedido.email_cliente}?subject=${asunto}&body=${encodeURIComponent(cuerpo)}`
+    window.location.href = mailto
+
+    // Marcar como Respondido
+    await cambiarEstadoPedido(_presupPedidoId, 'Respondido')
+    cerrarModal('modalPresupuesto')
+    cargarPedidos()
   }
 
   function cerrarModal(id) { document.getElementById(id).classList.remove('activo') }
