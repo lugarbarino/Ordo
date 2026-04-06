@@ -167,8 +167,8 @@ export function ProductosPanel() {
                     <input type="checkbox" checked={seleccionados.has(p.id)} onChange={() => toggleSeleccion(p.id)} className="cursor-pointer" />
                   </td>
                   <td className="py-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#f1f1f1] overflow-hidden flex-shrink-0">
-                      {p.imagen_url && <img src={p.imagen_url} alt="" className="w-full h-full object-cover" />}
+                    <div className="w-10 h-10 rounded-lg bg-[#f1f1f1] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      {p.imagen_url && <img src={p.imagen_url} alt="" className="w-full h-full object-contain" />}
                     </div>
                   </td>
                   <td className="py-3 px-2">
