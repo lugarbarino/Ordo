@@ -6,6 +6,7 @@ import { useAppStore } from '../../../store/useAppStore'
 export function CuentaPanel() {
   const { user, empresa, setUser } = useAppStore()
   const [fotoUploading, setFotoUploading] = useState(false)
+  const [fotoError, setFotoError] = useState('')
   const [nombreVal, setNombreVal] = useState(user?.user_metadata?.nombre || '')
   const [nombreMsg, setNombreMsg] = useState('')
   const [nombreLoading, setNombreLoading] = useState(false)
@@ -25,13 +26,14 @@ export function CuentaPanel() {
 
   const subirFoto = async (file) => {
     if (!file || !user) return
-    setFotoUploading(true)
+    setFotoUploading(true); setFotoError('')
     const ext = file.name.split('.').pop()
-    const path = `avatars/${user.id}.${ext}`
+    const path = `${user.id}/avatar.${ext}`
     const { error: upErr } = await db.storage.from('logos').upload(path, file, { upsert: true })
-    if (upErr) { setFotoUploading(false); return }
+    if (upErr) { setFotoError(upErr.message); setFotoUploading(false); return }
     const url = `${SUPABASE_URL}/storage/v1/object/public/logos/${path}`
-    await db.auth.updateUser({ data: { avatar_url: url } })
+    const { error: updErr } = await db.auth.updateUser({ data: { avatar_url: url } })
+    if (updErr) { setFotoError(updErr.message); setFotoUploading(false); return }
     const { data: { user: u } } = await db.auth.getUser()
     setUser(u)
     setFotoUploading(false)
@@ -106,6 +108,7 @@ export function CuentaPanel() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden"
             onChange={e => subirFoto(e.target.files[0])} />
         </div>
+        {fotoError && <p className="text-xs text-red-500 mt-2">{fotoError}</p>}
       </div>
 
       {/* Nombre */}
