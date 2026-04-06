@@ -140,17 +140,17 @@ export function CuentaPanel() {
               <Trash2 size={14} /> Borrar cuenta
             </button>
           : <div className="space-y-3">
-              <p className="text-xs text-[#666]">Escribí <span className="font-semibold text-red-600">{DELETE_PHRASE}</span> para confirmar:</p>
+              <p className="text-xs text-[#666]">Escribí <span className="font-semibold text-[#111]">{DELETE_PHRASE}</span> para confirmar:</p>
               <input value={deleteText} onChange={e => setDeleteText(e.target.value)}
                 placeholder={DELETE_PHRASE} className={inputCls} />
               <div className="flex items-center justify-end gap-3">
-                <button onClick={borrarCuenta} disabled={deleteLoading || deleteText !== DELETE_PHRASE}
-                  className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-700 transition-colors disabled:opacity-50 border-none">
-                  {deleteLoading ? 'Cerrando…' : 'Borrar cuenta'}
-                </button>
                 <button onClick={() => { setDeleteConfirm(false); setDeleteText('') }}
                   className="px-4 py-2 text-sm text-[#666] bg-transparent border-none cursor-pointer hover:text-[#111]">
                   Cancelar
+                </button>
+                <button onClick={borrarCuenta} disabled={deleteLoading || deleteText !== DELETE_PHRASE}
+                  className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-700 transition-colors disabled:opacity-50 border-none">
+                  {deleteLoading ? 'Cerrando…' : 'Borrar cuenta'}
                 </button>
               </div>
             </div>
