@@ -2,7 +2,108 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image } from 'lucide-react'
 import { db } from './lib/supabase'
 import { Landing } from './components/Landing'
+import { useAppStore } from './store/useAppStore'
+import { useProductosStore } from './store/useProductosStore'
+import { usePedidosStore } from './store/usePedidosStore'
+import { Layout } from './components/admin/layout/Layout'
+import { Onboarding as AdminOnboarding } from './components/admin/Onboarding'
+import { DashboardPanel } from './components/admin/panels/DashboardPanel'
+import { ProductosPanel } from './components/admin/panels/ProductosPanel'
+import { PedidosPanel } from './components/admin/panels/PedidosPanel'
+import { ConfigPanel } from './components/admin/panels/ConfigPanel'
+import { PdfPanel } from './components/admin/panels/PdfPanel'
 
+// ── Route detection ──────────────────────────────────────────
+const path = window.location.pathname
+
+function getRoute() {
+  if (path === '/admin' || path.startsWith('/admin/')) return 'admin'
+  const slug = path.replace(/^\//, '').split('/')[0]
+  if (slug) return 'catalog'
+  return 'landing'
+}
+
+const ROUTE = getRoute()
+
+// ── Admin App ────────────────────────────────────────────────
+function PanelContent({ panel }) {
+  switch (panel) {
+    case 'dashboard': return <DashboardPanel />
+    case 'productos': return <ProductosPanel />
+    case 'pedidos': return <PedidosPanel />
+    case 'config': return <ConfigPanel />
+    case 'pdf': return <PdfPanel />
+    default: return <DashboardPanel />
+  }
+}
+
+function AdminApp() {
+  const { user, empresa, panel, setUser, cargarEmpresa } = useAppStore()
+  const cargarProductos = useProductosStore(s => s.cargar)
+  const cargarPedidos = usePedidosStore(s => s.cargar)
+
+  useEffect(() => {
+    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+      const u = session?.user || null
+      setUser(u)
+      if (u) {
+        const emp = await cargarEmpresa()
+        if (emp) {
+          cargarProductos(emp.id)
+          cargarPedidos(emp.id)
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (empresa) {
+      cargarProductos(empresa.id)
+      cargarPedidos(empresa.id)
+    }
+  }, [empresa?.id])
+
+  // Not logged in → redirect to landing
+  if (user === null) {
+    // user starts as null; only redirect after auth check completes
+    // We show nothing until auth state is determined (subscription fires quickly)
+    return null
+  }
+
+  if (!empresa) return <AdminOnboarding initialStep={2} />
+
+  return (
+    <Layout>
+      <PanelContent panel={panel} />
+    </Layout>
+  )
+}
+
+// ── Admin route wrapper (handles auth loading state) ─────────
+function AdminRoute() {
+  const [authChecked, setAuthChecked] = useState(false)
+  const [initialUser, setInitialUser] = useState(undefined)
+
+  useEffect(() => {
+    db.auth.getSession().then(({ data: { session } }) => {
+      setInitialUser(session?.user || null)
+      setAuthChecked(true)
+    })
+  }, [])
+
+  if (!authChecked) return null
+
+  // Not logged in → go to landing
+  if (initialUser === null) {
+    window.location.href = '/'
+    return null
+  }
+
+  return <AdminApp />
+}
+
+// ── Catalog view ─────────────────────────────────────────────
 function formatPrecio(v) {
   if (!v) return null
   const s = String(v).trim()
@@ -11,7 +112,6 @@ function formatPrecio(v) {
   return `$${Number(s).toLocaleString('es-AR')}`
 }
 
-// ── Spinner ──────────────────────────────────────────────────
 function Spinner({ color }) {
   return (
     <div className="flex items-center justify-center h-72">
@@ -21,7 +121,6 @@ function Spinner({ color }) {
   )
 }
 
-// ── Modal Foto ───────────────────────────────────────────────
 function ModalFoto({ img, nombre, onClose }) {
   useEffect(() => {
     const h = e => e.key === 'Escape' && onClose()
@@ -45,7 +144,6 @@ function ModalFoto({ img, nombre, onClose }) {
   )
 }
 
-// ── Modal Carrito ────────────────────────────────────────────
 function ModalCarrito({ carrito, empresa, onClose, onCambiarCantidad, onQuitar, onEnviado, brandColor }) {
   const [nombre, setNombre] = useState('')
   const [tel, setTel] = useState('')
@@ -210,8 +308,7 @@ function ModalCarrito({ carrito, empresa, onClose, onCambiarCantidad, onQuitar, 
   )
 }
 
-// ── App principal ────────────────────────────────────────────
-export default function App() {
+function CatalogApp() {
   const [empresa, setEmpresa] = useState(null)
   const [productos, setProductos] = useState([])
   const [error, setError] = useState(false)
@@ -219,7 +316,7 @@ export default function App() {
   const [catActiva, setCatActiva] = useState('')
   const [busqueda, setBusqueda] = useState('')
   const [carrito, setCarrito] = useState([])
-  const [fotoModal, setFotoModal] = useState(null) // { url, nombre }
+  const [fotoModal, setFotoModal] = useState(null)
   const [carritoOpen, setCarritoOpen] = useState(false)
 
   const slug = new URLSearchParams(window.location.search).get('slug')
@@ -236,7 +333,6 @@ export default function App() {
       setEmpresa(emp)
       document.title = emp.nombre + ' — Catálogo'
 
-      // Visita al catálogo
       db.from('visitas').insert({ empresa_id: emp.id }).then(() => {})
 
       const { data: prods } = await db.from('productos').select('*')
@@ -279,8 +375,6 @@ export default function App() {
 
   const totalCarrito = carrito.reduce((s, x) => s + x.cantidad, 0)
 
-  if (!slug) return <Landing />
-
   if (cargando) return (
     <div className="min-h-screen bg-white">
       <Spinner color={brandColor} />
@@ -313,12 +407,10 @@ export default function App() {
         max-w-[calc(100%-48px)] w-[1000px] h-[450px]
         max-md:h-[260px] max-md:px-6 max-md:my-3 max-md:max-w-[calc(100%-24px)]
         max-sm:h-[200px] max-sm:px-[18px] max-sm:my-2.5 max-sm:rounded-[10px]">
-        {/* bg */}
         <div className="absolute inset-0" style={{
           background: brandColor,
           ...(empresa.banner_url ? { backgroundImage: `url(${empresa.banner_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {})
         }} />
-        {/* overlay */}
         <div className="absolute inset-0"
           style={{ background: 'linear-gradient(110deg,rgba(15,38,62,0.88) 0%,rgba(25,60,95,0.65) 55%,rgba(25,60,95,0.35) 100%)' }} />
         <div className="relative z-10 w-[500px] max-w-full">
@@ -337,7 +429,6 @@ export default function App() {
       {/* FILTER BAR */}
       <div className="bg-white border-b border-[#dde3ed] px-10 h-16 flex items-center gap-4 sticky top-0 z-20
         max-md:px-4 max-md:h-auto max-md:flex-wrap max-md:gap-2 max-md:py-2.5">
-        {/* Pills */}
         <div className="flex items-center bg-[#f1f1f1] rounded-[40px] p-1 gap-0.5 overflow-x-auto shrink min-w-0 max-md:order-1 max-md:w-full"
           style={{ scrollbarWidth: 'none' }}>
           {['', ...categorias].map(cat => (
@@ -350,15 +441,12 @@ export default function App() {
             </button>
           ))}
         </div>
-        {/* Search */}
-        <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[10px] px-3.5 h-[42px] min-w-[200px] shrink-0 ml-auto transition-colors focus-within:border-current max-md:order-2 max-md:min-w-0 max-md:flex-1 max-md:ml-0"
-          style={{ '--tw-border-opacity': 1 }}>
+        <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[10px] px-3.5 h-[42px] min-w-[200px] shrink-0 ml-auto transition-colors focus-within:border-current max-md:order-2 max-md:min-w-0 max-md:flex-1 max-md:ml-0">
           <Search size={15} className="text-[#aab] shrink-0" />
           <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
             placeholder="Buscar productos…"
             className="border-none outline-none text-[.88rem] w-full text-[#1e2a3a] placeholder:text-[#aab] bg-transparent" />
         </div>
-        {/* Count */}
         <span className="text-[.8rem] text-[#6b7a90] whitespace-nowrap shrink-0 max-md:order-3 max-md:ml-auto">
           {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''}
         </span>
@@ -404,12 +492,10 @@ export default function App() {
         </button>
       )}
 
-      {/* Modal foto */}
       {fotoModal && (
         <ModalFoto img={fotoModal.url} nombre={fotoModal.nombre} onClose={() => setFotoModal(null)} />
       )}
 
-      {/* Modal carrito */}
       {carritoOpen && (
         <ModalCarrito
           carrito={carrito}
@@ -425,13 +511,11 @@ export default function App() {
   )
 }
 
-// ── Tarjeta de producto ──────────────────────────────────────
 function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, onAgregar }) {
   const precio = formatPrecio(p.precio)
 
   return (
     <div className="bg-white rounded-xl border border-[#dde3ed] overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(0,0,0,.10)]">
-      {/* Imagen */}
       <div className="w-full h-[185px] bg-white flex items-center justify-center overflow-hidden relative border-b border-[#eef1f6] cursor-zoom-in max-sm:h-[130px]"
         onClick={p.imagen_url ? onFoto : undefined}>
         {p.imagen_url
@@ -445,7 +529,6 @@ function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, o
         )}
       </div>
 
-      {/* Body */}
       <div className="p-4 flex flex-col flex-1 max-sm:px-2.5 max-sm:py-2.5">
         {p.categoria && (
           <span className="self-start text-[.62rem] font-bold px-2.5 py-0.5 rounded-[20px] uppercase tracking-[.6px] mb-2"
@@ -475,4 +558,29 @@ function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, o
       </div>
     </div>
   )
+}
+
+// ── Root App ─────────────────────────────────────────────────
+export default function App() {
+  if (ROUTE === 'admin') return <AdminRoute />
+  if (ROUTE === 'catalog') return <CatalogApp />
+  return <LandingRoute />
+}
+
+// ── Landing route (check if logged in → redirect to /admin) ──
+function LandingRoute() {
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        window.location.href = '/admin'
+      } else {
+        setChecked(true)
+      }
+    })
+  }, [])
+
+  if (!checked) return null
+  return <Landing />
 }
