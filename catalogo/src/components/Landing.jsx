@@ -36,7 +36,7 @@ const OrdoLogo = ({ className = 'h-[22px] w-auto' }) => (
   <img src="/logo-ordo.svg" alt="ORDO" className={className} />
 )
 
-function LoginModal({ open, onClose }) {
+function LoginModal({ open, onClose, onRegister }) {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
   const [showPass, setShowPass] = useState(false)
@@ -76,11 +76,13 @@ function LoginModal({ open, onClose }) {
 
         {tab !== 'magic' && (
           <div className="flex mb-6 border-b-2 border-[#dde3ed]">
-            <button onClick={() => { setTab('login'); setError('') }}
-              className={`flex-1 py-2.5 text-sm font-semibold border-none cursor-pointer transition-colors bg-transparent
-                ${tab === 'login' ? 'text-[#295e4f] border-b-[3px] border-[#295e4f] -mb-0.5' : 'text-[#6b7a90]'}`}>
-              Iniciar sesión
-            </button>
+            {[['login', 'Iniciar sesión'], ['registro', 'Crear cuenta']].map(([t, label]) => (
+              <button key={t} onClick={() => { if (t === 'registro') { onClose(); onRegister?.() } else { setTab(t); setError('') } }}
+                className={`flex-1 py-2.5 text-sm font-semibold border-none cursor-pointer transition-colors bg-transparent
+                  ${tab === t ? 'text-[#295e4f] border-b-[3px] border-[#295e4f] -mb-0.5' : 'text-[#6b7a90]'}`}>
+                {label}
+              </button>
+            ))}
           </div>
         )}
 
@@ -263,7 +265,7 @@ export function Landing() {
         <span className="text-sm sm:text-base text-[#333]">Hecho con <span className="text-[#c13e58]">❤</span> en Argentina</span>
       </footer>
 
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onRegister={() => setMode('onboarding')} />
     </div>
   )
 }
