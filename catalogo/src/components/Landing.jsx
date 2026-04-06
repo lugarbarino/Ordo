@@ -197,93 +197,95 @@ export function Landing() {
   const [modal, setModal] = useState(null)
 
   return (
-    <div className="min-h-screen font-['Inter'] bg-[#f8f8f8] text-[#373c42]">
+    <div style={{ minHeight: '100vh', fontFamily: "'Inter', sans-serif", background: '#f8f8f8', color: '#373c42' }}>
 
-      <nav className="flex items-center justify-between px-12 py-5 sticky top-0 bg-[#f8f8f8] z-40">
+      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 48px', position: 'sticky', top: 0, background: '#f8f8f8', zIndex: 40 }}>
         <OrdoLogo />
-        <button onClick={() => setModal('login')}
-          className="bg-[#1c1c1c] text-white px-7 py-4 rounded-[14px] font-semibold text-base cursor-pointer hover:opacity-80 transition-opacity border-none">
+        <button onClick={() => setModal('login')} style={{ background: '#1c1c1c', color: 'white', padding: '14px 28px', borderRadius: 14, fontWeight: 600, fontSize: '1rem', cursor: 'pointer', border: 'none' }}>
           Iniciar Sesión
         </button>
       </nav>
 
-      <section className="px-12 pb-12 pt-8">
-        <div className="relative rounded-xl overflow-hidden max-w-[1035px] mx-auto flex items-end" style={{ height: 416 }}>
-          <div className="absolute inset-0 bg-cover bg-top" style={{ backgroundImage: "url('/hero.png')" }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(95deg,rgba(0,0,0,.6) 34%,rgba(49,49,49,.31) 73%,rgba(102,102,102,0) 98%)' }} />
-          <div className="relative z-10 px-[67px] pb-[52px]">
-            <h1 className="text-[43px] font-black leading-[1.14] text-white mb-[18px] capitalize">
+      {/* HERO */}
+      <section style={{ padding: '32px 48px 48px' }}>
+        <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', maxWidth: 1035, margin: '0 auto', display: 'flex', alignItems: 'flex-end', height: 416 }}>
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/hero.png')", backgroundSize: 'cover', backgroundPosition: 'top' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(95deg,rgba(0,0,0,.6) 34%,rgba(49,49,49,.31) 73%,rgba(102,102,102,0) 98%)' }} />
+          <div style={{ position: 'relative', zIndex: 1, padding: '0 67px 52px' }}>
+            <h1 style={{ fontSize: 43, fontWeight: 900, color: 'white', lineHeight: 1.14, marginBottom: 18, textTransform: 'capitalize' }}>
               Tu catálogo digital<br />listo en minutos
             </h1>
-            <p className="text-xl text-white max-w-[526px] leading-[1.4] mb-7">
+            <p style={{ fontSize: '1.25rem', color: 'rgba(255,255,255,.9)', maxWidth: 526, lineHeight: 1.4, marginBottom: 28 }}>
               Subí tu PDF, la IA extrae todos tus productos automáticamente. Tus clientes lo ven online, sin poder editar nada.
             </p>
-            <div className="flex gap-3.5 flex-wrap">
-              <button onClick={() => setModal('registro')}
-                className="flex items-center gap-3 bg-[#295e4f] text-white px-6 py-[22px] rounded-[13px] font-semibold text-[1.05rem] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all capitalize border-none">
-                Creá tu catálogo
-              </button>
-            </div>
+            <button onClick={() => setModal('registro')} style={{ background: '#295e4f', color: 'white', padding: '18px 24px', borderRadius: 13, fontWeight: 600, fontSize: '1.05rem', cursor: 'pointer', border: 'none', textTransform: 'capitalize' }}>
+              Creá tu catálogo
+            </button>
           </div>
         </div>
       </section>
 
-      <section className="px-12 py-20">
-        <FadeIn className="text-center mb-12">
-          <h2 className="text-[43px] font-black text-[#373c42] capitalize mb-1.5">Todo lo que necesitás</h2>
-          <p className="text-2xl text-[#373c42] capitalize">Sin técnicos, sin complicaciones</p>
+      {/* FEATURES */}
+      <section style={{ padding: '80px 48px' }}>
+        <FadeIn>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <h2 style={{ fontSize: 43, fontWeight: 900, color: '#373c42', textTransform: 'capitalize', marginBottom: 6 }}>Todo lo que necesitás</h2>
+            <p style={{ fontSize: '1.5rem', color: '#373c42', textTransform: 'capitalize' }}>Sin técnicos, sin complicaciones</p>
+          </div>
         </FadeIn>
-        <div className="grid grid-cols-3 gap-6 max-w-[1160px] mx-auto">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, maxWidth: 1160, margin: '0 auto' }}>
           {FEATURES.map(({ icon: Icon, title, desc }, i) => (
             <FadeIn key={title} delay={i * 80}>
-              <div className="bg-white rounded-[20px] px-8 py-10 shadow-[0_4px_34px_rgba(0,0,0,.09)] hover:-translate-y-1 hover:shadow-[0_12px_48px_rgba(0,0,0,.18)] transition-all h-full">
-                <div className="w-[51px] h-[51px] flex items-center justify-center mb-4">
-                  <Icon size={34} strokeWidth={1.5} className="text-[#295e4f]" />
+              <div style={{ background: 'white', borderRadius: 20, padding: '40px 32px', boxShadow: '0 4px 34px rgba(0,0,0,.09)', height: '100%' }}>
+                <div style={{ width: 51, height: 51, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                  <Icon size={34} strokeWidth={1.5} color="#295e4f" />
                 </div>
-                <h3 className="text-xl font-black text-black mb-2.5 capitalize">{title}</h3>
-                <p className="text-base text-[#545454] leading-relaxed">{desc}</p>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'black', marginBottom: 10, textTransform: 'capitalize' }}>{title}</h3>
+                <p style={{ fontSize: '1rem', color: '#545454', lineHeight: 1.6 }}>{desc}</p>
               </div>
             </FadeIn>
           ))}
         </div>
       </section>
 
-      <section className="bg-[#1e453b] px-12 py-20 pb-28">
+      {/* CÓMO FUNCIONA */}
+      <section style={{ background: '#1e453b', padding: '80px 48px 112px' }}>
         <FadeIn>
-          <h2 className="text-center text-[43px] font-black text-[#e0e0e0] capitalize mb-16">¿Cómo funciona?</h2>
+          <h2 style={{ textAlign: 'center', fontSize: 43, fontWeight: 900, color: '#e0e0e0', textTransform: 'capitalize', marginBottom: 64 }}>¿Cómo funciona?</h2>
         </FadeIn>
-        <div className="flex gap-[60px] justify-center max-w-[1300px] mx-auto">
+        <div style={{ display: 'flex', gap: 60, justifyContent: 'center', maxWidth: 1300, margin: '0 auto' }}>
           {STEPS.map(({ n, title, desc }, i) => (
-            <FadeIn key={n} delay={i * 120} className="flex-1 max-w-[359px]">
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="w-[77px] h-[77px] rounded-full bg-white flex items-center justify-center text-[40px] font-black text-[#1e453b] flex-shrink-0">{n}</div>
-                <h4 className="text-xl font-semibold text-[#e0e0e0] leading-relaxed">{title}</h4>
-                <p className="text-base text-[#e0e0e0] leading-relaxed">{desc}</p>
+            <FadeIn key={n} delay={i * 120} style={{ flex: 1, maxWidth: 359 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 16 }}>
+                <div style={{ width: 77, height: 77, borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, fontWeight: 900, color: '#1e453b', flexShrink: 0 }}>{n}</div>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#e0e0e0', lineHeight: 1.4 }}>{title}</h4>
+                <p style={{ fontSize: '1rem', color: '#e0e0e0', lineHeight: 1.6 }}>{desc}</p>
               </div>
             </FadeIn>
           ))}
         </div>
       </section>
 
-      <section className="relative h-[480px] overflow-hidden flex items-center">
-        <div className="absolute inset-0 bg-cover bg-[center_30%] brightness-65" style={{ backgroundImage: "url('/banner.png')" }} />
-        <FadeIn className="relative z-10 ml-[clamp(40px,8vw,200px)]">
-          <div className="bg-white rounded-[20px] px-12 py-11 max-w-[380px]">
-            <h2 className="text-[32px] font-black text-[#373c42] mb-3.5">Empezá hoy</h2>
-            <p className="text-base text-[#545454] leading-relaxed mb-7">
+      {/* CTA BANNER */}
+      <section style={{ position: 'relative', height: 480, overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: "url('/banner.png')", backgroundSize: 'cover', backgroundPosition: 'center 30%', filter: 'brightness(0.65)' }} />
+        <FadeIn style={{ position: 'relative', zIndex: 1, marginLeft: 'clamp(40px,8vw,200px)' }}>
+          <div style={{ background: 'white', borderRadius: 20, padding: '44px 48px', maxWidth: 380 }}>
+            <h2 style={{ fontSize: 32, fontWeight: 900, color: '#373c42', marginBottom: 14 }}>Empezá hoy</h2>
+            <p style={{ fontSize: '1rem', color: '#545454', lineHeight: 1.6, marginBottom: 28 }}>
               Subís tu catálogo en PDF o crealo a mano y tenés tu catálogo hoy mismo.
             </p>
-            <button onClick={() => setModal('registro')}
-              className="w-full flex items-center justify-center gap-3 bg-[#295e4f] text-white py-[22px] rounded-[13px] font-semibold text-[1.05rem] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all capitalize border-none">
+            <button onClick={() => setModal('registro')} style={{ width: '100%', background: '#295e4f', color: 'white', padding: '18px 24px', borderRadius: 13, fontWeight: 600, fontSize: '1.05rem', cursor: 'pointer', border: 'none', textTransform: 'capitalize' }}>
               Creá tu catálogo
             </button>
           </div>
         </FadeIn>
       </section>
 
-      <footer className="flex items-center justify-between px-12 py-8 border-t border-[#e0e0e0] bg-[#f8f8f8]">
+      {/* FOOTER */}
+      <footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '32px 48px', borderTop: '1px solid #e0e0e0', background: '#f8f8f8' }}>
         <OrdoLogo className="h-[18px] w-auto opacity-50" />
-        <span className="text-base text-[#333]">Hecho con <span className="text-[#c13e58]">❤</span> en Argentina</span>
+        <span style={{ fontSize: '1rem', color: '#333' }}>Hecho con <span style={{ color: '#c13e58' }}>❤</span> en Argentina</span>
       </footer>
 
       <AuthModal open={!!modal} tab={modal} onClose={() => setModal(null)} />
