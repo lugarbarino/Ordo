@@ -14,7 +14,9 @@ export function CuentaPanel() {
   const [passMsg, setPassMsg] = useState('')
   const [passLoading, setPassLoading] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [deleteText, setDeleteText] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const DELETE_PHRASE = 'Quiero borrar mi cuenta'
   const fileRef = useRef()
 
   const avatarUrl = user?.user_metadata?.avatar_url
@@ -103,10 +105,12 @@ export function CuentaPanel() {
             className={inputCls + ' pl-8'} />
         </div>
         {emailMsg && <p className={`text-xs ${emailMsg.includes('confirmación') ? 'text-[#295e4f]' : 'text-red-500'}`}>{emailMsg}</p>}
-        <button onClick={cambiarEmail} disabled={emailLoading || emailVal === user?.email}
-          className="px-4 py-2 bg-[#111] text-white text-sm font-semibold rounded-lg cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-40 border-none">
-          {emailLoading ? 'Guardando…' : 'Actualizar email'}
-        </button>
+        <div className="flex justify-end">
+          <button onClick={cambiarEmail} disabled={emailLoading || emailVal === user?.email}
+            className="px-4 py-2 bg-[#111] text-white text-sm font-semibold rounded-lg cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-40 border-none">
+            {emailLoading ? 'Guardando…' : 'Actualizar email'}
+          </button>
+        </div>
       </div>
 
       {/* Cambiar contraseña */}
@@ -118,31 +122,37 @@ export function CuentaPanel() {
             placeholder="Nueva contraseña" className={inputCls + ' pl-8'} />
         </div>
         {passMsg && <p className={`text-xs ${passMsg.includes('actualizada') ? 'text-[#295e4f]' : 'text-red-500'}`}>{passMsg}</p>}
-        <button onClick={cambiarPassword} disabled={passLoading || passNueva.length < 6}
-          className="px-4 py-2 bg-[#111] text-white text-sm font-semibold rounded-lg cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-40 border-none">
-          {passLoading ? 'Guardando…' : 'Cambiar contraseña'}
-        </button>
+        <div className="flex justify-end">
+          <button onClick={cambiarPassword} disabled={passLoading || passNueva.length < 6}
+            className="px-4 py-2 bg-[#111] text-white text-sm font-semibold rounded-lg cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-40 border-none">
+            {passLoading ? 'Guardando…' : 'Cambiar contraseña'}
+          </button>
+        </div>
       </div>
 
       {/* Zona de peligro */}
       <div className="bg-white border border-red-200 rounded-xl p-6">
-        <h2 className="text-sm font-semibold text-red-600 mb-2">Zona de peligro</h2>
+        <h2 className="text-sm font-semibold text-[#111] mb-2">Borrar cuenta</h2>
         <p className="text-xs text-[#666] mb-4">Al borrar tu cuenta se eliminará tu sesión. Para eliminar los datos permanentemente contactá soporte.</p>
         {!deleteConfirm
           ? <button onClick={() => setDeleteConfirm(true)}
               className="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-600 text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-50 transition-colors bg-transparent">
               <Trash2 size={14} /> Borrar cuenta
             </button>
-          : <div className="flex items-center gap-3">
-              <span className="text-xs text-red-600 font-medium">¿Estás seguro?</span>
-              <button onClick={borrarCuenta} disabled={deleteLoading}
-                className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-700 transition-colors disabled:opacity-50 border-none">
-                {deleteLoading ? 'Cerrando…' : 'Sí, borrar'}
-              </button>
-              <button onClick={() => setDeleteConfirm(false)}
-                className="px-4 py-2 text-sm text-[#666] bg-transparent border-none cursor-pointer hover:text-[#111]">
-                Cancelar
-              </button>
+          : <div className="space-y-3">
+              <p className="text-xs text-[#666]">Escribí <span className="font-semibold text-red-600">{DELETE_PHRASE}</span> para confirmar:</p>
+              <input value={deleteText} onChange={e => setDeleteText(e.target.value)}
+                placeholder={DELETE_PHRASE} className={inputCls} />
+              <div className="flex items-center justify-end gap-3">
+                <button onClick={borrarCuenta} disabled={deleteLoading || deleteText !== DELETE_PHRASE}
+                  className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-700 transition-colors disabled:opacity-50 border-none">
+                  {deleteLoading ? 'Cerrando…' : 'Borrar cuenta'}
+                </button>
+                <button onClick={() => { setDeleteConfirm(false); setDeleteText('') }}
+                  className="px-4 py-2 text-sm text-[#666] bg-transparent border-none cursor-pointer hover:text-[#111]">
+                  Cancelar
+                </button>
+              </div>
             </div>
         }
       </div>
