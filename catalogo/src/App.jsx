@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image } from 'lucide-react'
 import { db } from './lib/supabase'
+import { Landing } from './components/Landing'
 
 function formatPrecio(v) {
   if (!v) return null
@@ -277,6 +278,8 @@ export default function App() {
   }
 
   const totalCarrito = carrito.reduce((s, x) => s + x.cantidad, 0)
+
+  if (!slug) return <Landing />
 
   if (cargando) return (
     <div className="min-h-screen bg-white">
