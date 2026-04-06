@@ -89,7 +89,7 @@ export function PedidosPanel() {
   return (
     <div className="max-w-2xl">
       {/* Sticky tabs */}
-      <div className="sticky top-0 z-10 bg-[#f8f9fa] -mx-7 px-7 pt-7 pb-4 mb-2">
+      <div className="sticky top-0 z-10 bg-white -mx-7 px-7 pt-7 pb-4 mb-2">
         <Tabs tabs={TABS} active={tabActivo} onChange={setTab} />
       </div>
 
