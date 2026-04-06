@@ -1,4 +1,4 @@
-import { LayoutDashboard, Upload, Package, Receipt, Building2, LogOut, X } from 'lucide-react'
+import { LayoutDashboard, Upload, Package, Receipt, Building2, LogOut, X, UserCircle } from 'lucide-react'
 import { useAppStore } from '../../../store/useAppStore'
 import { db } from '../../../lib/supabase'
 import { clsx } from '../../../lib/utils'
@@ -10,6 +10,7 @@ const NAV = [
   { id: 'productos', label: 'Productos', icon: Package },
   { id: 'pedidos', label: 'Pedidos', icon: Receipt },
   { id: 'config', label: 'Mi empresa', icon: Building2 },
+  { id: 'cuenta', label: 'Mi cuenta', icon: UserCircle },
 ]
 
 function NavItem({ item, active, onClick }) {
