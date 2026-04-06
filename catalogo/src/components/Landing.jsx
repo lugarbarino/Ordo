@@ -44,6 +44,7 @@ function LoginModal({ open, onClose, onRegister }) {
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState('login')
   const [success, setSuccess] = useState('')
+  const [remember, setRemember] = useState(true)
 
   useEffect(() => { if (open) { setError(''); setSuccess(''); setTab('login') } }, [open])
   if (!open) return null
@@ -105,6 +106,11 @@ function LoginModal({ open, onClose, onRegister }) {
                 </button>
               </div>
             </div>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)}
+                className="w-3.5 h-3.5 accent-[#295e4f] cursor-pointer" />
+              <span className="text-xs text-[#6b7a90]">Recordar cuenta</span>
+            </label>
             {error && <p className="text-red-500 text-xs">{error}</p>}
             <button onClick={handleLogin} disabled={loading}
               className="w-full py-3 bg-[#295e4f] text-white rounded-lg font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 border-none">
