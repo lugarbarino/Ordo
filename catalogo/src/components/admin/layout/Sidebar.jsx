@@ -45,7 +45,9 @@ export function Sidebar({ onClose }) {
     onClose?.()
   }
 
-  const initial = empresa?.nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'O'
+  const avatarUrl = user?.user_metadata?.avatar_url
+  const nombre = user?.user_metadata?.nombre || ''
+  const initial = nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'
 
   return (
     <aside className="w-[220px] bg-white border-r-2 border-[#f1f1f1] flex flex-col flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
@@ -62,27 +64,21 @@ export function Sidebar({ onClose }) {
         )}
       </div>
 
-      {/* Company selector */}
+      {/* User profile box */}
       <button
-        onClick={() => navigate('config')}
+        onClick={() => navigate('cuenta')}
         className="mx-3 border border-[#e3e3e3] rounded-lg px-2.5 py-2 cursor-pointer flex items-center gap-2.5 hover:bg-[#f8f9fa] transition-colors bg-transparent text-left"
       >
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0 overflow-hidden"
-          style={{ background: 'var(--brand)' }}
-        >
-          {empresa?.logo_url
-            ? <img src={empresa.logo_url} alt="" className="w-full h-full object-cover" />
-            : initial
-          }
+        <div className="w-8 h-8 rounded-full bg-[#295e4f] flex items-center justify-center text-sm font-bold text-white flex-shrink-0 overflow-hidden">
+          {avatarUrl
+            ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+            : initial}
         </div>
         <div className="min-w-0">
           <div className="text-xs font-semibold text-[#111] truncate">
-            {empresa?.nombre || 'Mi empresa'}
+            {nombre || user?.email?.split('@')[0]}
           </div>
-          {empresa?.nombre && (
-            <div className="text-[0.7rem] text-[#888] truncate">{user?.email}</div>
-          )}
+          <div className="text-[0.7rem] text-[#888] truncate">{user?.email}</div>
         </div>
       </button>
 

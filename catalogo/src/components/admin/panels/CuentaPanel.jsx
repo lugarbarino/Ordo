@@ -1,15 +1,17 @@
 import { useState, useRef } from 'react'
-import { Camera, Mail, Lock, Trash2 } from 'lucide-react'
+import { Camera, Mail, Lock, Trash2, User } from 'lucide-react'
 import { db, SUPABASE_URL } from '../../../lib/supabase'
 import { useAppStore } from '../../../store/useAppStore'
 
 export function CuentaPanel() {
   const { user, empresa, setUser } = useAppStore()
   const [fotoUploading, setFotoUploading] = useState(false)
+  const [nombreVal, setNombreVal] = useState(user?.user_metadata?.nombre || '')
+  const [nombreMsg, setNombreMsg] = useState('')
+  const [nombreLoading, setNombreLoading] = useState(false)
   const [emailVal, setEmailVal] = useState(user?.email || '')
   const [emailMsg, setEmailMsg] = useState('')
   const [emailLoading, setEmailLoading] = useState(false)
-  const [passActual, setPassActual] = useState('')
   const [passNueva, setPassNueva] = useState('')
   const [passMsg, setPassMsg] = useState('')
   const [passLoading, setPassLoading] = useState(false)
@@ -33,6 +35,16 @@ export function CuentaPanel() {
     const { data: { user: u } } = await db.auth.getUser()
     setUser(u)
     setFotoUploading(false)
+  }
+
+  const guardarNombre = async () => {
+    setNombreMsg(''); setNombreLoading(true)
+    const { error } = await db.auth.updateUser({ data: { nombre: nombreVal } })
+    setNombreLoading(false)
+    if (error) { setNombreMsg(error.message); return }
+    const { data: { user: u } } = await db.auth.getUser()
+    setUser(u)
+    setNombreMsg('Nombre actualizado.')
   }
 
   const cambiarEmail = async () => {
@@ -93,6 +105,23 @@ export function CuentaPanel() {
           </div>
           <input ref={fileRef} type="file" accept="image/*" className="hidden"
             onChange={e => subirFoto(e.target.files[0])} />
+        </div>
+      </div>
+
+      {/* Nombre */}
+      <div className="bg-white border border-[#e3e3e3] rounded-xl p-6 space-y-3">
+        <h2 className="text-sm font-semibold text-[#111]">Nombre</h2>
+        <div className="relative">
+          <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa]" />
+          <input type="text" value={nombreVal} onChange={e => setNombreVal(e.target.value)}
+            placeholder="Tu nombre" className={inputCls + ' pl-8'} />
+        </div>
+        {nombreMsg && <p className={`text-xs ${nombreMsg.includes('actualizado') ? 'text-[#295e4f]' : 'text-red-500'}`}>{nombreMsg}</p>}
+        <div className="flex justify-end">
+          <button onClick={guardarNombre} disabled={nombreLoading || nombreVal === (user?.user_metadata?.nombre || '')}
+            className="px-4 py-2 bg-[#111] text-white text-sm font-semibold rounded-lg cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-40 border-none">
+            {nombreLoading ? 'Guardando…' : 'Guardar nombre'}
+          </button>
         </div>
       </div>
 
