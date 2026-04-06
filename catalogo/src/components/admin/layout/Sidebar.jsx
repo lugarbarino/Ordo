@@ -1,4 +1,4 @@
-import { LayoutDashboard, FileText, Package, Receipt, Building2, LogOut, X } from 'lucide-react'
+import { LayoutDashboard, Upload, Package, Receipt, Building2, LogOut, X } from 'lucide-react'
 import { useAppStore } from '../../../store/useAppStore'
 import { db } from '../../../lib/supabase'
 import { clsx } from '../../../lib/utils'
@@ -6,7 +6,7 @@ import { clsx } from '../../../lib/utils'
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { type: 'section', label: 'CATÁLOGO' },
-  { id: 'pdf', label: 'Cargar productos', icon: FileText },
+  { id: 'pdf', label: 'Cargar productos', icon: Upload },
   { id: 'productos', label: 'Productos', icon: Package },
   { id: 'pedidos', label: 'Pedidos', icon: Receipt },
   { id: 'config', label: 'Mi empresa', icon: Building2 },

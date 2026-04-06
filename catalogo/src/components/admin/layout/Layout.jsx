@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, X, LayoutDashboard, Package, Receipt, Building2 } from 'lucide-react'
+import { Menu, X, LayoutDashboard, Upload, Package, Receipt, Building2 } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import { Toast } from '../ui/Toast'
 import { useAppStore } from '../../../store/useAppStore'
@@ -25,7 +25,7 @@ export function Layout({ children }) {
   const { panel, setPanel } = useAppStore()
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-white">
 
       {/* ── Desktop sidebar (lg+) ─────────────────────── */}
       <div className="hidden lg:block flex-shrink-0">
