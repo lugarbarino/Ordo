@@ -1,0 +1,278 @@
+import { useState, useEffect, useRef } from 'react'
+import { Sparkles, Link, RefreshCw, Palette, Shield, Smartphone, Eye, EyeOff } from 'lucide-react'
+import { db } from '../lib/supabase'
+import { Onboarding } from './Onboarding'
+
+function useFadeIn(options = {}) {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect() }
+    }, { threshold: 0.12, ...options })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return [ref, visible]
+}
+
+function FadeIn({ children, delay = 0, className = '', up = true }) {
+  const [ref, visible] = useFadeIn()
+  return (
+    <div ref={ref} className={className} style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : up ? 'translateY(28px)' : 'none',
+      transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+    }}>
+      {children}
+    </div>
+  )
+}
+
+const OrdoLogo = ({ className = 'h-[22px] w-auto' }) => (
+  <img src="/logo-ordo.svg" alt="ORDO" className={className} />
+)
+
+function AuthModal({ open, tab: initialTab, onClose, onRegister }) {
+  const [tab, setTab] = useState(initialTab || 'login')
+  const [email, setEmail] = useState('')
+  const [pass, setPass] = useState('')
+  const [showPass, setShowPass] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  if (!open) return null
+
+  const reset = () => { setError(''); setSuccess('') }
+
+  const handleLogin = async () => {
+    reset(); setLoading(true)
+    const { error } = await db.auth.signInWithPassword({ email, password: pass })
+    setLoading(false)
+    if (error) setError(error.message)
+  }
+
+  const handleMagic = async () => {
+    reset(); setLoading(true)
+    const { error } = await db.auth.signInWithOtp({ email })
+    setLoading(false)
+    if (error) setError(error.message)
+    else setSuccess('¡Link enviado! Revisá tu correo.')
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white rounded-[18px] p-9 w-full max-w-[420px] relative shadow-2xl">
+        <button onClick={onClose} className="absolute top-3.5 right-4 text-[#6b7a90] text-xl bg-none border-none cursor-pointer">✕</button>
+
+        {/* Tabs */}
+        {tab !== 'magic' && (
+          <div className="flex mb-6 border-b-2 border-[#dde3ed]">
+            <button onClick={() => { setTab('login'); reset() }}
+              className={`flex-1 py-2.5 text-sm font-semibold border-none cursor-pointer transition-colors bg-transparent
+                ${tab === 'login' ? 'text-[#295e4f] border-b-[3px] border-[#295e4f] -mb-0.5' : 'text-[#6b7a90]'}`}>
+              Iniciar sesión
+            </button>
+            <button onClick={() => { onClose(); onRegister?.() }}
+              className="flex-1 py-2.5 text-sm font-semibold border-none cursor-pointer transition-colors bg-transparent text-[#6b7a90]">
+              Crear cuenta
+            </button>
+          </div>
+        )}
+
+        {/* Login */}
+        {tab === 'login' && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold mb-1.5 text-[#111]">Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="tu@email.com"
+                className="w-full px-3.5 py-2.5 border border-[#dde3ed] rounded-lg text-sm outline-none focus:border-[#295e4f] transition-colors" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1.5 text-[#111]">Contraseña</label>
+              <div className="relative">
+                <input type={showPass ? 'text' : 'password'} value={pass} onChange={e => setPass(e.target.value)}
+                  placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                  className="w-full px-3.5 py-2.5 pr-10 border border-[#dde3ed] rounded-lg text-sm outline-none focus:border-[#295e4f] transition-colors" />
+                <button type="button" onClick={() => setShowPass(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aaa] hover:text-[#555] transition-colors bg-transparent border-none cursor-pointer p-0">
+                  {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+            {error && <p className="text-red-500 text-xs">{error}</p>}
+            <button onClick={handleLogin} disabled={loading}
+              className="w-full py-3 bg-[#295e4f] text-white rounded-lg font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 border-none">
+              {loading ? 'Ingresando…' : 'Iniciar sesión'}
+            </button>
+            <div className="flex items-center gap-2 text-[#aaa] text-xs"><div className="flex-1 h-px bg-[#e0e0e0]" />o<div className="flex-1 h-px bg-[#e0e0e0]" /></div>
+            <button onClick={() => { setTab('magic'); reset() }}
+              className="w-full py-2.5 border border-[#dde3ed] rounded-lg text-sm font-semibold bg-white text-[#111] cursor-pointer hover:bg-[#f4f4f4] transition-colors">
+              Acceder sin contraseña
+            </button>
+          </div>
+        )}
+
+        {/* Magic link */}
+        {tab === 'magic' && (
+          <div className="space-y-4">
+            <button onClick={() => { setTab('login'); reset() }}
+              className="flex items-center gap-1 text-xs text-[#6b7a90] bg-none border-none cursor-pointer mb-1 p-0">
+              ← Volver
+            </button>
+            <h2 className="text-lg font-bold">Acceder sin contraseña</h2>
+            <p className="text-sm text-[#6b7a90] leading-relaxed">Te enviamos un link único para que inicies sesión sin contraseña.</p>
+            <div>
+              <label className="block text-xs font-semibold mb-1.5 text-[#111]">Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                placeholder="tu@email.com" onKeyDown={e => e.key === 'Enter' && handleMagic()}
+                className="w-full px-3.5 py-2.5 border border-[#dde3ed] rounded-lg text-sm outline-none focus:border-[#295e4f] transition-colors" />
+            </div>
+            {error && <p className="text-red-500 text-xs">{error}</p>}
+            {success && <p className="text-[#295e4f] text-xs">{success}</p>}
+            <button onClick={handleMagic} disabled={loading}
+              className="w-full py-3 bg-[#295e4f] text-white rounded-lg font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 border-none">
+              {loading ? 'Enviando…' : 'Enviar link'}
+            </button>
+            <p className="text-xs text-[#aaa] text-center">Revisá tu correo no deseado si no te llega.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const FEATURES = [
+  { icon: Sparkles, title: 'IA extrae tus productos', desc: 'Subís tu catálogo en PDF y la inteligencia artificial identifica todos los productos automáticamente.' },
+  { icon: Link, title: 'Link propio para tus clientes', desc: 'Recibís un link único ordo.app/tu-empresa para compartir con clientes.' },
+  { icon: RefreshCw, title: 'Catálogo siempre actualizado', desc: 'Agregás, editás o eliminás productos cuando quieras. Los clientes siempre ven la última versión.' },
+  { icon: Palette, title: 'Con tu marca', desc: 'Logo, colores y descripción de tu empresa. Tu catálogo se ve profesional desde el primer día.' },
+  { icon: Shield, title: 'Seguro', desc: 'Tus clientes ven el catálogo pero no pueden modificar nada. Vos tenés el control total.' },
+  { icon: Smartphone, title: 'Funciona en celular', desc: 'El catálogo se adapta a cualquier pantalla. Tus clientes lo ven perfecto desde el celular.' },
+]
+
+const STEPS = [
+  { n: '1', title: 'Creás tu cuenta y configurás tu empresa', desc: 'Nombre, logo, descripción y el link único para tus clientes. Tarda 2 minutos.' },
+  { n: '2', title: 'Subís tu catálogo en PDF', desc: 'La IA lee el PDF y extrae todos los productos automáticamente. Revisás, editás y confirmás.' },
+  { n: '3', title: 'Compartís el link con tus clientes', desc: 'Tus clientes entran al link y ven el catálogo completo con buscador y filtros. Y te mandan su pedido de presupuesto.' },
+]
+
+export function Landing() {
+  const [modal, setModal] = useState(null) // null | 'login'
+  const [mode, setMode] = useState('landing') // 'landing' | 'onboarding'
+
+  if (mode === 'onboarding') {
+    return <Onboarding initialStep={1} onLogin={() => { setMode('landing'); setModal('login') }} />
+  }
+
+  return (
+    <div className="min-h-screen font-['Inter'] bg-[#f8f8f8] text-[#373c42]">
+
+      {/* NAV */}
+      <nav className="flex items-center justify-between px-12 py-5 sticky top-0 bg-[#f8f8f8] z-40">
+        <OrdoLogo />
+        <button onClick={() => setModal('login')}
+          className="bg-[#1c1c1c] text-white px-7 py-4 rounded-[14px] font-semibold text-base cursor-pointer hover:opacity-80 transition-opacity border-none">
+          Iniciar Sesión
+        </button>
+      </nav>
+
+      {/* HERO */}
+      <section className="px-12 pb-12 pt-8">
+        <div className="relative rounded-xl overflow-hidden max-w-[1035px] mx-auto flex items-end" style={{ height: 416 }}>
+          <div className="absolute inset-0 bg-cover bg-top" style={{ backgroundImage: "url('/hero.png')" }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(95deg,rgba(0,0,0,.6) 34%,rgba(49,49,49,.31) 73%,rgba(102,102,102,0) 98%)' }} />
+          <div className="relative z-10 px-[67px] pb-[52px]">
+            <h1 className="text-[43px] font-black leading-[1.14] text-white mb-[18px] capitalize">
+              Tu catálogo digital<br />listo en minutos
+            </h1>
+            <p className="text-xl text-white max-w-[526px] leading-[1.4] mb-7">
+              Subí tu PDF, la IA extrae todos tus productos automáticamente. Tus clientes lo ven online, sin poder editar nada.
+            </p>
+            <div className="flex gap-3.5 flex-wrap">
+              <button onClick={() => setMode('onboarding')}
+                className="flex items-center gap-3 bg-[#295e4f] text-white px-6 py-[22px] rounded-[13px] font-semibold text-[1.05rem] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all capitalize border-none">
+                Creá tu catálogo
+              </button>
+              <button onClick={() => window.open('http://localhost:3000/catalogo.html?slug=demo', '_blank')}
+                className="bg-white text-[#080b2f] px-7 py-[22px] rounded-[13px] font-semibold text-[1.05rem] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all capitalize border-none">
+                Ver demo
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="px-12 py-20">
+        <FadeIn className="text-center mb-12">
+          <h2 className="text-[43px] font-black text-[#373c42] capitalize mb-1.5">Todo lo que necesitás</h2>
+          <p className="text-2xl text-[#373c42] capitalize">Sin técnicos, sin complicaciones</p>
+        </FadeIn>
+        <div className="grid grid-cols-3 gap-6 max-w-[1160px] mx-auto">
+          {FEATURES.map(({ icon: Icon, title, desc }, i) => (
+            <FadeIn key={title} delay={i * 80}>
+              <div className="bg-white rounded-[20px] px-8 py-10 shadow-[0_4px_34px_rgba(0,0,0,.09)] hover:-translate-y-1 hover:shadow-[0_12px_48px_rgba(0,0,0,.18)] transition-all h-full">
+                <div className="w-[51px] h-[51px] flex items-center justify-center mb-4">
+                  <Icon size={34} strokeWidth={1.5} className="text-[#295e4f]" />
+                </div>
+                <h3 className="text-xl font-black text-black mb-2.5 capitalize">{title}</h3>
+                <p className="text-base text-[#545454] leading-relaxed">{desc}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </section>
+
+      {/* COMO FUNCIONA */}
+      <section className="bg-[#1e453b] px-12 py-20 pb-28">
+        <FadeIn>
+          <h2 className="text-center text-[43px] font-black text-[#e0e0e0] capitalize mb-16">¿Cómo funciona?</h2>
+        </FadeIn>
+        <div className="flex gap-[60px] justify-center max-w-[1300px] mx-auto">
+          {STEPS.map(({ n, title, desc }, i) => (
+            <FadeIn key={n} delay={i * 120} className="flex-1 max-w-[359px]">
+              <div className="flex flex-col items-center text-center gap-4">
+                <div className="w-[77px] h-[77px] rounded-full bg-white flex items-center justify-center text-[40px] font-black text-[#1e453b] flex-shrink-0">
+                  {n}
+                </div>
+                <h4 className="text-xl font-semibold text-[#e0e0e0] leading-relaxed">{title}</h4>
+                <p className="text-base text-[#e0e0e0] leading-relaxed">{desc}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA BANNER */}
+      <section className="relative h-[480px] overflow-hidden flex items-center">
+        <div className="absolute inset-0 bg-cover bg-[center_30%] brightness-65" style={{ backgroundImage: "url('/banner.png')" }} />
+        <FadeIn up={false} className="relative z-10 ml-[clamp(40px,8vw,200px)]">
+          <div className="bg-white rounded-[20px] px-12 py-11 max-w-[380px]">
+            <h2 className="text-[32px] font-black text-[#373c42] mb-3.5">Empezá hoy</h2>
+            <p className="text-base text-[#545454] leading-relaxed mb-7">
+              Subís tu catálogo en PDF o crealo a mano y tenés tu catálogo hoy mismo.
+            </p>
+            <button onClick={() => setMode('onboarding')}
+              className="w-full flex items-center justify-center gap-3 bg-[#295e4f] text-white py-[22px] rounded-[13px] font-semibold text-[1.05rem] cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all capitalize border-none">
+              Creá tu catálogo
+            </button>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="flex items-center justify-between px-12 py-8 border-t border-[#e0e0e0] bg-[#f8f8f8]">
+        <OrdoLogo className="h-[18px] w-auto opacity-50" />
+        <span className="text-base text-[#333]">Hecho con <span className="text-[#c13e58]">❤</span> en Argentina</span>
+      </footer>
+
+      {/* AUTH MODAL */}
+      <AuthModal open={!!modal} tab={modal} onClose={() => setModal(null)} onRegister={() => setMode('onboarding')} />
+    </div>
+  )
+}

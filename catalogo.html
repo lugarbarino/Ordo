@@ -224,6 +224,9 @@
     if (!empresa) { mostrarError(); return }
     EMPRESA_DATA = empresa
 
+    // Registrar visita al catálogo
+    db.from('visitas').insert({ empresa_id: empresa.id }).then(() => {})
+
     // Color de marca
     const color = empresa.color || '#285576'
     document.documentElement.style.setProperty('--p', color)
@@ -307,7 +310,7 @@
       const enCar = CARRITO.some(x => x.id === p.id)
 
       const imgHTML = p.imagen_url
-        ? `<div class="tarjeta-img" onclick="abrirFoto('${ejs}','${en}')">
+        ? `<div class="tarjeta-img" onclick="abrirFoto('${ejs}','${en}','${p.id}')">
              <img class="img-prod" src="${eu}" alt="${en}" onerror="this.style.display='none'">
              ${p.codigo ? `<span class="tarjeta-codigo">${p.codigo}</span>` : ''}
            </div>`
@@ -334,10 +337,12 @@
     })
   }
 
-  function abrirFoto(url, nombre) {
+  function abrirFoto(url, nombre, productoId) {
     document.getElementById('modalFotoImg').src = url
     document.getElementById('modalFotoNombre').textContent = nombre
     document.getElementById('modalFoto').classList.add('activo')
+    if (productoId && EMPRESA_DATA)
+      db.from('visitas').insert({ empresa_id: EMPRESA_DATA.id, producto_id: productoId }).then(() => {})
   }
 
   document.addEventListener('keydown', e => {
