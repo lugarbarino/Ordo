@@ -31,7 +31,7 @@ export function ConfigPanel() {
       setForm({
         nombre: empresa.nombre || '',
         slug: empresa.slug || '',
-        email: empresa.email || user?.email || '',
+        email: empresa.email_contacto || empresa.email || user?.email || '',
         color: empresa.color || '#3872fa',
         logo_url: empresa.logo_url || '',
         banner_url: empresa.banner_url || '',
@@ -39,7 +39,7 @@ export function ConfigPanel() {
         descripcion: empresa.descripcion || '',
       })
     } else {
-      setForm({ color: '#3872fa', email: user?.email || '', nombre: '', slug: '', logo_url: '', banner_url: '', titulo: '', descripcion: '' })
+      setForm({ color: '#3872fa', email_contacto: user?.email || '', nombre: '', slug: '', logo_url: '', banner_url: '', titulo: '', descripcion: '' })
     }
   }, [empresa, user])
 
@@ -138,8 +138,8 @@ export function ConfigPanel() {
         <Input
           label="Mail para recibir presupuestos"
           type="email"
-          value={form.email || ''}
-          onChange={e => set('email', e.target.value)}
+          value={form.email_contacto || ''}
+          onChange={e => set('email_contacto', e.target.value)}
           placeholder="tumail@gmail.com"
         />
 
