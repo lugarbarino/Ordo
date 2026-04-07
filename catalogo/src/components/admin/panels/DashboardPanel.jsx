@@ -159,7 +159,7 @@ export function DashboardPanel() {
                     <span className="text-xs font-bold text-[#aaa] w-4">{i + 1}</span>
                     <span className="text-sm font-medium text-[#111] truncate max-w-[180px]">{nombre}</span>
                   </div>
-                  <span className="text-sm font-bold text-[#666]">{visitas} vez{visitas !== 1 ? 'es' : ''}</span>
+                  <span className="text-sm font-bold text-[#666]">{visitas} vec{visitas !== 1 ? 'es' : 'ez'}</span>
                 </div>
               ))}
             </div>
