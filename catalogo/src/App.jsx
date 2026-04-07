@@ -411,7 +411,7 @@ function CatalogApp() {
       <div className="mx-auto my-5 rounded-[14px] overflow-hidden relative flex items-center px-14
         max-w-[calc(100%-48px)] w-[1000px] h-[450px]
         max-md:h-[260px] max-md:px-6 max-md:my-3 max-md:max-w-[calc(100%-24px)]
-        max-sm:h-[200px] max-sm:px-[18px] max-sm:my-2.5 max-sm:rounded-[10px]">
+        max-sm:h-[300px] max-sm:px-[18px] max-sm:my-2.5 max-sm:rounded-[10px]">
         {empresa.banner_url && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url) ? (
           <video key={empresa.banner_url} autoPlay muted loop playsInline
             className="absolute inset-0 w-full h-full object-cover">
@@ -427,11 +427,11 @@ function CatalogApp() {
           style={{ background: 'linear-gradient(110deg,rgba(15,38,62,0.88) 0%,rgba(25,60,95,0.65) 55%,rgba(25,60,95,0.35) 100%)' }} />
         <div className="relative z-10 w-[500px] max-w-full">
           <h1 className="text-[50px] font-black text-white leading-[1.1] mb-4
-            max-md:text-[2rem] max-sm:text-[1.5rem] max-sm:mb-2">
+            max-md:text-[2rem] max-sm:text-[1.75rem] max-sm:mb-2">
             {empresa.titulo || empresa.nombre}
           </h1>
           {empresa.descripcion && (
-            <p className="text-xl text-white/85 leading-relaxed max-md:text-sm max-md:leading-snug max-sm:text-[.82rem]">
+            <p className="text-xl text-white/85 leading-relaxed max-md:text-sm max-md:leading-snug max-sm:text-[.95rem]">
               {empresa.descripcion}
             </p>
           )}
