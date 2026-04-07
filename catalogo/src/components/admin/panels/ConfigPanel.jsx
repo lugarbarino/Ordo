@@ -52,7 +52,7 @@ export function ConfigPanel() {
       const ext = file.name.split('.').pop()
       const path = `${user.id}/${Date.now()}.${ext}`
       const { error } = await db.storage.from(bucket).upload(path, file, { upsert: true })
-      if (error) { showToast('Error al subir imagen', 'err'); return }
+      if (error) { showToast('Error al subir: ' + error.message, 'err'); return }
       const url = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`
       set(field, url)
     } catch {
@@ -69,7 +69,7 @@ export function ConfigPanel() {
     setSaving(false)
   }
 
-  const slugPreview = form.slug ? `${window.location.origin.replace('5173', '3000')}/${form.slug}` : '—'
+  const slugPreview = form.slug ? `${window.location.origin}/${form.slug}` : '—'
   const bannerIsVideo = isVideo(form.banner_url)
 
   return (
