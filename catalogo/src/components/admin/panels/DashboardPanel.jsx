@@ -10,18 +10,27 @@ import { Badge } from '../ui/Badge'
 function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
   return (
     <div
-      className={`relative bg-white border border-[#e3e3e3] rounded-xl p-3 md:p-5 min-h-[90px] md:min-h-0 ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''} transition-colors`}
+      className={`bg-white border border-[#e3e3e3] rounded-xl transition-colors ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''}
+        flex flex-col p-3 gap-2 min-h-[90px]
+        md:relative md:p-5 md:min-h-0 md:block md:gap-0`}
       onClick={onClick}
     >
-      <div className="pr-9 md:pr-12">
-        <div className="text-xl md:text-2xl font-bold text-[#111]">{value ?? '—'}</div>
-        <div className="text-xs md:text-sm text-[#666] mt-0.5 leading-snug">
-          <span className="md:hidden">{shortLabel || label}</span>
-          <span className="hidden md:inline">{label}</span>
+      {/* Mobile layout */}
+      <div className="flex items-center justify-between md:hidden">
+        <div className="text-3xl font-bold text-[#111]">{value ?? '—'}</div>
+        <div className="w-8 h-8 bg-[#eef3ff] rounded-lg flex items-center justify-center text-[var(--brand)]">
+          <Icon size={17} />
         </div>
       </div>
-      <div className="absolute right-2 top-2 md:right-4 md:top-4 w-8 h-8 md:w-10 md:h-10 bg-[#eef3ff] rounded-lg flex items-center justify-center text-[var(--brand)]">
-        <Icon size={17} className="md:hidden" /><Icon size={22} className="hidden md:block" />
+      <div className="text-xs text-[#666] text-center md:hidden">{shortLabel || label}</div>
+
+      {/* Desktop layout */}
+      <div className="hidden md:block pr-12">
+        <div className="text-2xl font-bold text-[#111]">{value ?? '—'}</div>
+        <div className="text-sm text-[#666] mt-0.5">{label}</div>
+      </div>
+      <div className="hidden md:flex absolute right-4 top-4 w-10 h-10 bg-[#eef3ff] rounded-lg items-center justify-center text-[var(--brand)]">
+        <Icon size={22} />
       </div>
     </div>
   )
