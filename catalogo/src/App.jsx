@@ -446,10 +446,7 @@ function CatalogApp() {
               style={catActiva === cat
                 ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
                 : { background: 'transparent', color: '#666' }}>
-              <span className="flex items-center gap-1.5">
-                {catActiva === cat && <Check size={12} strokeWidth={2.5} />}
-                {cat || 'Todas'}
-              </span>
+              {cat || 'Todas'}
             </button>
           ))}
         </div>
@@ -565,7 +562,7 @@ function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, o
           }
           onMouseEnter={e => { if (!enCarrito) { e.currentTarget.style.background = '#f0f5fb'; e.currentTarget.style.borderColor = brandColor } }}
           onMouseLeave={e => { if (!enCarrito) { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#ccd6e0' } }}>
-          {enCarrito ? '✓ Agregado' : '+ Presupuestá'}
+          {enCarrito ? <><Check size={13} strokeWidth={2.5} /> Agregado</> : '+ Presupuestá'}
         </button>
       </div>
     </div>
