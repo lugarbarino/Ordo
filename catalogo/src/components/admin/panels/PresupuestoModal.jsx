@@ -199,7 +199,7 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold truncate">{item.nombre}</div>
-                  <div className="text-xs text-[#999]">x{item.cantidad}</div>
+                  <div className="text-xs text-[#999]">{prod.codigo && <span className="font-mono mr-1.5">{prod.codigo}</span>}x{item.cantidad}</div>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-[#999]">$</span>
