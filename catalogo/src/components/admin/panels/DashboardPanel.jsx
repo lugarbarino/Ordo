@@ -7,18 +7,21 @@ import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Badge } from '../ui/Badge'
 
-function StatCard({ label, value, icon: Icon, onClick }) {
+function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
   return (
     <div
-      className={`relative bg-white border border-[#e3e3e3] rounded-xl p-5 ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''} transition-colors`}
+      className={`relative bg-white border border-[#e3e3e3] rounded-xl p-3 md:p-5 ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''} transition-colors`}
       onClick={onClick}
     >
-      <div className="pr-12">
-        <div className="text-2xl font-bold text-[#111]">{value ?? '—'}</div>
-        <div className="text-sm text-[#666] mt-0.5">{label}</div>
+      <div className="pr-9 md:pr-12">
+        <div className="text-xl md:text-2xl font-bold text-[#111]">{value ?? '—'}</div>
+        <div className="text-xs md:text-sm text-[#666] mt-0.5 leading-snug">
+          <span className="md:hidden">{shortLabel || label}</span>
+          <span className="hidden md:inline">{label}</span>
+        </div>
       </div>
-      <div className="absolute right-4 top-4 w-10 h-10 bg-[#eef3ff] rounded-lg flex items-center justify-center text-[var(--brand)]">
-        <Icon size={22} />
+      <div className="absolute right-2 top-2 md:right-4 md:top-4 w-8 h-8 md:w-10 md:h-10 bg-[#eef3ff] rounded-lg flex items-center justify-center text-[var(--brand)]">
+        <Icon size={17} className="md:hidden" /><Icon size={22} className="hidden md:block" />
       </div>
     </div>
   )
@@ -116,7 +119,7 @@ export function DashboardPanel() {
       <div>
         <div className="text-xs font-bold text-[#666] uppercase tracking-wide mb-3">Este mes</div>
         <div className="grid grid-cols-3 gap-3">
-          <StatCard label="Visitas al catálogo" value={visitasEsteMes} icon={TrendingUp} />
+          <StatCard label="Visitas al catálogo" shortLabel="Visitas" value={visitasEsteMes} icon={TrendingUp} />
           <StatCard label="Presupuestos" value={pedidosEsteMes} icon={Receipt} onClick={() => setPanel('pedidos')} />
           <StatCard label="Pendientes" value={pedidosPendientes} icon={Clock} onClick={() => setPanel('pedidos')} />
         </div>
