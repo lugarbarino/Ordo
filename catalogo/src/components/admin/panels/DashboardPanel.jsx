@@ -10,7 +10,7 @@ import { Badge } from '../ui/Badge'
 function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
   return (
     <div
-      className={`relative bg-white border border-[#e3e3e3] rounded-xl p-3 md:p-5 ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''} transition-colors`}
+      className={`relative bg-white border border-[#e3e3e3] rounded-xl p-3 md:p-5 min-h-[90px] md:min-h-0 ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''} transition-colors`}
       onClick={onClick}
     >
       <div className="pr-9 md:pr-12">
