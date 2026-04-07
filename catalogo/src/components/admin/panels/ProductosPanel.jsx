@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Search, Plus, Trash2, Download, Pencil } from 'lucide-react'
 import { useProductosStore } from '../../../store/useProductosStore'
 import { useAppStore } from '../../../store/useAppStore'
@@ -29,24 +29,9 @@ export function ProductosPanel() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editando, setEditando] = useState(null)
-  const headerRef = useRef()
-  const tableWrapRef = useRef()
 
   const productos = productosFiltrados()
   const todos = seleccionados.size === productos.length && productos.length > 0
-
-  useEffect(() => {
-    const calcHeight = () => {
-      if (!headerRef.current || !tableWrapRef.current) return
-      const bottom = headerRef.current.getBoundingClientRect().bottom
-      const isMob = window.innerWidth < 768
-      const bottomNav = isMob ? 56 : 0
-      tableWrapRef.current.style.height = `${window.innerHeight - bottom - bottomNav}px`
-    }
-    calcHeight()
-    window.addEventListener('resize', calcHeight)
-    return () => window.removeEventListener('resize', calcHeight)
-  }, [seleccionados.size])
 
   const handleEliminar = async (ids) => {
     if (!confirm(`¿Eliminás ${ids.size} producto${ids.size !== 1 ? 's' : ''}?`)) return
@@ -74,10 +59,10 @@ export function ProductosPanel() {
   const abrirNuevo = () => { setEditando(null); setModalOpen(true) }
 
   return (
-    <div className="flex flex-col -mx-4 md:-mx-7 -mt-4 md:-mt-7 h-screen">
+    <div className="flex flex-col -mx-4 md:-mx-7 -mt-4 md:-mt-7 h-[calc(100vh-52px)] md:h-screen">
 
       {/* Header bar */}
-      <div ref={headerRef} className="flex-shrink-0 bg-white border-b border-[#e3e3e3]">
+      <div className="flex-shrink-0 bg-white border-b border-[#e3e3e3]">
         <div className="flex items-center justify-between gap-3 px-4 md:px-7 py-3">
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa]" />
@@ -111,7 +96,7 @@ export function ProductosPanel() {
       </div>
 
       {/* Table — single scrollable container with sticky thead */}
-      <div ref={tableWrapRef} className="overflow-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'auto' }}>
+      <div className="flex-1 overflow-auto overscroll-contain">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-sm text-[#888]">Cargando...</div>
         ) : !productos.length ? (
