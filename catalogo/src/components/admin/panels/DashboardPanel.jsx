@@ -63,22 +63,33 @@ export function DashboardPanel() {
       .eq('empresa_id', empresa.id).is('producto_id', null).gte('created_at', iso)
       .then(({ count }) => setVisitasEsteMes(count || 0))
 
-    // Productos más vistos este mes
-    db.from('visitas').select('producto_id')
-      .eq('empresa_id', empresa.id).not('producto_id', 'is', null).gte('created_at', iso)
-      .then(async ({ data }) => {
+    // Productos más presupuestados
+    db.from('pedidos').select('productos')
+      .eq('empresa_id', empresa.id)
+      .then(({ data }) => {
         if (!data?.length) return
         const counts = {}
-        data.forEach(v => { counts[v.producto_id] = (counts[v.producto_id] || 0) + 1 })
-        const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3)
-        const ids = top.map(([id]) => id)
-        const { data: prods } = await db.from('productos').select('id, nombre').in('id', ids)
-        setMasVistos(top.map(([id, n]) => ({ nombre: prods?.find(p => p.id === id)?.nombre || '—', visitas: n })))
+        data.forEach(p => (p.productos || []).forEach(item => {
+          counts[item.id] = (counts[item.id] || 0) + 1
+        }))
+        const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4)
+        setMasVistos(top.map(([id, n]) => ({
+          nombre: productos.find(p => String(p.id) === String(id))?.nombre || '—',
+          visitas: n
+        })))
       })
 
     db.from('pedidos').select('*').eq('empresa_id', empresa.id)
-      .order('created_at', { ascending: false }).limit(5)
-      .then(({ data }) => setUltimosPedidos(data || []))
+      .order('created_at', { ascending: false }).limit(10)
+      .then(({ data }) => {
+        if (!data) return setUltimosPedidos([])
+        const sorted = [...data].sort((a, b) => {
+          if (a.estado === 'Pendiente' && b.estado !== 'Pendiente') return -1
+          if (a.estado !== 'Pendiente' && b.estado === 'Pendiente') return 1
+          return 0
+        })
+        setUltimosPedidos(sorted.slice(0, 5))
+      })
   }, [empresa])
 
   const categorias = new Set(productos.map(p => p.categoria).filter(Boolean)).size
@@ -137,9 +148,9 @@ export function DashboardPanel() {
       {/* Más vistos + Últimos pedidos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Card className="p-6">
-          <h3 className="text-base font-bold mb-4">Productos más vistos</h3>
+          <h3 className="text-base font-bold mb-4">Productos más presupuestados</h3>
           {!masVistos.length ? (
-            <p className="text-sm text-[#888]">Todavía no hay visitas registradas.</p>
+            <p className="text-sm text-[#888]">Todavía no hay presupuestos generados.</p>
           ) : (
             <div className="space-y-2">
               {masVistos.map(({ nombre, visitas }, i) => (
@@ -148,7 +159,7 @@ export function DashboardPanel() {
                     <span className="text-xs font-bold text-[#aaa] w-4">{i + 1}</span>
                     <span className="text-sm font-medium text-[#111] truncate max-w-[180px]">{nombre}</span>
                   </div>
-                  <span className="text-sm font-bold text-[#666]">{visitas} vista{visitas !== 1 ? 's' : ''}</span>
+                  <span className="text-sm font-bold text-[#666]">{visitas} vez{visitas !== 1 ? 'es' : ''}</span>
                 </div>
               ))}
             </div>

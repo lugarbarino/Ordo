@@ -49,7 +49,7 @@ export function Sidebar({ onClose }) {
   const initial = nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <aside className="w-[220px] bg-white border-r-2 border-[#f1f1f1] flex flex-col flex-shrink-0 h-screen sticky top-0 overflow-y-auto">
+    <aside className="w-[220px] bg-white border-r-2 border-[#f1f1f1] flex flex-col flex-shrink-0 h-screen sticky top-0">
       {/* Logo row — with close button on mobile/tablet */}
       <div className="h-[52px] flex items-center px-5 justify-between">
         <img src="/logo-ordo.svg" alt="ORDO" className="h-[18px] w-auto" />
@@ -82,7 +82,7 @@ export function Sidebar({ onClose }) {
       </button>
 
       {/* Nav */}
-      <nav className="flex-1 py-3">
+      <nav className="flex-1 py-3 overflow-y-auto">
         {NAV.map((item, i) => {
           if (item.type === 'section') {
             return (
