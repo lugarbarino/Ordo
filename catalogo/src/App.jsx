@@ -557,7 +557,7 @@ function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, o
           disabled={enCarrito}
           className="w-full h-[60px] border rounded-lg text-[.84rem] font-semibold flex items-center justify-center gap-1.5 transition-colors max-sm:h-12 max-sm:text-[.78rem]"
           style={enCarrito
-            ? { background: '#f0f0f0', borderColor: '#e0e0e0', color: '#6b7a90', cursor: 'default' }
+            ? { background: '#f0f0f0', border: 'none', color: '#6b7a90', cursor: 'default' }
             : { background: 'white', borderColor: '#ccd6e0', color: '#1e2a3a' }
           }
           onMouseEnter={e => { if (!enCarrito) { e.currentTarget.style.background = '#f0f5fb'; e.currentTarget.style.borderColor = brandColor } }}
