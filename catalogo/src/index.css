@@ -3,6 +3,14 @@
 
 @layer base {
   * { box-sizing: border-box; }
+  html {
+    font-size: 16px;
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 19px;
+    }
+  }
   body {
     font-family: 'Inter', sans-serif;
     margin: 0;
