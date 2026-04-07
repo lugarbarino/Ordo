@@ -100,16 +100,16 @@ export function DashboardPanel() {
             {catalogoUrl && (
               <button
                 onClick={() => window.open(catalogoUrl, '_blank')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-[#111] hover:bg-white/90 transition-colors cursor-pointer border-none"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold bg-white text-[#111] hover:bg-white/90 transition-colors cursor-pointer border-none"
               >
-                <ExternalLink size={13} /> Ver
+                <ExternalLink size={15} /> Ver
               </button>
             )}
             <button
               onClick={copiarLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold border border-white/40 text-white hover:bg-white/10 transition-colors cursor-pointer bg-transparent"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border border-white/40 text-white hover:bg-white/10 transition-colors cursor-pointer bg-transparent"
             >
-              <Link size={13} /> Copiar link
+              <Link size={15} /> Copiar link
             </button>
           </div>
         </div>
