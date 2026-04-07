@@ -31,7 +31,7 @@ export function ConfigPanel() {
       setForm({
         nombre: empresa.nombre || '',
         slug: empresa.slug || '',
-        email: empresa.email_contacto || empresa.email || user?.email || '',
+        email_contacto: empresa.email_contacto || empresa.email || user?.email || '',
         color: empresa.color || '#3872fa',
         logo_url: empresa.logo_url || '',
         banner_url: empresa.banner_url || '',
