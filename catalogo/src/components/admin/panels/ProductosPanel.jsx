@@ -74,7 +74,7 @@ export function ProductosPanel() {
             />
           </div>
           <Button variant="primary" size="sm" onClick={abrirNuevo} className="!h-9">
-            <Plus size={14} /> <span className="hidden md:inline">Agregar </span>producto
+            <Plus size={14} /> <span className="hidden md:inline">Agregar </span>Productos
           </Button>
         </div>
 

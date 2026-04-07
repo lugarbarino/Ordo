@@ -49,7 +49,7 @@ function PedidoCard({ pedido, productos, onResponder }) {
           const prod = productos.find(p => String(p.id) === String(item.id)) || {}
           return (
             <div key={i} className="flex items-center gap-2.5 py-2 border-b border-[#f1f1f1] last:border-0">
-              <div className="w-10 h-10 rounded-md bg-[#f1f1f1] flex-shrink-0 overflow-hidden flex items-center justify-center">
+              <div className="w-10 h-10 rounded-md bg-white border border-[#e3e3e3] flex-shrink-0 overflow-hidden flex items-center justify-center">
                 {prod.imagen_url
                   ? <img src={prod.imagen_url} alt="" className="w-full h-full object-contain" />
                   : <Receipt size={16} className="text-[#bbb]" />
