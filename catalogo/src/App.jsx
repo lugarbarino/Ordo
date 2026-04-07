@@ -427,11 +427,11 @@ function CatalogApp() {
           style={{ background: 'linear-gradient(110deg,rgba(15,38,62,0.88) 0%,rgba(25,60,95,0.65) 55%,rgba(25,60,95,0.35) 100%)' }} />
         <div className="relative z-10 w-[500px] max-w-full">
           <h1 className="text-[50px] font-black text-white leading-[1.1] mb-4
-            max-md:text-[2rem] max-sm:text-[1.75rem] max-sm:mb-2">
+            max-md:text-[2rem] max-sm:text-[2.1rem] max-sm:mb-2">
             {empresa.titulo || empresa.nombre}
           </h1>
           {empresa.descripcion && (
-            <p className="text-xl text-white/85 leading-relaxed max-md:text-sm max-md:leading-snug max-sm:text-[.95rem]">
+            <p className="text-xl text-white/85 leading-relaxed max-md:text-sm max-md:leading-snug max-sm:text-[1.05rem]">
               {empresa.descripcion}
             </p>
           )}
