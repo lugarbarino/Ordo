@@ -125,7 +125,7 @@ export function ConfigPanel() {
           <label className="text-xs font-semibold text-[#666] uppercase tracking-wide">Logo de la empresa</label>
           <p className="text-sm text-[#6b7a90]">Usá una versión en PNG sin fondo para que se vea limpia sobre fondos claros. También puede estar en .svg, que queda nítido en cualquier tamaño.</p>
           <div
-            className="w-full max-w-xs h-36 border-2 border-dashed border-[#e3e3e3] rounded-xl flex items-center justify-center cursor-pointer hover:border-[var(--brand)] transition-colors overflow-hidden"
+            className="w-full max-w-[200px] h-24 border-2 border-dashed border-[#e3e3e3] rounded-xl flex items-center justify-center cursor-pointer hover:border-[var(--brand)] transition-colors overflow-hidden"
             onClick={() => logoRef.current?.click()}
           >
             {form.logo_url

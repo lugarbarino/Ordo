@@ -399,7 +399,7 @@ function CatalogApp() {
 
       {/* HEADER logo */}
       <div className="flex justify-center pt-6 pb-0 bg-white">
-        <div className="w-[250px] h-[110px] flex items-center justify-center overflow-hidden">
+        <div className="w-[180px] h-[80px] flex items-center justify-center overflow-hidden">
           {empresa.logo_url
             ? <img src={empresa.logo_url} alt={empresa.nombre} className="w-full h-full object-contain" />
             : <span className="text-2xl font-black" style={{ color: brandColor }}>{empresa.nombre}</span>
