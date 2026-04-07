@@ -438,14 +438,14 @@ function CatalogApp() {
       {/* FILTER BAR */}
       <div className="bg-white border-b border-[#dde3ed] px-10 h-16 flex items-center gap-4 sticky top-0 z-20
         max-md:px-4 max-md:h-auto max-md:flex-wrap max-md:gap-2 max-md:py-2.5">
-        <div className="flex items-center bg-[#f1f1f1] rounded-[40px] p-1 gap-0.5 overflow-x-auto shrink min-w-0 max-md:order-1 max-md:w-full"
+        <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-1 overflow-x-auto shrink min-w-0 max-md:order-1 max-md:w-full"
           style={{ scrollbarWidth: 'none' }}>
           {['', ...categorias].map(cat => (
             <button key={cat} onClick={() => setCatActiva(cat)}
-              className="px-5 py-2 rounded-[30px] text-[.85rem] font-semibold cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
+              className="px-5 py-1.5 rounded-[7px] text-sm font-medium cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
               style={catActiva === cat
-                ? { background: brandColor, color: 'white', boxShadow: '0 2px 8px rgba(0,0,0,.18)' }
-                : { background: 'transparent', color: '#333' }}>
+                ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
+                : { background: 'transparent', color: '#666' }}>
               {cat || 'Todas'}
             </button>
           ))}
