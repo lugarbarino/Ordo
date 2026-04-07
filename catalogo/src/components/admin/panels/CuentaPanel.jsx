@@ -166,12 +166,8 @@ export function CuentaPanel() {
       <div className="bg-white border border-red-200 rounded-xl p-6">
         <h2 className="text-sm font-semibold text-[#111] mb-2">Borrar cuenta</h2>
         <p className="text-xs text-[#666] mb-4">Al borrar tu cuenta se eliminará tu sesión. Para eliminar los datos permanentemente contactá soporte.</p>
-        {!deleteConfirm
-          ? <button onClick={() => setDeleteConfirm(true)}
-              className="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-600 text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-50 transition-colors bg-transparent">
-              <Trash2 size={14} /> Borrar cuenta
-            </button>
-          : <div className="space-y-3">
+        {deleteConfirm
+          ? <div className="space-y-3">
               <p className="text-xs text-[#666]">Escribí <span className="font-semibold text-[#111]">{DELETE_PHRASE}</span> para confirmar:</p>
               <input value={deleteText} onChange={e => setDeleteText(e.target.value)}
                 placeholder={DELETE_PHRASE} className={inputCls} />
@@ -186,6 +182,10 @@ export function CuentaPanel() {
                 </button>
               </div>
             </div>
+          : <button onClick={() => setDeleteConfirm(true)}
+              className="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-600 text-sm font-semibold rounded-lg cursor-pointer hover:bg-red-50 transition-colors bg-transparent">
+              <Trash2 size={14} /> Borrar cuenta
+            </button>
         }
       </div>
     </div>
