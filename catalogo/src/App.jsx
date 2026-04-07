@@ -13,6 +13,7 @@ import { PedidosPanel } from './components/admin/panels/PedidosPanel'
 import { ConfigPanel } from './components/admin/panels/ConfigPanel'
 import { PdfPanel } from './components/admin/panels/PdfPanel'
 import { CuentaPanel } from './components/admin/panels/CuentaPanel'
+import { DesignPanel } from './components/admin/panels/DesignPanel'
 
 // ── Route detection ──────────────────────────────────────────
 const path = window.location.pathname
@@ -35,6 +36,7 @@ function PanelContent({ panel }) {
     case 'config': return <ConfigPanel />
     case 'pdf': return <PdfPanel />
     case 'cuenta': return <CuentaPanel />
+    case 'design': return <DesignPanel />
     default: return <DashboardPanel />
   }
 }

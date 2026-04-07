@@ -9,9 +9,9 @@ const variants = {
 }
 
 const sizes = {
-  sm: 'px-3 py-1.5 text-xs rounded-md gap-1.5',
-  md: 'px-4 py-2 text-sm rounded-lg gap-2',
-  lg: 'px-5 py-2.5 text-sm rounded-lg gap-2',
+  sm: 'px-3 py-1.5 text-xs gap-1.5',
+  md: 'px-4 py-2 text-sm gap-2',
+  lg: 'px-5 py-2.5 text-sm gap-2',
 }
 
 export function Button({
@@ -25,6 +25,7 @@ export function Button({
 }) {
   return (
     <button
+      style={{ borderRadius: 'var(--radius-btn, 8px)' }}
       className={clsx(
         'inline-flex items-center justify-center font-semibold cursor-pointer transition-all select-none whitespace-nowrap font-[Inter]',
         variants[variant],

@@ -25,10 +25,10 @@ export function Layout({ children }) {
   const { panel, setPanel } = useAppStore()
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white lg:[zoom:1.19]">
+    <div className="flex h-screen overflow-hidden bg-white">
 
       {/* ── Desktop sidebar (lg+) ─────────────────────── */}
-      <div className="hidden lg:block flex-shrink-0">
+      <div className="hidden lg:block flex-shrink-0 h-full">
         <Sidebar />
       </div>
 

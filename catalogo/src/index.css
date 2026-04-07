@@ -1,11 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+:root {
+  --brand: #285576;
+  --brand-light: #28557622;
+
+  /* Texto */
+  --color-text:       #111111;
+  --color-text-soft:  #444444;
+  --color-text-muted: #888888;
+
+  /* Bordes y fondos */
+  --color-border:       #e3e3e3;
+  --color-border-light: #f1f1f1;
+  --color-bg-soft:      #f8f9fa;
+
+  /* Forma */
+  --radius-card: 12px;
+  --radius-btn:  8px;
+
+  /* Tipografía */
+  --font-scale: 1;
+  --font-family:         'Inter', sans-serif;
+  --font-family-heading: var(--font-family);
+}
 
 @layer base {
   * { box-sizing: border-box; }
-body {
-    font-family: 'Inter', sans-serif;
+  html { font-size: calc(15px * var(--font-scale)); }
+  body {
+    font-family: var(--font-family);
     margin: 0;
     -webkit-font-smoothing: antialiased;
+    color: var(--color-text);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-heading);
   }
 }

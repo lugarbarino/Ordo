@@ -90,7 +90,7 @@ export function DashboardPanel() {
         })
         setUltimosPedidos(sorted.slice(0, 5))
       })
-  }, [empresa])
+  }, [empresa, productos])
 
   const categorias = new Set(productos.map(p => p.categoria).filter(Boolean)).size
   const catalogoUrl = empresa?.slug ? `${window.location.origin.replace('5173', '3000')}/${empresa.slug}` : null

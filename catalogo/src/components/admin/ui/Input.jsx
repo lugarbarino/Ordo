@@ -9,8 +9,9 @@ export function Input({ label, error, className, ...props }) {
         </label>
       )}
       <input
+        style={{ borderRadius: 'var(--radius-btn, 8px)' }}
         className={clsx(
-          'w-full px-3 py-2 text-sm border border-[#e3e3e3] rounded-lg bg-white outline-none transition-all',
+          'w-full px-3 py-2 text-sm border border-[#e3e3e3] bg-white outline-none transition-all',
           'focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20',
           'placeholder:text-[#bbb]',
           error && 'border-red-400',
@@ -32,8 +33,9 @@ export function Textarea({ label, error, className, ...props }) {
         </label>
       )}
       <textarea
+        style={{ borderRadius: 'var(--radius-btn, 8px)' }}
         className={clsx(
-          'w-full px-3 py-2 text-sm border border-[#e3e3e3] rounded-lg bg-white outline-none transition-all resize-none',
+          'w-full px-3 py-2 text-sm border border-[#e3e3e3] bg-white outline-none transition-all resize-none',
           'focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20',
           'placeholder:text-[#bbb]',
           error && 'border-red-400',
