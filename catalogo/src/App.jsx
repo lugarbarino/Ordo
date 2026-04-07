@@ -43,6 +43,7 @@ function AdminApp() {
   const { user, empresa, panel, setUser, cargarEmpresa } = useAppStore()
   const cargarProductos = useProductosStore(s => s.cargar)
   const cargarPedidos = usePedidosStore(s => s.cargar)
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
@@ -55,6 +56,7 @@ function AdminApp() {
           cargarPedidos(emp.id)
         }
       }
+      setCargando(false)
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -66,12 +68,13 @@ function AdminApp() {
     }
   }, [empresa?.id])
 
-  // Not logged in → redirect to landing
-  if (user === null) {
-    // user starts as null; only redirect after auth check completes
-    // We show nothing until auth state is determined (subscription fires quickly)
-    return null
-  }
+  if (cargando) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full border-4 border-[#e3e3e3] border-t-[#111] animate-spin" />
+    </div>
+  )
+
+  if (user === null) return null
 
   if (!empresa) return <AdminOnboarding initialStep={2} />
 
