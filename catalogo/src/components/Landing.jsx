@@ -192,7 +192,7 @@ export function Landing() {
       <section className="px-4 sm:px-12 pb-8 sm:pb-12 pt-4 sm:pt-8">
         <div className="relative rounded-xl overflow-hidden max-w-[1035px] mx-auto flex items-end"
           style={{ height: 'clamp(380px, 40vw, 416px)' }}>
-          <div className="absolute inset-0 bg-cover bg-top" style={{ backgroundImage: "url('/hero.png')" }} />
+          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/hero.png')" }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(95deg,rgba(0,0,0,.65) 34%,rgba(49,49,49,.31) 73%,rgba(102,102,102,0) 98%)' }} />
           <div className="relative z-10 p-6 sm:p-0" style={{ paddingLeft: 'clamp(24px,5vw,67px)', paddingBottom: 'clamp(24px,4vw,52px)' }}>
             <h1 className="text-2xl sm:text-[43px] font-black leading-tight text-white mb-3 sm:mb-[18px] capitalize">
