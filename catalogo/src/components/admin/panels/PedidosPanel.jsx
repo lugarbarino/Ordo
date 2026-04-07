@@ -38,7 +38,7 @@ function PedidoCard({ pedido, productos, onResponder }) {
             variant={pedido.estado === 'Respondido' ? 'secondary' : 'primary'}
             onClick={() => onResponder(pedido)}
           >
-            {pedido.estado === 'Respondido' ? 'Reenviar' : 'Responder'}
+            {pedido.estado === 'Respondido' ? 'Reenviar' : 'Armar presupuesto'}
           </Button>
         </div>
       </div>

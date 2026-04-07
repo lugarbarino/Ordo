@@ -54,55 +54,72 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       const bg = parseInt(brandHex.slice(3, 5), 16)
       const bb = parseInt(brandHex.slice(5, 7), 16)
 
-      // Logo (left)
+      // Logo (left) — canvas para soportar PNG/JPEG/SVG/WebP
       if (empresa?.logo_url) {
         try {
           const b64 = await imgToB64(empresa.logo_url)
-          const ext = empresa.logo_url.split('.').pop().split('?')[0].toUpperCase().replace('JPG', 'JPEG')
-          const logoExt = ['PNG', 'JPEG'].includes(ext) ? ext : 'PNG'
           const img = new Image()
           await new Promise(r => { img.onload = img.onerror = r; img.src = b64 })
           const ratio = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 3
-          const logoH = 40
-          const logoW = Math.min(logoH * ratio, 160)
-          doc.addImage(b64, logoExt, 40, 30, logoW, logoH, '', 'FAST')
+          const logoW = Math.min(100, img.naturalWidth || 100)
+          const logoH = logoW / ratio
+          const canvas = document.createElement('canvas')
+          canvas.width = logoW * 3
+          canvas.height = logoH * 3
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+          doc.addImage(canvas.toDataURL('image/png'), 'PNG', 40, 44, logoW, logoH, '', 'FAST')
         } catch (e) {}
       }
 
       const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-      doc.setFontSize(9).setTextColor(120).setFont(undefined, 'italic')
-      doc.text(`fecha: ${fecha}`, W - 40, 48, { align: 'right' })
+      doc.setFontSize(10).setTextColor(100).setFont(undefined, 'italic')
+      doc.text(empresa?.nombre || '', W - 40, 38, { align: 'right' })
+      doc.text(`fecha: ${fecha}`, W - 40, 52, { align: 'right' })
 
       let y = 100
       const clientLines = [pedido.empresa_cliente, pedido.email_cliente, pedido.telefono_cliente].filter(Boolean)
-      const CLIENT_BOX_H = Math.max(20 + 16 + clientLines.length * 14 + 16, 70)
+      const hasMensaje = !!pedido.mensaje
+      const BOX_GAP = 10
+      const BOX_W = hasMensaje ? (W - 80 - BOX_GAP) / 2 : W - 80
+      const CLIENT_BOX_H = Math.max(18 + 20 + clientLines.length * 16 + 18, 95)
 
-      // Client box (full width)
-      doc.setFillColor(247, 248, 250).roundedRect(40, y, W - 80, CLIENT_BOX_H, 6, 6, 'F')
-      doc.setFontSize(8).setTextColor(40).setFont(undefined, 'bold')
+      // Caja CLIENTE
+      doc.setFillColor(247, 248, 250).roundedRect(40, y, BOX_W, CLIENT_BOX_H, 6, 6, 'F')
+      doc.setFontSize(9).setTextColor(80).setFont(undefined, 'bold')
       doc.text('CLIENTE', 56, y + 18)
-      doc.setFontSize(11).setTextColor(20).setFont(undefined, 'bold')
-      doc.text(pedido.nombre_cliente, 56, y + 34)
-      doc.setFontSize(9.5).setFont(undefined, 'normal').setTextColor(90)
-      let cy = y + 50
-      clientLines.forEach(line => { doc.text(line, 56, cy); cy += 14 })
-      y += CLIENT_BOX_H + 24
+      doc.setFontSize(13).setTextColor(20).setFont(undefined, 'bold')
+      doc.text(pedido.nombre_cliente || '', 56, y + 34)
+      doc.setFontSize(11).setFont(undefined, 'normal').setTextColor(90)
+      let cy = y + 52
+      clientLines.forEach(line => { doc.text(line, 56, cy); cy += 16 })
+
+      // Caja NOTA (mensaje del cliente)
+      if (hasMensaje) {
+        const nX = 40 + BOX_W + BOX_GAP
+        doc.setDrawColor(210).setLineWidth(0.5).roundedRect(nX, y, BOX_W, CLIENT_BOX_H, 6, 6, 'S')
+        doc.setFontSize(9).setTextColor(80).setFont(undefined, 'bold')
+        doc.text('NOTA', nX + 16, y + 18)
+        doc.setFontSize(11).setFont(undefined, 'normal').setTextColor(80)
+        const msgLines = doc.splitTextToSize(pedido.mensaje, BOX_W - 32)
+        let my = y + 34
+        msgLines.forEach(line => { doc.text(line, nX + 16, my); my += 16 })
+      }
+
+      y += CLIENT_BOX_H + 28
 
       // Title
-      doc.setFontSize(13).setTextColor(20).setFont(undefined, 'bold')
+      doc.setFontSize(16).setTextColor(40).setFont(undefined, 'bold')
       doc.text('PRESUPUESTO', 40, y)
-      doc.setFontSize(9).setTextColor(150).setFont(undefined, 'normal')
-      doc.text('Validez: 15 días', W - 40, y, { align: 'right' })
-      y += 16
+      y += 22
 
       // Table header
       const colX = { prod: 40, cant: W - 170, precio: W - 52 }
-      doc.setFillColor(br, bg, bb).rect(40, y, W - 80, 30, 'F')
-      doc.setFontSize(8.5).setTextColor(255).setFont(undefined, 'bold')
-      doc.text('PRODUCTO', colX.prod + 8, y + 19)
-      doc.text('CANT.', colX.cant, y + 19, { align: 'right' })
-      doc.text('PRECIO', colX.precio, y + 19, { align: 'right' })
-      y += 30
+      doc.setFillColor(br, bg, bb).rect(40, y, W - 80, 32, 'F')
+      doc.setFontSize(9.5).setTextColor(255).setFont(undefined, 'bold')
+      doc.text('PRODUCTO', colX.prod + 8, y + 20)
+      doc.text('CANT.', colX.cant, y + 20, { align: 'right' })
+      doc.text('PRECIO', colX.precio, y + 20, { align: 'right' })
+      y += 32
 
       // Rows
       const items = pedido.productos || []
@@ -110,7 +127,7 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
         const precio = parseFloat(precios[i])
         const bgRow = i % 2 === 0 ? [255, 255, 255] : [249, 250, 252]
         doc.setFillColor(...bgRow).rect(40, y, W - 80, 28, 'F')
-        doc.setFontSize(9).setTextColor(20).setFont(undefined, 'normal')
+        doc.setFontSize(10).setTextColor(20).setFont(undefined, 'normal')
         doc.text(item.nombre, colX.prod + 8, y + 18)
         doc.text(String(item.cantidad), colX.cant, y + 18, { align: 'right' })
         if (!isNaN(precio)) {
@@ -122,30 +139,32 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       // Total row
       y += 16
       doc.setDrawColor(220).line(40, y, W - 40, y)
-      y += 14
-      doc.setFontSize(9).setTextColor(120).setFont(undefined, 'normal')
-      doc.text('TOTAL', colX.cant, y, { align: 'right' })
+      y += 26
+      doc.setFontSize(13).setTextColor(20).setFont(undefined, 'bold')
+      doc.text('Total estimado', 40, y)
       if (hayTotal) {
-        doc.setFontSize(14).setFont(undefined, 'bold').setTextColor(20)
+        doc.setFontSize(22).setFont(undefined, 'bold').setTextColor(20)
         doc.text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.precio, y, { align: 'right' })
       }
 
-      // Nota de empresa al cliente
+      // Consideraciones (nota de empresa)
       const notaText = nota.trim()
       if (notaText) {
-        y += 32
-        doc.setFontSize(8).setTextColor(40).setFont(undefined, 'bold')
-        doc.text('NOTA', 40, y)
-        y += 14
-        doc.setFontSize(9.5).setFont(undefined, 'normal').setTextColor(80)
+        y += 38
+        doc.setFontSize(9).setTextColor(40).setFont(undefined, 'bold')
+        doc.text('CONSIDERACIONES', 40, y)
+        y += 15
+        doc.setFontSize(11).setFont(undefined, 'normal').setTextColor(70)
         const noteLines = doc.splitTextToSize(notaText, W - 80)
-        noteLines.forEach(line => { doc.text(line, 40, y); y += 13 })
+        noteLines.forEach(line => { doc.text(line, 40, y); y += 15 })
       }
 
       // Footer
-      doc.setFillColor(246, 247, 249).rect(0, H - 52, W, 52, 'F')
-      doc.setFontSize(8).setTextColor(160).setFont(undefined, 'normal')
-      doc.text(`Generado con Ordo · ${empresa?.nombre || ''}`, W / 2, H - 24, { align: 'center' })
+      doc.setFillColor(246, 247, 249).rect(0, H - 56, W, 56, 'F')
+      doc.setFontSize(9).setTextColor(150).setFont(undefined, 'italic')
+      doc.text('Validez del presupuesto: 15 días hábiles a partir de la fecha de emisión.', 40, H - 33)
+      doc.setFont(undefined, 'normal')
+      doc.text(empresa?.nombre || '', 40, H - 19)
 
       const nombre = pedido.nombre_cliente?.replace(/\s+/g, '_') || 'cliente'
       doc.save(`presupuesto_${nombre}.pdf`)

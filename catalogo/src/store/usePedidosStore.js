@@ -1,7 +1,8 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { db } from '../lib/supabase'
 
-export const usePedidosStore = create((set, get) => ({
+export const usePedidosStore = create(persist((set, get) => ({
   pedidos: [],
   loading: false,
   tabActivo: 'Pendiente',
@@ -35,4 +36,7 @@ export const usePedidosStore = create((set, get) => ({
       presupCache: { ...state.presupCache, [pedidoId]: { precios, nota } }
     }))
   },
+}), {
+  name: 'ordo-presup-cache',
+  partialize: (state) => ({ presupCache: state.presupCache }),
 }))
