@@ -29,9 +29,9 @@ export function CuentaPanel() {
     setFotoUploading(true); setFotoError('')
     const ext = file.name.split('.').pop()
     const path = `${user.id}/avatar.${ext}`
-    const { error: upErr } = await db.storage.from('logos').upload(path, file, { upsert: true })
+    const { error: upErr } = await db.storage.from('avatars').upload(path, file, { upsert: true })
     if (upErr) { setFotoError(upErr.message); setFotoUploading(false); return }
-    const url = `${SUPABASE_URL}/storage/v1/object/public/logos/${path}`
+    const url = `${SUPABASE_URL}/storage/v1/object/public/avatars/${path}`
     const { error: updErr } = await db.auth.updateUser({ data: { avatar_url: url } })
     if (updErr) { setFotoError(updErr.message); setFotoUploading(false); return }
     const { data: { user: u } } = await db.auth.getUser()
