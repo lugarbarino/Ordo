@@ -111,7 +111,7 @@ export function ProductosPanel() {
       </div>
 
       {/* Table — single scrollable container with sticky thead */}
-      <div ref={tableWrapRef} className="overflow-auto">
+      <div ref={tableWrapRef} className="overflow-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'auto' }}>
         {loading ? (
           <div className="flex items-center justify-center py-16 text-sm text-[#888]">Cargando...</div>
         ) : !productos.length ? (
