@@ -78,18 +78,18 @@ export function ProductosPanel() {
 
       {/* Header bar */}
       <div ref={headerRef} className="flex-shrink-0 bg-white border-b border-[#e3e3e3]">
-        <div className="flex items-center gap-2 px-4 md:px-7 py-3 flex-wrap">
-          <div className="relative flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-3 px-4 md:px-7 py-3">
+          <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#aaa]" />
             <input
               value={busqueda}
               onChange={e => setBusqueda(e.target.value)}
               placeholder="Buscar..."
-              className="w-full pl-9 pr-3 py-2 text-sm border border-[#e3e3e3] rounded-lg outline-none focus:border-[var(--brand)]"
+              className="pl-9 pr-3 h-9 text-sm border border-[#e3e3e3] rounded-lg outline-none focus:border-[var(--brand)] w-56"
             />
           </div>
-          <Button variant="primary" size="sm" onClick={abrirNuevo}>
-            <Plus size={14} /> <span className="hidden sm:inline">Agregar producto</span><span className="sm:hidden">Agregar</span>
+          <Button variant="primary" size="sm" onClick={abrirNuevo} className="!h-9">
+            <Plus size={14} /> Agregar producto
           </Button>
         </div>
 
