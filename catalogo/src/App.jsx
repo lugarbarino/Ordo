@@ -534,11 +534,6 @@ function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, o
           ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-3.5" />
           : <Image size={32} className="text-[#d8dee6]" />
         }
-        {p.codigo && (
-          <span className="absolute top-2.5 right-2.5 text-[.68rem] text-[#444] font-mono font-bold bg-[rgba(220,228,238,.92)] px-2 py-0.5 rounded-[5px] z-10 tracking-[.3px]">
-            {p.codigo}
-          </span>
-        )}
       </div>
 
       <div className="p-4 flex flex-col flex-1 max-sm:px-2.5 max-sm:py-2.5">
