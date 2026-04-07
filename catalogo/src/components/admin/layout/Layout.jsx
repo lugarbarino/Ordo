@@ -25,7 +25,7 @@ export function Layout({ children }) {
   const { panel, setPanel } = useAppStore()
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-white lg:[zoom:1.19]">
 
       {/* ── Desktop sidebar (lg+) ─────────────────────── */}
       <div className="hidden lg:block flex-shrink-0">
