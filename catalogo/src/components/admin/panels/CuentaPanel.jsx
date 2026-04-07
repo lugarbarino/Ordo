@@ -74,7 +74,7 @@ export function CuentaPanel() {
   }
 
   const inputCls = 'w-full px-3.5 py-2.5 border border-[#e3e3e3] rounded-lg text-sm outline-none focus:border-[#295e4f] transition-colors'
-  const initial = empresa?.nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'
+  const initial = (user?.user_metadata?.nombre || user?.email)?.[0]?.toUpperCase() || 'U'
 
   return (
     <div className="max-w-lg space-y-6">
