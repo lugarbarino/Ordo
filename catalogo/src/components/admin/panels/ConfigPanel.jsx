@@ -230,7 +230,8 @@ export function ConfigPanel() {
             onChange={e => set('descripcion', e.target.value)}
             placeholder="Explicá un poco más tu servicio"
             rows={3}
-            className="w-full px-4 py-2.5 text-sm border border-[#e3e3e3] rounded-xl focus:outline-none focus:border-[var(--brand)] resize-none bg-white text-[#111] placeholder-[#aaa] transition-colors"
+            className="w-full px-4 py-2.5 text-sm border border-[#e3e3e3] focus:outline-none focus:border-[var(--brand)] resize-none bg-white text-[#111] placeholder-[#aaa] transition-colors"
+            style={{ borderRadius: 'var(--radius-btn)' }}
           />
         </div>
 

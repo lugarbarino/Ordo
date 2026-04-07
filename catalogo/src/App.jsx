@@ -339,6 +339,14 @@ function CatalogApp() {
       if (!emp) { setError(true); setCargando(false); return }
       setEmpresa(emp)
       document.title = emp.nombre + ' — Catálogo'
+      // Aplicar tokens del design system
+      const t = emp.tokens || {}
+      const root = document.documentElement
+      if (t.fontFamily)        root.style.setProperty('--font-family',         t.fontFamily)
+      if (t.fontFamilyHeading) root.style.setProperty('--font-family-heading', t.fontFamilyHeading)
+      if (t.fontScale)         root.style.setProperty('--font-scale',          t.fontScale)
+      if (t.radiusCard)        root.style.setProperty('--radius-card',         t.radiusCard)
+      if (t.radiusBtn)         root.style.setProperty('--radius-btn',          t.radiusBtn)
 
       db.from('visitas').insert({ empresa_id: emp.id }).then(() => {})
 
@@ -396,8 +404,18 @@ function CatalogApp() {
     </div>
   )
 
+  const tokens = empresa?.tokens || {}
+
   return (
-    <div className="min-h-screen bg-white text-[#1e2a3a]" style={{ '--brand': brandColor, '--brand-light': brandLight }}>
+    <div className="min-h-screen bg-white text-[#1e2a3a]" style={{
+      '--brand': brandColor,
+      '--brand-light': brandLight,
+      '--font-family': tokens.fontFamily || undefined,
+      '--font-family-heading': tokens.fontFamilyHeading || undefined,
+      '--font-scale': tokens.fontScale || undefined,
+      '--radius-card': tokens.radiusCard || undefined,
+      '--radius-btn': tokens.radiusBtn || undefined,
+    }}>
 
       {/* HEADER logo */}
       <div className="flex justify-center pt-6 pb-0 bg-white">
@@ -495,8 +513,8 @@ function CatalogApp() {
       {/* FAB carrito */}
       {totalCarrito > 0 && (
         <button onClick={() => setCarritoOpen(true)}
-          className="fixed bottom-7 right-7 text-white border-none rounded-[13px] px-5 h-[60px] text-[.92rem] font-bold cursor-pointer flex items-center gap-2.5 shadow-[0_4px_20px_rgba(0,0,0,.25)] z-50 hover:scale-[1.04] transition-transform max-sm:bottom-4 max-sm:right-4 max-sm:h-[52px] max-sm:px-4 max-sm:text-[.84rem]"
-          style={{ background: brandColor }}>
+          className="fixed bottom-7 right-7 text-white border-none px-5 h-[60px] text-[.92rem] font-bold cursor-pointer flex items-center gap-2.5 shadow-[0_4px_20px_rgba(0,0,0,.25)] z-50 hover:scale-[1.04] transition-transform max-sm:bottom-4 max-sm:right-4 max-sm:h-[52px] max-sm:px-4 max-sm:text-[.84rem]"
+          style={{ background: brandColor, borderRadius: 'var(--radius-btn, 13px)' }}>
           <ShoppingBag size={18} style={{ opacity: 0.7 }} />
           Ver presupuesto
           <span className="bg-white rounded-full w-[22px] h-[22px] flex items-center justify-center text-[.8rem] font-black"
@@ -555,11 +573,11 @@ function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, o
         <button
           onClick={enCarrito ? undefined : onAgregar}
           disabled={enCarrito}
-          className="w-full h-[60px] border rounded-lg text-[.84rem] font-semibold flex items-center justify-center gap-1.5 transition-colors max-sm:h-12 max-sm:text-[.78rem]"
-          style={enCarrito
+          className="w-full h-[60px] border text-[.84rem] font-semibold flex items-center justify-center gap-1.5 transition-colors max-sm:h-12 max-sm:text-[.78rem]"
+          style={{ borderRadius: 'var(--radius-btn, 8px)', ...(enCarrito
             ? { background: '#f0f0f0', border: 'none', color: '#6b7a90', cursor: 'default' }
             : { background: 'white', borderColor: '#ccd6e0', color: '#1e2a3a' }
-          }
+          )}}
           onMouseEnter={e => { if (!enCarrito) { e.currentTarget.style.background = '#f0f5fb'; e.currentTarget.style.borderColor = brandColor } }}
           onMouseLeave={e => { if (!enCarrito) { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#ccd6e0' } }}>
           {enCarrito ? <><Check size={13} strokeWidth={2.5} /> Agregado</> : '+ Presupuestá'}

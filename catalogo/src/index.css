@@ -38,3 +38,12 @@
     font-family: var(--font-family-heading);
   }
 }
+
+@layer utilities {
+  /* Cards, modales, contenedores */
+  .rounded-xl  { border-radius: var(--radius-card) !important; }
+  .rounded-2xl { border-radius: var(--radius-card) !important; }
+  /* Botones, inputs, badges pequeños */
+  .rounded-lg  { border-radius: var(--radius-btn)  !important; }
+  .rounded-md  { border-radius: var(--radius-btn)  !important; }
+}

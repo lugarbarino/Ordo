@@ -9,8 +9,8 @@ const NAV = [
   { id: 'pdf', label: 'Cargar productos', icon: Upload },
   { id: 'productos', label: 'Productos', icon: Package },
   { id: 'pedidos', label: 'Pedidos', icon: Receipt },
-  { id: 'config', label: 'Mi empresa', icon: Building2 },
   { type: 'section', label: 'AJUSTES' },
+  { id: 'config', label: 'Mi empresa', icon: Building2 },
   { id: 'design', label: 'Apariencia', icon: Palette },
 ]
 
