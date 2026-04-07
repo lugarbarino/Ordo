@@ -139,7 +139,7 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
         y += 14
         doc.setFontSize(9.5).setFont(undefined, 'normal').setTextColor(80)
         const noteLines = doc.splitTextToSize(notaText, W - 80)
-        noteLines.forEach((line: string) => { doc.text(line, 40, y); y += 13 })
+        noteLines.forEach(line => { doc.text(line, 40, y); y += 13 })
       }
 
       // Footer
