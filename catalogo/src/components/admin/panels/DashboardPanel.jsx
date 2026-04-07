@@ -85,7 +85,7 @@ export function DashboardPanel() {
     <div className="space-y-6">
       {/* Hero banner */}
       <div
-        className="rounded-xl p-8 text-white flex items-center justify-between min-h-[190px] relative overflow-hidden"
+        className="rounded-xl p-8 pt-[100px] md:pt-8 text-white flex items-end justify-between min-h-[400px] md:min-h-[240px] relative overflow-hidden"
         style={{ background: 'linear-gradient(110deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,.3) 60%, transparent 100%), url(/banner-dash.png) center/cover no-repeat' }}
       >
         <div>
