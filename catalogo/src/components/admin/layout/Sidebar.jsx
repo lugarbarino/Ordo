@@ -49,7 +49,7 @@ export function Sidebar({ onClose }) {
   const initial = nombre?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'
 
   return (
-    <aside className="w-[220px] bg-white border-r-2 border-[#f1f1f1] flex flex-col flex-shrink-0 h-screen sticky top-0">
+    <aside className="w-[220px] bg-white border-r-2 border-[#f1f1f1] flex flex-col flex-shrink-0 h-full sticky top-0 overflow-hidden">
       {/* Logo row — with close button on mobile/tablet */}
       <div className="h-[52px] flex items-center px-5 justify-between">
         <img src="/logo-ordo.svg" alt="ORDO" className="h-[18px] w-auto" />

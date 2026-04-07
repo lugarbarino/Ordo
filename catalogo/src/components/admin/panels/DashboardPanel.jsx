@@ -72,11 +72,11 @@ export function DashboardPanel() {
         data.forEach(p => (p.productos || []).forEach(item => {
           counts[item.id] = (counts[item.id] || 0) + 1
         }))
-        const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4)
-        setMasVistos(top.map(([id, n]) => ({
-          nombre: productos.find(p => String(p.id) === String(id))?.nombre || '—',
-          visitas: n
-        })))
+        const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5)
+        setMasVistos(top.map(([id, n]) => {
+          const prod = productos.find(p => String(p.id) === String(id))
+          return { nombre: prod?.nombre || '—', imagen: prod?.imagen || null, codigo: prod?.codigo || null, visitas: n }
+        }))
       })
 
     db.from('pedidos').select('*').eq('empresa_id', empresa.id)
@@ -152,14 +152,20 @@ export function DashboardPanel() {
           {!masVistos.length ? (
             <p className="text-sm text-[#888]">Todavía no hay presupuestos generados.</p>
           ) : (
-            <div className="space-y-2">
-              {masVistos.map(({ nombre, visitas }, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-[#f8f9fa]">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-[#aaa] w-4">{i + 1}</span>
-                    <span className="text-sm font-medium text-[#111] truncate max-w-[180px]">{nombre}</span>
+            <div className="space-y-1">
+              {masVistos.map(({ nombre, imagen, codigo, visitas }, i) => (
+                <div key={i} className="flex items-center gap-3 py-2">
+                  <div className="w-11 h-11 rounded-xl overflow-hidden bg-white border border-[#e3e3e3] flex-shrink-0 flex items-center justify-center">
+                    {imagen
+                      ? <img src={imagen} alt={nombre} className="w-full h-full object-cover" />
+                      : <Receipt size={18} className="text-[#ccc]" />
+                    }
                   </div>
-                  <span className="text-sm font-bold text-[#666]">{visitas} vec{visitas !== 1 ? 'es' : 'ez'}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-[#111] truncate">{nombre}</div>
+                    {codigo && <div className="text-xs text-[#888]">{codigo}</div>}
+                  </div>
+                  <span className="text-sm font-semibold text-[#888] flex-shrink-0">x{visitas}</span>
                 </div>
               ))}
             </div>
