@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image } from 'lucide-react'
+import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image, Check } from 'lucide-react'
 import { db } from './lib/supabase'
 import { Landing } from './components/Landing'
 import { useAppStore } from './store/useAppStore'
@@ -446,7 +446,10 @@ function CatalogApp() {
               style={catActiva === cat
                 ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
                 : { background: 'transparent', color: '#666' }}>
-              {cat || 'Todas'}
+              <span className="flex items-center gap-1.5">
+                {catActiva === cat && <Check size={12} strokeWidth={2.5} />}
+                {cat || 'Todas'}
+              </span>
             </button>
           ))}
         </div>
