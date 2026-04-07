@@ -409,10 +409,17 @@ function CatalogApp() {
         max-w-[calc(100%-48px)] w-[1000px] h-[450px]
         max-md:h-[260px] max-md:px-6 max-md:my-3 max-md:max-w-[calc(100%-24px)]
         max-sm:h-[200px] max-sm:px-[18px] max-sm:my-2.5 max-sm:rounded-[10px]">
-        <div className="absolute inset-0" style={{
-          background: brandColor,
-          ...(empresa.banner_url ? { backgroundImage: `url(${empresa.banner_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {})
-        }} />
+        {empresa.banner_url && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url) ? (
+          <video key={empresa.banner_url} autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover">
+            <source src={empresa.banner_url} />
+          </video>
+        ) : (
+          <div className="absolute inset-0" style={{
+            background: brandColor,
+            ...(empresa.banner_url ? { backgroundImage: `url(${empresa.banner_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {})
+          }} />
+        )}
         <div className="absolute inset-0"
           style={{ background: 'linear-gradient(110deg,rgba(15,38,62,0.88) 0%,rgba(25,60,95,0.65) 55%,rgba(25,60,95,0.35) 100%)' }} />
         <div className="relative z-10 w-[500px] max-w-full">

@@ -54,9 +54,12 @@ export function ConfigPanel() {
       const { error } = await db.storage.from(bucket).upload(path, file, { upsert: true })
       if (error) { showToast('Error al subir: ' + error.message, 'err'); return }
       const url = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`
-      set(field, url)
-    } catch {
-      showToast('Error al subir imagen', 'err')
+      // Update form and immediately save to DB
+      const newForm = { ...form, [field]: url }
+      setForm(newForm)
+      await guardarEmpresa(newForm)
+    } catch (e) {
+      showToast('Error al subir: ' + e.message, 'err')
     } finally {
       setLoading(false)
     }
