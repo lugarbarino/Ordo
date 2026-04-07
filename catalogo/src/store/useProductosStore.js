@@ -29,7 +29,7 @@ export const useProductosStore = create((set, get) => ({
   cargar: async (empresaId) => {
     if (!empresaId) { set({ productos: [] }); return }
     set({ loading: true })
-    const { data } = await db.from('productos').select('*').eq('empresa_id', empresaId).order('posicion', { ascending: true })
+    const { data } = await db.from('productos').select('*').eq('empresa_id', empresaId).order('created_at', { ascending: true })
     set({ productos: data || [], loading: false })
   },
 
