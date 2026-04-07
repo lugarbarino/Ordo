@@ -27,6 +27,7 @@ export function ProductoModal({ open, onClose, producto }) {
         descripcion: producto.descripcion || '',
         stock: producto.stock || 'Disponible',
         imagen_url: producto.imagen_url || '',
+        posicion: producto.posicion,
       } : { stock: 'Disponible', nombre: '', codigo: '', categoria: '', precio: '', descripcion: '', imagen_url: '' })
     }
   }, [open, producto])
