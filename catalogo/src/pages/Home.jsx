@@ -4,15 +4,15 @@ import { LayoutGrid, Brush } from 'lucide-react'
 const OPCIONES = [
   {
     key: 'catalogo',
-    label: 'Catalogo',
-    desc: 'Creá y compartí tu catalogo digital en minutos',
+    label: 'Catálogo',
+    desc: 'Creá y compartí tu catálogo digital en minutos',
     icon: LayoutGrid,
     path: '/catalogo',
   },
   {
     key: 'marca',
     label: 'Marca',
-    desc: 'Gestioná la identidad tus clientes y compartiels cada paso',
+    desc: 'Gestioná la identidad de tus clientes y compartiles cada paso',
     icon: Brush,
     path: '/marca',
   },
