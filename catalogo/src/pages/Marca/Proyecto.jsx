@@ -34,6 +34,10 @@ function PanelBrief({ proyecto }) {
       const inserts = PREGUNTAS_DEFAULT.map((texto, i) => ({ proyecto_id: proyecto.id, texto, orden: i }))
       const { data: nuevas } = await db.from('brief_preguntas').insert(inserts).select()
       preg = nuevas || []
+    } else {
+      // Deduplicar por texto en caso de inserciones duplicadas previas
+      const seen = new Set()
+      preg = preg.filter(p => { if (seen.has(p.texto)) return false; seen.add(p.texto); return true })
     }
 
     const { data: resp } = await db.from('brief_respuestas').select('*').eq('proyecto_id', proyecto.id)
@@ -79,9 +83,18 @@ function PanelBrief({ proyecto }) {
 
   return (
     <div className="p-6 md:p-8 max-w-[760px]">
-      <div className="mb-8">
-        <h2 className="text-2xl font-black text-[#1c1c1c] mb-1">Brief</h2>
-        <p className="text-sm text-[#888]">Preguntas para el cliente. Podés editar cualquiera.</p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-[#1c1c1c] mb-1">Brief</h2>
+          <p className="text-sm text-[#888]">Preguntas para el cliente. Podés editar cualquiera.</p>
+        </div>
+        <a
+          href={`/marca/${proyecto.slug || proyecto.id}/brief`}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-1.5 text-xs font-semibold text-[#1c1c1c] border border-[#e8e8e8] bg-white px-3 py-2 rounded-[8px] no-underline hover:border-[#ccc] transition-colors shrink-0">
+          <ExternalLink size={13} /> Ver link del cliente
+        </a>
       </div>
 
       {/* Preguntas */}
@@ -300,12 +313,14 @@ function Dashboard({ proyecto, stats, onPanel }) {
 }
 
 // ── Nav items ────────────────────────────────────────────────
-const NAV = [
-  { key: 'dashboard',   label: 'Dashboard',   icon: LayoutDashboard },
-  { key: 'brief',       label: 'Brief',        icon: FileText },
-  { key: 'exploracion', label: 'Exploración',  icon: Palette },
-  { key: 'finalista',   label: 'Finalistas',   icon: Star },
-  { key: 'manual',      label: 'Manual',       icon: BookOpen },
+const NAV_TOP = [
+  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+]
+const NAV_LINKS = [
+  { key: 'brief',       label: 'Brief',       icon: FileText },
+  { key: 'exploracion', label: 'Exploración', icon: Palette },
+  { key: 'finalista',   label: 'Finalistas',  icon: Star },
+  { key: 'manual',      label: 'Manual',      icon: BookOpen },
 ]
 
 // ── Sidebar ──────────────────────────────────────────────────
@@ -347,21 +362,32 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-4 py-4">
-        <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-2.5 mb-2">Links</p>
-        {NAV.map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => onPanel(key)}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium mb-0.5 cursor-pointer border-none transition-colors text-left
-              ${panel === key
-                ? 'bg-[#f0f0f0] text-[#1c1c1c] font-semibold'
-                : 'bg-transparent text-[#666] hover:bg-[#f5f5f5] hover:text-[#1c1c1c]'
-              }`}>
-            <Icon size={15} className="shrink-0" />
-            {label}
-          </button>
-        ))}
+      <nav className="flex-1 px-4 py-4 flex flex-col gap-4">
+        <div>
+          {NAV_TOP.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => onPanel(key)}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium cursor-pointer border-none transition-colors text-left
+                ${panel === key ? 'bg-[#f0f0f0] text-[#1c1c1c] font-semibold' : 'bg-transparent text-[#666] hover:bg-[#f5f5f5] hover:text-[#1c1c1c]'}`}>
+              <Icon size={15} className="shrink-0" />
+              {label}
+            </button>
+          ))}
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-2.5 mb-2">Links</p>
+          {NAV_LINKS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => onPanel(key)}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium mb-0.5 cursor-pointer border-none transition-colors text-left
+                ${panel === key ? 'bg-[#f0f0f0] text-[#1c1c1c] font-semibold' : 'bg-transparent text-[#666] hover:bg-[#f5f5f5] hover:text-[#1c1c1c]'}`}>
+              <Icon size={15} className="shrink-0" />
+              {label}
+            </button>
+          ))}
+        </div>
       </nav>
 
       {/* User + logout */}
