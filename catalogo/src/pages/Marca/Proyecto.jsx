@@ -394,7 +394,8 @@ export default function MarcaProyecto() {
     const user = session?.user
     if (!user) { window.location.href = '/marca'; return }
 
-    const { data: cuenta } = await db.from('cuentas_marca').select('*').eq('user_id', user.id).single()
+    const { data: cuentas } = await db.from('cuentas_marca').select('*').eq('user_id', user.id).limit(1)
+    const cuenta = cuentas?.[0]
     if (!cuenta) { navigate('/marca/admin'); return }
 
     const { data: proyectos } = await db
@@ -402,7 +403,6 @@ export default function MarcaProyecto() {
       .select('*')
       .eq('cuenta_id', cuenta.id)
       .neq('estado', 'archivado')
-      .order('created_at', { ascending: false })
 
     const proyecto = (proyectos || []).find(p => p.id === proyectoId)
     if (!proyecto) { navigate('/marca/admin'); return }

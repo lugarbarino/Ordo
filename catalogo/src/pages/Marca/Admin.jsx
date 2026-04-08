@@ -313,7 +313,6 @@ function AdminContent({ cuenta, user }) {
       .select('*')
       .eq('cuenta_id', cuenta.id)
       .neq('estado', 'archivado')
-      .order('created_at', { ascending: false })
     setProyectos(data || [])
     setCargando(false)
   }
@@ -361,13 +360,13 @@ export default function MarcaAdmin() {
       const user = session?.user || null
       if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
 
-      const { data: cuenta } = await db
+      const { data: cuentas } = await db
         .from('cuentas_marca')
         .select('*')
         .eq('user_id', user.id)
-        .single()
+        .limit(1)
 
-      setState({ checked: true, user, cuenta: cuenta || null })
+      setState({ checked: true, user, cuenta: cuentas?.[0] || null })
     })
   }, [])
 
