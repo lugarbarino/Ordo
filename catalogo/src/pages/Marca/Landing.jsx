@@ -48,24 +48,47 @@ function LoginModal({ open, onClose }) {
   useEffect(() => { if (open) { setError(''); setSuccess(''); setTab('login'); setNombre('') } }, [open])
   if (!open) return null
 
+  const ensureCuentaMarca = async (userId, nombreEstudio) => {
+    const { data: existing } = await db.from('cuentas_marca').select('id').eq('user_id', userId).single()
+    if (!existing && nombreEstudio?.trim()) {
+      await db.from('cuentas_marca').insert({ user_id: userId, nombre: nombreEstudio.trim() })
+    }
+  }
+
   const handleLogin = async () => {
     setError(''); setLoading(true)
     const { data, error } = await db.auth.signInWithPassword({ email, password: pass })
     setLoading(false)
     if (error) { setError(error.message); return }
-    if (data?.session) window.location.href = '/marca/admin'
+    if (data?.session) {
+      // Si viene de Catálogo y no tiene cuentas_marca, pedir nombre
+      const { data: cuenta } = await db.from('cuentas_marca').select('id').eq('user_id', data.user.id).single()
+      if (!cuenta) {
+        // El onboarding del admin se encarga de pedirlo
+      }
+      window.location.href = '/marca/admin'
+    }
     onClose()
   }
 
   const handleRegistro = async () => {
     if (!nombre.trim()) { setError('El nombre del estudio es obligatorio'); return }
     setError(''); setLoading(true)
+
     const { data, error } = await db.auth.signUp({ email, password: pass })
+
+    // Si el mail ya existe, logueamos directo y creamos la cuenta de marca
+    if (error?.message?.toLowerCase().includes('already registered') || error?.message?.toLowerCase().includes('already exists')) {
+      const { data: loginData, error: loginError } = await db.auth.signInWithPassword({ email, password: pass })
+      setLoading(false)
+      if (loginError) { setError('El mail ya tiene cuenta. Iniciá sesión en la otra pestaña.'); return }
+      if (loginData?.user) await ensureCuentaMarca(loginData.user.id, nombre)
+      if (loginData?.session) { window.location.href = '/marca/admin'; return }
+    }
+
     setLoading(false)
     if (error) { setError(error.message); return }
-    if (data?.user) {
-      await db.from('cuentas_marca').insert({ user_id: data.user.id, nombre: nombre.trim() })
-    }
+    if (data?.user) await ensureCuentaMarca(data.user.id, nombre)
     if (data?.session) {
       window.location.href = '/marca/admin'
     } else {
