@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FileText, Palette, Star, BookOpen, LogOut, ChevronDown, ExternalLink, ClipboardList, LayoutGrid } from 'lucide-react'
+import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 // ── Panels ───────────────────────────────────────────────────
@@ -40,35 +40,55 @@ function PanelManual({ proyecto }) {
   )
 }
 
+// ── Stat card ────────────────────────────────────────────────
+function StatCard({ label, value, icon: Icon }) {
+  return (
+    <div className="bg-white rounded-[16px] p-5 border border-[#e8e8e8] flex items-center justify-between">
+      <div>
+        <div className="text-3xl font-black text-[#1c1c1c] mb-1">{value}</div>
+        <div className="text-xs text-[#888]">{label}</div>
+      </div>
+      <div className="w-10 h-10 rounded-[10px] bg-[#e8eaf6] flex items-center justify-center shrink-0">
+        <Icon size={18} className="text-[#3949ab]" />
+      </div>
+    </div>
+  )
+}
+
 // ── Dashboard ────────────────────────────────────────────────
 const PASOS = [
-  { key: 'brief',       label: 'Armá tu brief',           icon: ClipboardList },
-  { key: 'exploracion', label: 'Mostrá tus exploraciones', icon: LayoutGrid },
-  { key: 'finalista',   label: 'Los finalistas',           icon: Star },
-  { key: 'manual',      label: 'Manual de marca',          icon: BookOpen },
+  { key: 'brief',       label: 'Armá tu brief',           icon: ClipboardList, muted: false },
+  { key: 'exploracion', label: 'Mostrá tus exploraciones', icon: LayoutGrid,    muted: false },
+  { key: 'finalista',   label: 'Los finalistas',           icon: Star,          muted: false },
+  { key: 'manual',      label: 'Manual de marca',          icon: Link,          muted: true  },
 ]
 
 function Dashboard({ proyecto, stats, onPanel }) {
   const slug = proyecto.slug || proyecto.id
 
   return (
-    <div className="p-8 max-w-[900px]">
+    <div className="p-8 max-w-[960px]">
 
       {/* Hero */}
       <div className="bg-[#1c1c1c] rounded-[20px] p-8 mb-8">
-        <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-2">Compartí tu proceso</p>
+        <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-3">Compartí tu proceso</p>
         <h2 className="text-2xl font-black text-white mb-2">
           {proyecto.nombre}
         </h2>
-        <p className="text-white/60 text-sm mb-5">
-          Compartí el link con tu cliente para que participe del proceso
+        <p className="text-white/60 text-sm mb-6">
+          Compartí tu link con tus clientes y recibí feedback
         </p>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => onPanel('brief')}
+            className="flex items-center gap-2 bg-transparent text-white border border-white/30 hover:border-white/60 px-4 py-2.5 rounded-[10px] text-sm font-semibold cursor-pointer transition-colors">
+            <ClipboardList size={14} /> Armá tu brief
+          </button>
           <a
-            href={`/marca/${slug}/brief`}
+            href={`/marca/${slug}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 bg-white text-[#1c1c1c] px-4 py-2.5 rounded-[10px] text-sm font-semibold no-underline hover:opacity-90 transition-opacity">
+            className="flex items-center gap-2 text-white/50 hover:text-white/80 text-sm no-underline transition-colors">
             <ExternalLink size={14} /> Ver link del cliente
           </a>
         </div>
@@ -77,27 +97,26 @@ function Dashboard({ proyecto, stats, onPanel }) {
       {/* Stats */}
       <p className="text-[10px] font-bold text-[#aaa] uppercase tracking-widest mb-3">Datos</p>
       <div className="grid grid-cols-3 gap-4 mb-8">
-        {[
-          { label: 'Propuestas', value: stats.propuestas },
-          { label: 'Finalistas', value: stats.finalistas },
-          { label: 'Feedback recibido', value: stats.feedback },
-        ].map(({ label, value }) => (
-          <div key={label} className="bg-white rounded-[16px] p-5 border border-[#e8e8e8]">
-            <div className="text-3xl font-black text-[#1c1c1c] mb-1">{value}</div>
-            <div className="text-xs text-[#888]">{label}</div>
-          </div>
-        ))}
+        <StatCard label="Vistas"        value={stats.vistas}    icon={Eye} />
+        <StatCard label="Respuestas"    value={stats.respuestas} icon={MessageSquare} />
+        <StatCard label="Pedidos nuevos" value={stats.pedidos}   icon={ShoppingBag} />
       </div>
 
       {/* Primeros pasos */}
       <p className="text-sm font-bold text-[#1c1c1c] mb-4">Primeros pasos</p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {PASOS.map(({ key, label, icon: Icon }) => (
+        {PASOS.map(({ key, label, icon: Icon, muted }) => (
           <button
             key={key}
             onClick={() => onPanel(key)}
-            className="bg-[#1c1c1c] hover:bg-[#333] rounded-[16px] p-5 text-left cursor-pointer border-none transition-colors group">
-            <Icon size={20} className="text-white/60 mb-6 group-hover:text-white/80 transition-colors" />
+            className={`rounded-[16px] p-5 text-left cursor-pointer border-none transition-colors group flex flex-col justify-between min-h-[140px]
+              ${muted
+                ? 'bg-[#b0b8d4] hover:bg-[#9ba5c8]'
+                : 'bg-[#2d3561] hover:bg-[#363f72]'
+              }`}>
+            <div className={`w-9 h-9 rounded-[8px] flex items-center justify-center mb-4 ${muted ? 'bg-white/20' : 'bg-white/15'}`}>
+              <Icon size={18} className="text-white" />
+            </div>
             <div className="text-white text-sm font-bold leading-snug">{label}</div>
           </button>
         ))}
@@ -119,7 +138,7 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
   const [selectorOpen, setSelectorOpen] = useState(false)
 
   return (
-    <aside className="w-[220px] shrink-0 bg-white border-r border-[#e8e8e8] flex flex-col h-screen sticky top-0">
+    <aside className="w-[240px] shrink-0 bg-white border-r border-[#e8e8e8] flex flex-col h-screen sticky top-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-[#f0f0f0]">
         <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
@@ -130,7 +149,7 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
         <button
           onClick={() => setSelectorOpen(v => !v)}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] hover:bg-[#f5f5f5] transition-colors bg-transparent border-none cursor-pointer text-left">
-          <div className="w-7 h-7 rounded-full bg-[#1c1c1c] text-white flex items-center justify-center text-xs font-bold shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#2d3561] text-white flex items-center justify-center text-xs font-bold shrink-0">
             {proyecto.nombre?.[0]?.toUpperCase() || 'M'}
           </div>
           <span className="text-sm font-semibold text-[#1c1c1c] truncate flex-1">{proyecto.nombre}</span>
@@ -171,13 +190,16 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
       </nav>
 
       {/* User + logout */}
-      <div className="px-5 py-4 border-t border-[#f0f0f0]">
-        <div className="text-xs text-[#aaa] mb-1 truncate">{cuenta.nombre}</div>
-        <button
-          onClick={onLogout}
-          className="text-xs text-[#666] underline bg-transparent border-none cursor-pointer p-0 hover:text-[#1c1c1c] transition-colors">
-          cerrar sesión
-        </button>
+      <div className="px-4 py-4 border-t border-[#f0f0f0] flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-[#e0e0e0] shrink-0" />
+        <div className="min-w-0">
+          <div className="text-xs text-[#555] font-medium truncate">{cuenta.nombre}</div>
+          <button
+            onClick={onLogout}
+            className="text-xs text-[#999] underline bg-transparent border-none cursor-pointer p-0 hover:text-[#1c1c1c] transition-colors">
+            cerrar sesión
+          </button>
+        </div>
       </div>
     </aside>
   )
@@ -188,19 +210,18 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const navigate = useNavigate()
   const [proyecto, setProyecto] = useState(proyectoInicial)
   const [panel, setPanel] = useState('dashboard')
-  const [stats, setStats] = useState({ propuestas: 0, finalistas: 0, feedback: 0 })
+  const [stats, setStats] = useState({ vistas: 0, respuestas: 0, pedidos: 0 })
 
   useEffect(() => {
     cargarStats(proyecto.id)
   }, [proyecto.id])
 
   const cargarStats = async (proyectoId) => {
-    const [{ count: propuestas }, { count: finalistas }, { data: fb }] = await Promise.all([
-      db.from('opciones_marca').select('*', { count: 'exact', head: true }).eq('proyecto_id', proyectoId).eq('es_propuesta', true),
+    const [{ count: respuestas }, { count: pedidos }] = await Promise.all([
+      db.from('exploracion_feedback').select('*', { count: 'exact', head: true }).eq('proyecto_id', proyectoId),
       db.from('opciones_marca').select('*', { count: 'exact', head: true }).eq('proyecto_id', proyectoId).eq('es_finalista', true),
-      db.from('exploracion_feedback').select('id').eq('proyecto_id', proyectoId),
     ])
-    setStats({ propuestas: propuestas || 0, finalistas: finalistas || 0, feedback: fb?.length || 0 })
+    setStats({ vistas: 0, respuestas: respuestas || 0, pedidos: pedidos || 0 })
   }
 
   const handleProyecto = (p) => {
