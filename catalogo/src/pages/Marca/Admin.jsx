@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, ExternalLink, X, ChevronRight, Archive, Briefcase, Package, Link, ChevronDown } from 'lucide-react'
+import { Plus, ExternalLink, X, ChevronRight, Archive, Briefcase, Package, Link, ChevronDown, FileText, Palette, Star, BookOpen } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 const FASES = ['brief', 'exploracion', 'finalista', 'manual']
@@ -266,14 +266,50 @@ function EmptyDashboard({ onNuevo }) {
   )
 }
 
+const NAV_EMPTY = [
+  { label: 'Brief',      icon: FileText },
+  { label: 'Exploración', icon: Palette },
+  { label: 'Finalistas',  icon: Star },
+  { label: 'Manual',      icon: BookOpen },
+]
+
 // ── Sidebar (admin) ──────────────────────────────────────────
-function AdminSidebar({ cuenta, onLogout }) {
+function AdminSidebar({ cuenta, onLogout, onNuevo }) {
   return (
     <aside className="w-[288px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
-      <div className="px-8 h-[72px] flex items-center border-b border-[#f0f0f0]">
+      {/* Logo */}
+      <div className="px-8 h-[72px] flex items-center border-b border-[#f1f1f1]">
         <img src="/logo-ordo.svg" alt="ORDO" className="h-[26px] w-auto" />
       </div>
-      <div className="flex-1" />
+
+      {/* Proyecto selector placeholder */}
+      <div className="px-4 py-3 border-b border-[#f1f1f1]">
+        <button
+          onClick={onNuevo}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] hover:bg-[#f5f5f5] transition-colors bg-transparent border-none cursor-pointer text-left">
+          <div className="w-10 h-10 rounded-full bg-[#726d76] text-white flex items-center justify-center text-xs font-bold shrink-0">
+            M
+          </div>
+          <span className="text-sm font-semibold text-[#aaa] truncate flex-1">Nueva marca</span>
+          <Plus size={14} className="text-[#aaa] shrink-0" />
+        </button>
+      </div>
+
+      {/* Nav links (placeholder, todos abren modal) */}
+      <nav className="flex-1 px-4 py-4">
+        <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-2.5 mb-2">Links</p>
+        {NAV_EMPTY.map(({ label, icon: Icon }) => (
+          <button
+            key={label}
+            onClick={onNuevo}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium mb-0.5 cursor-pointer border-none transition-colors text-left bg-transparent text-[#bbb] hover:bg-[#f5f5f5] hover:text-[#999]">
+            <Icon size={15} className="shrink-0" />
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      {/* User + logout */}
       <div className="px-6 py-6 border-t border-[#e3e3e3]">
         <div className="flex items-center gap-3 pt-3">
           <div className="w-10 h-10 rounded-full bg-[#726d76] shrink-0" />
@@ -338,7 +374,7 @@ function AdminContent({ cuenta, user }) {
   // ── Empty state ──────────────────────────────────────────
   return (
     <div className="flex min-h-screen bg-[#f8f9fa]">
-      <AdminSidebar cuenta={cuenta} onLogout={handleLogout} />
+      <AdminSidebar cuenta={cuenta} onLogout={handleLogout} onNuevo={() => setModalOpen(true)} />
       <EmptyDashboard onNuevo={() => setModalOpen(true)} />
       {modalOpen && (
         <ModalNuevoProyecto
