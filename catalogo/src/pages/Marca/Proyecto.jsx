@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X } from 'lucide-react'
+import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 const PREGUNTAS_DEFAULT = [
@@ -15,8 +15,11 @@ const PREGUNTAS_DEFAULT = [
 function PanelBrief({ proyecto }) {
   const [preguntas, setPreguntas] = useState([])
   const [respuestas, setRespuestas] = useState({})
-  const [editando, setEditando] = useState(null) // id de la pregunta en edición
+  const [referencias, setReferencias] = useState([])
+  const [editando, setEditando] = useState(null)
   const [textoEdit, setTextoEdit] = useState('')
+  const [nuevoLink, setNuevoLink] = useState('')
+  const [nuevaDesc, setNuevaDesc] = useState('')
   const [cargando, setCargando] = useState(true)
   const inputRef = useRef(null)
 
@@ -25,66 +28,68 @@ function PanelBrief({ proyecto }) {
 
   const cargar = async () => {
     setCargando(true)
-    let { data: preg } = await db
-      .from('brief_preguntas')
-      .select('*')
-      .eq('proyecto_id', proyecto.id)
-      .order('orden')
+    let { data: preg } = await db.from('brief_preguntas').select('*').eq('proyecto_id', proyecto.id).order('orden')
 
     if (!preg || preg.length === 0) {
-      const inserts = PREGUNTAS_DEFAULT.map((texto, i) => ({
-        proyecto_id: proyecto.id, texto, orden: i,
-      }))
+      const inserts = PREGUNTAS_DEFAULT.map((texto, i) => ({ proyecto_id: proyecto.id, texto, orden: i }))
       const { data: nuevas } = await db.from('brief_preguntas').insert(inserts).select()
       preg = nuevas || []
     }
 
-    const { data: resp } = await db
-      .from('brief_respuestas')
-      .select('*')
-      .eq('proyecto_id', proyecto.id)
-
+    const { data: resp } = await db.from('brief_respuestas').select('*').eq('proyecto_id', proyecto.id)
     const respMap = {}
     resp?.forEach(r => { respMap[r.pregunta_id] = r.respuesta })
 
+    const { data: refs } = await db.from('brief_referencias').select('*').eq('proyecto_id', proyecto.id)
+
     setPreguntas(preg)
     setRespuestas(respMap)
+    setReferencias(refs || [])
     setCargando(false)
   }
 
-  const iniciarEdit = (p) => {
-    setEditando(p.id)
-    setTextoEdit(p.texto)
-  }
-
+  const iniciarEdit = (p) => { setEditando(p.id); setTextoEdit(p.texto) }
   const guardarEdit = async () => {
     if (!textoEdit.trim()) return
     await db.from('brief_preguntas').update({ texto: textoEdit.trim() }).eq('id', editando)
     setPreguntas(prev => prev.map(p => p.id === editando ? { ...p, texto: textoEdit.trim() } : p))
     setEditando(null)
   }
-
   const cancelarEdit = () => setEditando(null)
 
+  const agregarRef = async () => {
+    if (!nuevoLink.trim()) return
+    const tipo = nuevoLink.match(/\.(jpg|jpeg|png|gif|webp|svg)/i) ? 'imagen' : 'link'
+    const { data } = await db.from('brief_referencias')
+      .insert({ proyecto_id: proyecto.id, url: nuevoLink.trim(), descripcion: nuevaDesc.trim() || null, tipo })
+      .select().single()
+    if (data) { setReferencias(prev => [...prev, data]); setNuevoLink(''); setNuevaDesc('') }
+  }
+
+  const eliminarRef = async (id) => {
+    await db.from('brief_referencias').delete().eq('id', id)
+    setReferencias(prev => prev.filter(r => r.id !== id))
+  }
+
   if (cargando) return (
-    <div className="p-8 flex items-center justify-center py-20">
+    <div className="p-6 flex items-center justify-center py-20">
       <div className="w-6 h-6 rounded-full border-2 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
     </div>
   )
 
   return (
-    <div className="p-8 max-w-[760px]">
+    <div className="p-6 md:p-8 max-w-[760px]">
       <div className="mb-8">
         <h2 className="text-2xl font-black text-[#1c1c1c] mb-1">Brief</h2>
-        <p className="text-sm text-[#888]">Estas preguntas se muestran al cliente para que complete el brief. Podés editar cualquiera.</p>
+        <p className="text-sm text-[#888]">Preguntas para el cliente. Podés editar cualquiera.</p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      {/* Preguntas */}
+      <div className="flex flex-col gap-3 mb-10">
         {preguntas.map((p, i) => (
           <div key={p.id} className="bg-white rounded-[16px] border border-[#e8e8e8] p-5 group">
             <div className="flex items-start gap-3">
               <span className="text-xs font-bold text-[#bbb] mt-0.5 w-5 shrink-0">{i + 1}</span>
-
               <div className="flex-1 min-w-0">
                 {editando === p.id ? (
                   <div className="flex items-start gap-2">
@@ -97,25 +102,18 @@ function PanelBrief({ proyecto }) {
                       rows={2}
                     />
                     <div className="flex flex-col gap-1">
-                      <button onClick={guardarEdit} className="w-7 h-7 flex items-center justify-center bg-[#1c1c1c] text-white rounded-[6px] cursor-pointer border-none hover:opacity-80">
-                        <Check size={13} />
-                      </button>
-                      <button onClick={cancelarEdit} className="w-7 h-7 flex items-center justify-center bg-[#f0f0f0] text-[#666] rounded-[6px] cursor-pointer border-none hover:bg-[#e8e8e8]">
-                        <X size={13} />
-                      </button>
+                      <button onClick={guardarEdit} className="w-7 h-7 flex items-center justify-center bg-[#1c1c1c] text-white rounded-[6px] cursor-pointer border-none hover:opacity-80"><Check size={13} /></button>
+                      <button onClick={cancelarEdit} className="w-7 h-7 flex items-center justify-center bg-[#f0f0f0] text-[#666] rounded-[6px] cursor-pointer border-none hover:bg-[#e8e8e8]"><X size={13} /></button>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-sm font-semibold text-[#1c1c1c] leading-relaxed">{p.texto}</p>
-                    <button
-                      onClick={() => iniciarEdit(p)}
-                      className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center text-[#aaa] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-[6px] cursor-pointer border-none bg-transparent transition-all shrink-0">
+                    <button onClick={() => iniciarEdit(p)} className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center text-[#aaa] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-[6px] cursor-pointer border-none bg-transparent transition-all shrink-0">
                       <Pencil size={13} />
                     </button>
                   </div>
                 )}
-
                 {respuestas[p.id] && editando !== p.id && (
                   <div className="mt-3 pt-3 border-t border-[#f0f0f0]">
                     <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest mb-1">Respuesta del cliente</p>
@@ -126,6 +124,64 @@ function PanelBrief({ proyecto }) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Referencias */}
+      <div>
+        <h3 className="text-sm font-bold text-[#1c1c1c] mb-1">Referencias</h3>
+        <p className="text-xs text-[#888] mb-4">Links o imágenes de inspiración para la marca.</p>
+
+        {/* Input */}
+        <div className="bg-white border border-[#e8e8e8] rounded-[16px] p-5 mb-4">
+          <div className="flex flex-col gap-2">
+            <input
+              type="url"
+              value={nuevoLink}
+              onChange={e => setNuevoLink(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && agregarRef()}
+              placeholder="Pegá un link (URL, Pinterest, Behance…)"
+              className="w-full px-3 py-2.5 border border-[#e0e0e0] rounded-[8px] text-sm outline-none focus:border-[#1c1c1c] transition-colors"
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={nuevaDesc}
+                onChange={e => setNuevaDesc(e.target.value)}
+                placeholder="Descripción opcional"
+                className="flex-1 px-3 py-2 border border-[#e0e0e0] rounded-[8px] text-sm outline-none focus:border-[#1c1c1c] transition-colors"
+              />
+              <button
+                onClick={agregarRef}
+                className="flex items-center gap-1.5 bg-[#1c1c1c] text-white px-4 py-2 rounded-[8px] text-sm font-semibold cursor-pointer border-none hover:opacity-90 transition-opacity shrink-0">
+                <Plus size={14} /> Agregar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Lista */}
+        {referencias.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {referencias.map(r => (
+              <div key={r.id} className="bg-white border border-[#e8e8e8] rounded-[12px] p-4 flex items-center gap-3 group">
+                <div className="w-8 h-8 rounded-[6px] bg-[#f5f5f5] flex items-center justify-center shrink-0">
+                  <Link size={14} className="text-[#888]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <a href={r.url} target="_blank" rel="noreferrer" className="text-sm text-[#1c1c1c] font-medium truncate block hover:underline no-underline">
+                    {r.url}
+                  </a>
+                  {r.descripcion && <p className="text-xs text-[#888] mt-0.5">{r.descripcion}</p>}
+                </div>
+                <button
+                  onClick={() => eliminarRef(r.id)}
+                  className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center text-[#ccc] hover:text-red-400 rounded-[6px] cursor-pointer border-none bg-transparent transition-all shrink-0">
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -331,6 +387,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const [proyecto, setProyecto] = useState(proyectoInicial)
   const [panel, setPanel] = useState('dashboard')
   const [stats, setStats] = useState({ vistas: 0, respuestas: 0, pedidos: 0 })
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     cargarStats(proyecto.id)
@@ -363,18 +420,38 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
     if (panel === 'manual')      return <PanelManual proyecto={proyecto} />
   }
 
+  const handlePanel = (key) => { setPanel(key); setSidebarOpen(false) }
+
   return (
     <div className="flex min-h-screen bg-[#f5f5f3]">
-      <Sidebar
-        cuenta={cuenta}
-        proyecto={proyecto}
-        proyectos={proyectos}
-        panel={panel}
-        onPanel={setPanel}
-        onProyecto={handleProyecto}
-        onLogout={handleLogout}
-      />
-      <main className="flex-1 overflow-y-auto">
+      {/* Overlay mobile */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <div className={`fixed md:sticky top-0 z-40 h-screen transition-transform duration-300 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <Sidebar
+          cuenta={cuenta}
+          proyecto={proyecto}
+          proyectos={proyectos}
+          panel={panel}
+          onPanel={handlePanel}
+          onProyecto={handleProyecto}
+          onLogout={handleLogout}
+        />
+      </div>
+
+      {/* Main */}
+      <main className="flex-1 overflow-y-auto md:ml-0">
+        {/* Mobile topbar */}
+        <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-[#f1f1f1] md:hidden sticky top-0 z-20">
+          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-[8px] hover:bg-[#f5f5f5] bg-transparent border-none cursor-pointer">
+            <Menu size={20} className="text-[#1c1c1c]" />
+          </button>
+          <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
+          <span className="text-sm font-semibold text-[#1c1c1c] truncate">{proyecto.nombre}</span>
+        </div>
         {renderPanel()}
       </main>
     </div>
