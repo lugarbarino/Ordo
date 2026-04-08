@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, ExternalLink, X, ChevronRight, Archive, Briefcase, Package, Link, ChevronDown, FileText, Palette, Star, BookOpen } from 'lucide-react'
+import { Plus, ExternalLink, X, ChevronRight, Archive, Briefcase, Package, Link, ChevronDown, FileText, Palette, Star, BookOpen, Eye, MessageSquare, ShoppingBag } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 const FASES = ['brief', 'exploracion', 'finalista', 'manual']
