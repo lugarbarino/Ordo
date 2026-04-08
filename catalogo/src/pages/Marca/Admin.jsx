@@ -216,7 +216,7 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
 
 // ── Empty state dashboard ────────────────────────────────────
 const PASOS_EMPTY = [
-  { label: 'Armá tu brief',           icon: Briefcase, bg: 'bg-[#35425f]', textColor: 'text-white' },
+  { label: 'Armá tu brief',            icon: Briefcase, bg: 'bg-[#35425f]', textColor: 'text-white' },
   { label: 'Mostrá tus exploraciones', icon: Package,   bg: 'bg-[#495a82]', textColor: 'text-white' },
   { label: 'Los finalistas',           icon: Package,   bg: 'bg-[#495a82]', textColor: 'text-white' },
   { label: 'Manual de marca',          icon: Link,      bg: 'bg-[#aab8d8]', textColor: 'text-[#171717]' },
@@ -224,41 +224,52 @@ const PASOS_EMPTY = [
 
 function EmptyDashboard({ onNuevo }) {
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-7">
-      <div className="max-w-[976px]">
+    <div className="flex-1 overflow-y-auto p-8">
+      <div className="max-w-[960px]">
 
-        {/* Hero */}
-        <div className="relative rounded-[12px] overflow-hidden h-[280px] mb-5 flex items-end px-14 pb-8"
-          style={{ background: 'rgba(66,82,118,0.92)' }}>
-          {/* Decorative letters */}
-          <div className="absolute inset-0 flex items-center justify-end pr-12 pointer-events-none select-none overflow-hidden">
-            <span className="text-[200px] font-black text-white/10 leading-none tracking-tighter">iDeA</span>
-          </div>
-          <div className="relative z-10 flex flex-col gap-2 max-w-[480px]">
-            <p className="text-white text-base">Compartí tu proceso</p>
-            <h2 className="text-[32px] font-bold text-white leading-tight">Crea tu primera marca</h2>
-            <p className="text-white/80 text-lg leading-snug">Compartí tu link con tus clientes y recibí feedback</p>
-            <button
-              onClick={onNuevo}
-              className="mt-3 flex items-center gap-2 bg-white text-[#2b2b36] border border-[#3872fa] px-4 py-2 rounded-[6px] text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity w-fit">
-              <Plus size={16} /> Nuevo proyecto
+        {/* Hero — mismo estilo que Dashboard de proyecto */}
+        <div className="bg-[#1c1c1c] rounded-[20px] p-8 mb-8">
+          <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-3">Compartí tu proceso</p>
+          <h2 className="text-2xl font-black text-white mb-2">Crea tu primera marca</h2>
+          <p className="text-white/60 text-sm mb-6">Compartí tu link con tus clientes y recibí feedback</p>
+          <button
+            onClick={onNuevo}
+            className="flex items-center gap-2 bg-transparent text-white border border-white/30 hover:border-white/60 px-4 py-2.5 rounded-[10px] text-sm font-semibold cursor-pointer transition-colors">
+            <Plus size={14} /> Nuevo proyecto
+          </button>
+        </div>
+
+        {/* Stats en 0 */}
+        <p className="text-[10px] font-bold text-[#aaa] uppercase tracking-widest mb-3">Datos</p>
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {[
+            { label: 'Vistas', icon: Eye },
+            { label: 'Respuestas', icon: MessageSquare },
+            { label: 'Pedidos nuevos', icon: ShoppingBag },
+          ].map(({ label, icon: Icon }) => (
+            <button key={label} onClick={onNuevo} className="bg-white rounded-[16px] p-5 border border-[#e8e8e8] flex items-center justify-between cursor-pointer hover:border-[#ccc] transition-colors text-left">
+              <div>
+                <div className="text-3xl font-black text-[#ccc] mb-1">—</div>
+                <div className="text-xs text-[#aaa]">{label}</div>
+              </div>
+              <div className="w-10 h-10 rounded-[10px] bg-[#f0f0f0] flex items-center justify-center shrink-0">
+                <Icon size={18} className="text-[#ccc]" />
+              </div>
             </button>
-          </div>
+          ))}
         </div>
 
         {/* Primeros pasos */}
-        <div className="bg-white border border-[#e3e3e3] rounded-[8px] px-7 py-6">
-          <p className="text-sm font-bold text-[#111] mb-5">Primeros pasos</p>
-          <div className="grid grid-cols-4 gap-5">
-            {PASOS_EMPTY.map(({ label, icon: Icon, bg, textColor }) => (
-              <button key={label} onClick={onNuevo} className={`${bg} rounded-[12px] p-5 flex flex-col justify-between min-h-[191px] border-none cursor-pointer text-left hover:opacity-90 transition-opacity`}>
-                <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shrink-0">
-                  <Icon size={18} className="text-[#333]" />
-                </div>
-                <p className={`text-[22px] font-normal ${textColor} leading-snug`}>{label}</p>
-              </button>
-            ))}
-          </div>
+        <p className="text-sm font-bold text-[#1c1c1c] mb-4">Primeros pasos</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {PASOS_EMPTY.map(({ label, icon: Icon, bg, textColor }) => (
+            <button key={label} onClick={onNuevo} className={`${bg} rounded-[16px] p-5 flex flex-col justify-between min-h-[140px] border-none cursor-pointer text-left hover:opacity-90 transition-opacity`}>
+              <div className="w-9 h-9 rounded-[8px] bg-white/15 flex items-center justify-center shrink-0">
+                <Icon size={18} className="text-white" />
+              </div>
+              <p className={`text-sm font-bold ${textColor} leading-snug`}>{label}</p>
+            </button>
+          ))}
         </div>
 
       </div>
