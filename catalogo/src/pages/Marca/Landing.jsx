@@ -49,7 +49,8 @@ function LoginModal({ open, onClose }) {
   if (!open) return null
 
   const ensureCuentaMarca = async (userId, nombreEstudio) => {
-    const { data: existing } = await db.from('cuentas_marca').select('id').eq('user_id', userId).single()
+    const { data: existings } = await db.from('cuentas_marca').select('id').eq('user_id', userId).limit(1)
+    const existing = existings?.[0]
     if (!existing && nombreEstudio?.trim()) {
       await db.from('cuentas_marca').insert({ user_id: userId, nombre: nombreEstudio.trim() })
     }
