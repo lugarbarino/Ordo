@@ -7,6 +7,7 @@ const CatalogoAdmin = lazy(() => import('./pages/Catalogo/Admin'))
 const CatalogoPublic = lazy(() => import('./pages/Catalogo/Public'))
 const MarcaLanding = lazy(() => import('./pages/Marca/Landing'))
 const MarcaAdmin = lazy(() => import('./pages/Marca/Admin'))
+const MarcaProyecto = lazy(() => import('./pages/Marca/Proyecto'))
 const MarcaManual = lazy(() => import('./pages/Marca/Cliente/Manual'))
 const Brief = lazy(() => import('./pages/Marca/Cliente/Brief'))
 const Exploracion = lazy(() => import('./pages/Marca/Cliente/Exploracion'))
@@ -35,6 +36,7 @@ export default function App() {
           {/* Marca */}
           <Route path="/marca" element={<MarcaLanding />} />
           <Route path="/marca/admin" element={<MarcaAdmin />} />
+          <Route path="/marca/admin/:proyectoId" element={<MarcaProyecto />} />
           <Route path="/marca/:nombre" element={<MarcaManual />} />
           <Route path="/marca/:nombre/brief" element={<Brief />} />
           <Route path="/marca/:nombre/exploracion" element={<Exploracion />} />
