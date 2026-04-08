@@ -38,13 +38,14 @@ const OrdoLogo = ({ className = 'h-[22px] w-auto' }) => (
 function LoginModal({ open, onClose }) {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+  const [nombre, setNombre] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState('login')
   const [success, setSuccess] = useState('')
 
-  useEffect(() => { if (open) { setError(''); setSuccess(''); setTab('login') } }, [open])
+  useEffect(() => { if (open) { setError(''); setSuccess(''); setTab('login'); setNombre('') } }, [open])
   if (!open) return null
 
   const handleLogin = async () => {
@@ -57,10 +58,14 @@ function LoginModal({ open, onClose }) {
   }
 
   const handleRegistro = async () => {
+    if (!nombre.trim()) { setError('El nombre del estudio es obligatorio'); return }
     setError(''); setLoading(true)
     const { data, error } = await db.auth.signUp({ email, password: pass })
     setLoading(false)
     if (error) { setError(error.message); return }
+    if (data?.user) {
+      await db.from('cuentas_marca').insert({ user_id: data.user.id, nombre: nombre.trim() })
+    }
     if (data?.session) {
       window.location.href = '/marca/admin'
     } else {
@@ -98,6 +103,13 @@ function LoginModal({ open, onClose }) {
 
         {(tab === 'login' || tab === 'registro') && (
           <div className="space-y-4">
+            {tab === 'registro' && (
+              <div>
+                <label className="block text-xs font-semibold mb-1.5 text-[#111]">Nombre del estudio / diseñador</label>
+                <input type="text" value={nombre} onChange={e => setNombre(e.target.value)}
+                  placeholder="Ej: Estudio Vela, Ana García…" className={inputCls} />
+              </div>
+            )}
             <div>
               <label className="block text-xs font-semibold mb-1.5 text-[#111]">Email</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
