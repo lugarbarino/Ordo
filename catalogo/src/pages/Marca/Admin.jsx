@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, LogOut, ExternalLink, X, ChevronRight, Archive } from 'lucide-react'
+import { Plus, ExternalLink, X, ChevronRight, Archive, Briefcase, Package, Link, ChevronDown } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 const FASES = ['brief', 'exploracion', 'finalista', 'manual']
@@ -65,12 +65,12 @@ function Onboarding({ user, onCreada }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center p-8">
       <div className="bg-white rounded-[24px] p-10 w-full max-w-[440px] shadow-xl">
         <img src="/logo-ordo.svg" alt="ORDO" className="h-6 w-auto mb-8" />
         <h1 className="text-2xl font-black text-[#1c1c1c] mb-2">Bienvenido a Marca</h1>
         <p className="text-sm text-[#888] mb-8 leading-relaxed">
-          ¿Cómo se llama tu estudio o tu nombre como diseñador? Esto aparece en el sistema.
+          ¿Cómo se llama tu estudio o tu nombre como diseñador?
         </p>
         <div className="space-y-4">
           <div>
@@ -214,6 +214,83 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
   )
 }
 
+// ── Empty state dashboard ────────────────────────────────────
+const PASOS_EMPTY = [
+  { label: 'Armá tu brief',           icon: Briefcase, bg: 'bg-[#35425f]', textColor: 'text-white' },
+  { label: 'Mostrá tus exploraciones', icon: Package,   bg: 'bg-[#495a82]', textColor: 'text-white' },
+  { label: 'Los finalistas',           icon: Package,   bg: 'bg-[#495a82]', textColor: 'text-white' },
+  { label: 'Manual de marca',          icon: Link,      bg: 'bg-[#aab8d8]', textColor: 'text-[#171717]' },
+]
+
+function EmptyDashboard({ onNuevo }) {
+  return (
+    <div className="flex-1 overflow-y-auto px-8 py-7">
+      <div className="max-w-[976px]">
+
+        {/* Hero */}
+        <div className="relative rounded-[12px] overflow-hidden h-[280px] mb-5 flex items-end px-14 pb-8"
+          style={{ background: 'rgba(66,82,118,0.92)' }}>
+          {/* Decorative letters */}
+          <div className="absolute inset-0 flex items-center justify-end pr-12 pointer-events-none select-none overflow-hidden">
+            <span className="text-[200px] font-black text-white/10 leading-none tracking-tighter">iDeA</span>
+          </div>
+          <div className="relative z-10 flex flex-col gap-2 max-w-[480px]">
+            <p className="text-white text-base">Compartí tu proceso</p>
+            <h2 className="text-[32px] font-bold text-white leading-tight">Crea tu primera marca</h2>
+            <p className="text-white/80 text-lg leading-snug">Compartí tu link con tus clientes y recibí feedback</p>
+            <button
+              onClick={onNuevo}
+              className="mt-3 flex items-center gap-2 bg-white text-[#2b2b36] border border-[#3872fa] px-4 py-2 rounded-[6px] text-sm font-medium cursor-pointer hover:opacity-90 transition-opacity w-fit">
+              <Plus size={16} /> Nuevo proyecto
+            </button>
+          </div>
+        </div>
+
+        {/* Primeros pasos */}
+        <div className="bg-white border border-[#e3e3e3] rounded-[8px] px-7 py-6">
+          <p className="text-sm font-bold text-[#111] mb-5">Primeros pasos</p>
+          <div className="grid grid-cols-4 gap-5">
+            {PASOS_EMPTY.map(({ label, icon: Icon, bg, textColor }) => (
+              <button key={label} onClick={onNuevo} className={`${bg} rounded-[12px] p-5 flex flex-col justify-between min-h-[191px] border-none cursor-pointer text-left hover:opacity-90 transition-opacity`}>
+                <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shrink-0">
+                  <Icon size={18} className="text-[#333]" />
+                </div>
+                <p className={`text-[22px] font-normal ${textColor} leading-snug`}>{label}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+// ── Sidebar (admin) ──────────────────────────────────────────
+function AdminSidebar({ cuenta, onLogout }) {
+  return (
+    <aside className="w-[288px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
+      <div className="px-8 h-[72px] flex items-center border-b border-[#f0f0f0]">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-[26px] w-auto" />
+      </div>
+      <div className="flex-1" />
+      <div className="px-6 py-6 border-t border-[#e3e3e3]">
+        <div className="flex items-center gap-3 pt-3">
+          <div className="w-10 h-10 rounded-full bg-[#726d76] shrink-0" />
+          <div>
+            <p className="text-[11.2px] text-[#484848]">{cuenta.nombre}</p>
+            <button
+              onClick={onLogout}
+              className="text-[11.5px] text-[#111] underline bg-transparent border-none cursor-pointer p-0 hover:opacity-70">
+              cerrar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
 // ── Panel principal ──────────────────────────────────────────
 function AdminContent({ cuenta, user }) {
   const [proyectos, setProyectos] = useState([])
@@ -221,9 +298,7 @@ function AdminContent({ cuenta, user }) {
   const [modalOpen, setModalOpen] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    cargarProyectos()
-  }, [cuenta.id])
+  useEffect(() => { cargarProyectos() }, [cuenta.id])
 
   const cargarProyectos = async () => {
     setCargando(true)
@@ -247,25 +322,49 @@ function AdminContent({ cuenta, user }) {
     window.location.href = '/marca'
   }
 
+  if (cargando) return (
+    <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
+    </div>
+  )
+
+  // ── Empty state ──────────────────────────────────────────
+  if (proyectos.length === 0) {
+    return (
+      <div className="flex min-h-screen bg-[#f8f9fa]">
+        <AdminSidebar cuenta={cuenta} onLogout={handleLogout} />
+        <EmptyDashboard onNuevo={() => setModalOpen(true)} />
+        {modalOpen && (
+          <ModalNuevoProyecto
+            cuentaId={cuenta.id}
+            onClose={() => setModalOpen(false)}
+            onCreado={p => setProyectos([p])}
+          />
+        )}
+      </div>
+    )
+  }
+
+  // ── Con proyectos ────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#f5f5f3]">
-      <header className="bg-white border-b border-[#e8e8e8] px-6 sm:px-10 py-4 flex items-center justify-between sticky top-0 z-30">
+    <div className="min-h-screen bg-[#f8f9fa]">
+      <header className="bg-white border-b border-[#e8e8e8] px-8 py-4 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-4">
           <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
           <div className="w-px h-5 bg-[#e0e0e0]" />
           <span className="text-sm font-semibold text-[#1c1c1c]">Marca</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-[#888] hidden sm:block">{cuenta.nombre}</span>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-[#888]">{cuenta.nombre}</span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 text-sm text-[#666] hover:text-[#1c1c1c] bg-transparent border-none cursor-pointer transition-colors px-2 py-1">
-            <LogOut size={15} /> Salir
+            className="text-xs text-[#999] underline bg-transparent border-none cursor-pointer p-0 hover:text-[#1c1c1c]">
+            cerrar sesión
           </button>
         </div>
       </header>
 
-      <main className="max-w-[1100px] mx-auto px-6 sm:px-10 py-10">
+      <main className="max-w-[1100px] mx-auto px-8 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-black text-[#1c1c1c]">Proyectos de marca</h1>
@@ -280,35 +379,16 @@ function AdminContent({ cuenta, user }) {
           </button>
         </div>
 
-        {cargando ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
-          </div>
-        ) : proyectos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#e8e8e8] flex items-center justify-center mb-4">
-              <Plus size={24} className="text-[#999]" />
-            </div>
-            <h2 className="text-lg font-bold text-[#1c1c1c] mb-2">No hay proyectos todavía</h2>
-            <p className="text-sm text-[#888] mb-6">Creá tu primer proyecto de marca para empezar</p>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="bg-[#1c1c1c] text-white px-6 py-3 rounded-[12px] font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity border-none">
-              Nueva marca
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {proyectos.map(p => (
-              <ProyectoCard
-                key={p.id}
-                proyecto={p}
-                onAbrir={p => navigate(`/marca/admin/${p.id}`)}
-                onArchivar={handleArchivar}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {proyectos.map(p => (
+            <ProyectoCard
+              key={p.id}
+              proyecto={p}
+              onAbrir={p => navigate(`/marca/admin/${p.id}`)}
+              onArchivar={handleArchivar}
+            />
+          ))}
+        </div>
       </main>
 
       {modalOpen && (
