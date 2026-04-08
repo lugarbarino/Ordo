@@ -300,6 +300,12 @@ function AdminContent({ cuenta, user }) {
 
   useEffect(() => { cargarProyectos() }, [cuenta.id])
 
+  useEffect(() => {
+    if (!cargando && proyectos.length > 0) {
+      navigate(`/marca/admin/${proyectos[0].id}`, { replace: true })
+    }
+  }, [cargando, proyectos.length])
+
   const cargarProyectos = async () => {
     setCargando(true)
     const { data } = await db
@@ -310,11 +316,6 @@ function AdminContent({ cuenta, user }) {
       .order('created_at', { ascending: false })
     setProyectos(data || [])
     setCargando(false)
-  }
-
-  const handleArchivar = async (proyecto) => {
-    await db.from('proyectos_marca').update({ estado: 'archivado' }).eq('id', proyecto.id)
-    setProyectos(p => p.filter(x => x.id !== proyecto.id))
   }
 
   const handleLogout = async () => {
@@ -328,74 +329,23 @@ function AdminContent({ cuenta, user }) {
     </div>
   )
 
+  // Con proyectos → el useEffect ya redirige, mostramos spinner mientras
+  if (proyectos.length > 0) return (
+    <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
+    </div>
+  )
+
   // ── Empty state ──────────────────────────────────────────
-  if (proyectos.length === 0) {
-    return (
-      <div className="flex min-h-screen bg-[#f8f9fa]">
-        <AdminSidebar cuenta={cuenta} onLogout={handleLogout} />
-        <EmptyDashboard onNuevo={() => setModalOpen(true)} />
-        {modalOpen && (
-          <ModalNuevoProyecto
-            cuentaId={cuenta.id}
-            onClose={() => setModalOpen(false)}
-            onCreado={p => navigate(`/marca/admin/${p.id}`)}
-          />
-        )}
-      </div>
-    )
-  }
-
-  // ── Con proyectos ────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
-      <header className="bg-white border-b border-[#e8e8e8] px-8 py-4 flex items-center justify-between sticky top-0 z-30">
-        <div className="flex items-center gap-4">
-          <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
-          <div className="w-px h-5 bg-[#e0e0e0]" />
-          <span className="text-sm font-semibold text-[#1c1c1c]">Marca</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-[#888]">{cuenta.nombre}</span>
-          <button
-            onClick={handleLogout}
-            className="text-xs text-[#999] underline bg-transparent border-none cursor-pointer p-0 hover:text-[#1c1c1c]">
-            cerrar sesión
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-[1100px] mx-auto px-8 py-10">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-black text-[#1c1c1c]">Proyectos de marca</h1>
-            <p className="text-sm text-[#888] mt-1">
-              {proyectos.length} proyecto{proyectos.length !== 1 ? 's' : ''} activo{proyectos.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 bg-[#1c1c1c] text-white px-5 py-3 rounded-[12px] font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity border-none">
-            <Plus size={16} /> Nueva marca
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {proyectos.map(p => (
-            <ProyectoCard
-              key={p.id}
-              proyecto={p}
-              onAbrir={p => navigate(`/marca/admin/${p.id}`)}
-              onArchivar={handleArchivar}
-            />
-          ))}
-        </div>
-      </main>
-
+    <div className="flex min-h-screen bg-[#f8f9fa]">
+      <AdminSidebar cuenta={cuenta} onLogout={handleLogout} />
+      <EmptyDashboard onNuevo={() => setModalOpen(true)} />
       {modalOpen && (
         <ModalNuevoProyecto
           cuentaId={cuenta.id}
           onClose={() => setModalOpen(false)}
-          onCreado={p => setProyectos(prev => [p, ...prev])}
+          onCreado={p => navigate(`/marca/admin/${p.id}`)}
         />
       )}
     </div>
