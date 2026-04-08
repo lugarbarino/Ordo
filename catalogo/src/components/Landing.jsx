@@ -55,7 +55,7 @@ function LoginModal({ open, onClose, onRegister }) {
     setLoading(false)
     if (error) { setError(error.message); return }
     // Redirect to admin panel after login
-    if (data?.session) window.location.href = '/admin'
+    if (data?.session) window.location.href = '/catalogo/admin'
     onClose()
   }
 

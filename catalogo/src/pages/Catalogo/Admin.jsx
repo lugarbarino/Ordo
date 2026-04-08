@@ -1,0 +1,93 @@
+import { useState, useEffect } from 'react'
+import { db } from '../../lib/supabase'
+import { useAppStore } from '../../store/useAppStore'
+import { useProductosStore } from '../../store/useProductosStore'
+import { usePedidosStore } from '../../store/usePedidosStore'
+import { Layout } from '../../components/admin/layout/Layout'
+import { Onboarding as AdminOnboarding } from '../../components/admin/Onboarding'
+import { DashboardPanel } from '../../components/admin/panels/DashboardPanel'
+import { ProductosPanel } from '../../components/admin/panels/ProductosPanel'
+import { PedidosPanel } from '../../components/admin/panels/PedidosPanel'
+import { ConfigPanel } from '../../components/admin/panels/ConfigPanel'
+import { PdfPanel } from '../../components/admin/panels/PdfPanel'
+import { CuentaPanel } from '../../components/admin/panels/CuentaPanel'
+import { DesignPanel } from '../../components/admin/panels/DesignPanel'
+
+function PanelContent({ panel }) {
+  switch (panel) {
+    case 'dashboard': return <DashboardPanel />
+    case 'productos': return <ProductosPanel />
+    case 'pedidos': return <PedidosPanel />
+    case 'config': return <ConfigPanel />
+    case 'pdf': return <PdfPanel />
+    case 'cuenta': return <CuentaPanel />
+    case 'design': return <DesignPanel />
+    default: return <DashboardPanel />
+  }
+}
+
+function AdminApp() {
+  const { user, empresa, panel, setUser, cargarEmpresa } = useAppStore()
+  const cargarProductos = useProductosStore(s => s.cargar)
+  const cargarPedidos = usePedidosStore(s => s.cargar)
+  const [cargando, setCargando] = useState(true)
+
+  useEffect(() => {
+    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+      const u = session?.user || null
+      setUser(u)
+      if (u) {
+        const emp = await cargarEmpresa()
+        if (emp) {
+          cargarProductos(emp.id)
+          cargarPedidos(emp.id)
+        }
+      }
+      setCargando(false)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (empresa) {
+      cargarProductos(empresa.id)
+      cargarPedidos(empresa.id)
+    }
+  }, [empresa?.id])
+
+  if (cargando) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="w-10 h-10 rounded-full border-4 border-[#e3e3e3] border-t-[#111] animate-spin" />
+    </div>
+  )
+
+  if (user === null) return null
+  if (!empresa) return <AdminOnboarding initialStep={2} />
+
+  return (
+    <Layout>
+      <PanelContent panel={panel} />
+    </Layout>
+  )
+}
+
+export default function CatalogoAdmin() {
+  const [authChecked, setAuthChecked] = useState(false)
+  const [initialUser, setInitialUser] = useState(undefined)
+
+  useEffect(() => {
+    db.auth.getSession().then(({ data: { session } }) => {
+      setInitialUser(session?.user || null)
+      setAuthChecked(true)
+    })
+  }, [])
+
+  if (!authChecked) return null
+
+  if (initialUser === null) {
+    window.location.href = '/catalogo'
+    return null
+  }
+
+  return <AdminApp />
+}

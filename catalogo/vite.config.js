@@ -4,5 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { historyApiFallback: true },
+  server: {
+    port: parseInt(process.env.PORT || '3000'),
+    historyApiFallback: true,
+  },
 })
