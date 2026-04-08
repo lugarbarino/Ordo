@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, LogOut, ExternalLink, X, ChevronRight, Archive } from 'lucide-react'
 import { db } from '../../lib/supabase'
-import { useAppStore } from '../../store/useAppStore'
 
 const FASES = ['brief', 'exploracion', 'finalista', 'manual']
 
@@ -15,25 +14,11 @@ const FASE_LABEL = {
 }
 
 const FASE_COLOR = {
-  brief: { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-400' },
-  exploracion: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-400' },
-  finalista: { bg: 'bg-purple-50', text: 'text-purple-700', dot: 'bg-purple-400' },
-  manual: { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-400' },
-  completado: { bg: 'bg-[#f0f0f0]', text: 'text-[#888]', dot: 'bg-[#ccc]' },
-}
-
-function ProgressBar({ estado }) {
-  const idx = FASES.indexOf(estado)
-  return (
-    <div className="flex gap-1 mt-3">
-      {FASES.map((f, i) => (
-        <div key={f} className="flex-1 h-1 rounded-full overflow-hidden bg-[#e8e8e8]">
-          <div className={`h-full rounded-full transition-all ${i <= idx ? 'bg-[#1c1c1c]' : ''}`}
-            style={{ width: i <= idx ? '100%' : '0%' }} />
-        </div>
-      ))}
-    </div>
-  )
+  brief:      { bg: 'bg-amber-50',  text: 'text-amber-700',  dot: 'bg-amber-400' },
+  exploracion:{ bg: 'bg-blue-50',   text: 'text-blue-700',   dot: 'bg-blue-400' },
+  finalista:  { bg: 'bg-purple-50', text: 'text-purple-700', dot: 'bg-purple-400' },
+  manual:     { bg: 'bg-green-50',  text: 'text-green-700',  dot: 'bg-green-400' },
+  completado: { bg: 'bg-[#f0f0f0]', text: 'text-[#888]',     dot: 'bg-[#ccc]' },
 }
 
 function Badge({ estado }) {
@@ -46,7 +31,75 @@ function Badge({ estado }) {
   )
 }
 
-function ModalNuevoProyecto({ empresaId, onClose, onCreado }) {
+function ProgressBar({ estado }) {
+  const idx = FASES.indexOf(estado)
+  return (
+    <div className="flex gap-1 mt-3">
+      {FASES.map((f, i) => (
+        <div key={f} className="flex-1 h-1 rounded-full bg-[#e8e8e8]">
+          <div className={`h-full rounded-full ${i <= idx ? 'bg-[#1c1c1c]' : ''}`}
+            style={{ width: i <= idx ? '100%' : '0%' }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Onboarding ───────────────────────────────────────────────
+function Onboarding({ user, onCreada }) {
+  const [nombre, setNombre] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleCrear = async () => {
+    if (!nombre.trim()) { setError('El nombre es obligatorio'); return }
+    setLoading(true)
+    const { data, error: err } = await db
+      .from('cuentas_marca')
+      .insert({ user_id: user.id, nombre: nombre.trim() })
+      .select()
+      .single()
+    setLoading(false)
+    if (err) { setError(err.message); return }
+    onCreada(data)
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f5f5f3] flex items-center justify-center p-8">
+      <div className="bg-white rounded-[24px] p-10 w-full max-w-[440px] shadow-xl">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-6 w-auto mb-8" />
+        <h1 className="text-2xl font-black text-[#1c1c1c] mb-2">Bienvenido a Marca</h1>
+        <p className="text-sm text-[#888] mb-8 leading-relaxed">
+          ¿Cómo se llama tu estudio o tu nombre como diseñador? Esto aparece en el sistema.
+        </p>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold mb-1.5 text-[#111]">Nombre del estudio / diseñador</label>
+            <input
+              autoFocus
+              type="text"
+              value={nombre}
+              onChange={e => { setNombre(e.target.value); setError('') }}
+              onKeyDown={e => e.key === 'Enter' && handleCrear()}
+              placeholder="Ej: Estudio Vela, Ana García…"
+              className="w-full px-3.5 py-2.5 border border-[#dde3ed] rounded-lg text-sm outline-none focus:border-[#1c1c1c] transition-colors"
+            />
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+          </div>
+          <button
+            onClick={handleCrear}
+            disabled={loading}
+            className="w-full py-3 bg-[#1c1c1c] text-white rounded-lg font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 border-none">
+            {loading ? 'Creando…' : 'Empezar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Modal nuevo proyecto ─────────────────────────────────────
+function ModalNuevoProyecto({ cuentaId, onClose, onCreado }) {
   const [nombre, setNombre] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -62,7 +115,7 @@ function ModalNuevoProyecto({ empresaId, onClose, onCreado }) {
 
     const { data, error: err } = await db
       .from('proyectos_marca')
-      .insert({ empresa_id: empresaId, nombre: nombre.trim(), estado: 'brief', slug })
+      .insert({ cuenta_id: cuentaId, nombre: nombre.trim(), estado: 'brief', slug })
       .select()
       .single()
 
@@ -82,22 +135,20 @@ function ModalNuevoProyecto({ empresaId, onClose, onCreado }) {
             <X size={18} />
           </button>
         </div>
-
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold mb-1.5 text-[#111]">Nombre del proyecto / cliente</label>
+            <label className="block text-xs font-semibold mb-1.5 text-[#111]">Nombre de la empresa cliente</label>
             <input
               autoFocus
               type="text"
               value={nombre}
               onChange={e => { setNombre(e.target.value); setError('') }}
               onKeyDown={e => e.key === 'Enter' && handleCrear()}
-              placeholder="Ej: Café Mamá, Estudio Vela…"
+              placeholder="Ej: Café Mamá, Clínica Sur…"
               className="w-full px-3.5 py-2.5 border border-[#dde3ed] rounded-lg text-sm outline-none focus:border-[#1c1c1c] transition-colors"
             />
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
-
           <button
             onClick={handleCrear}
             disabled={loading}
@@ -110,9 +161,9 @@ function ModalNuevoProyecto({ empresaId, onClose, onCreado }) {
   )
 }
 
+// ── Card de proyecto ─────────────────────────────────────────
 function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
   const [menu, setMenu] = useState(false)
-  const faseIdx = FASES.indexOf(proyecto.estado)
 
   return (
     <div className="bg-white rounded-[18px] p-6 border border-[#e8e8e8] hover:border-[#ccc] hover:shadow-lg transition-all group relative">
@@ -121,11 +172,11 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
         <div className="relative">
           <button
             onClick={() => setMenu(v => !v)}
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#ccc] hover:text-[#666] hover:bg-[#f5f5f5] bg-transparent border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-[#ccc] hover:text-[#666] hover:bg-[#f5f5f5] bg-transparent border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity text-base leading-none">
             ···
           </button>
           {menu && (
-            <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-[#e8e8e8] py-1.5 w-44 z-10"
+            <div className="absolute right-0 top-8 bg-white rounded-xl shadow-xl border border-[#e8e8e8] py-1.5 w-40 z-10"
               onMouseLeave={() => setMenu(false)}>
               <button
                 onClick={() => { onArchivar(proyecto); setMenu(false) }}
@@ -138,10 +189,9 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
       </div>
 
       <h3 className="text-lg font-black text-[#1c1c1c] mb-1 leading-tight">{proyecto.nombre}</h3>
-
-      <div className="flex gap-3 text-xs text-[#aaa] mb-4">
-        <span>{new Date(proyecto.created_at || Date.now()).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-      </div>
+      <p className="text-xs text-[#aaa] mb-4">
+        {new Date(proyecto.created_at || Date.now()).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}
+      </p>
 
       <ProgressBar estado={proyecto.estado} />
 
@@ -155,6 +205,7 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
           href={`/marca/${proyecto.slug || proyecto.id}`}
           target="_blank"
           rel="noreferrer"
+          title="Ver página del cliente"
           className="w-10 h-10 flex items-center justify-center border border-[#e8e8e8] rounded-lg text-[#666] hover:bg-[#f5f5f5] transition-colors no-underline">
           <ExternalLink size={15} />
         </a>
@@ -163,7 +214,8 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
   )
 }
 
-function AdminContent({ empresa }) {
+// ── Panel principal ──────────────────────────────────────────
+function AdminContent({ cuenta, user }) {
   const [proyectos, setProyectos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
@@ -171,31 +223,23 @@ function AdminContent({ empresa }) {
 
   useEffect(() => {
     cargarProyectos()
-  }, [empresa.id])
+  }, [cuenta.id])
 
   const cargarProyectos = async () => {
     setCargando(true)
     const { data } = await db
       .from('proyectos_marca')
       .select('*')
-      .eq('empresa_id', empresa.id)
+      .eq('cuenta_id', cuenta.id)
       .neq('estado', 'archivado')
       .order('created_at', { ascending: false })
     setProyectos(data || [])
     setCargando(false)
   }
 
-  const handleCreado = (nuevo) => {
-    setProyectos(p => [nuevo, ...p])
-  }
-
   const handleArchivar = async (proyecto) => {
     await db.from('proyectos_marca').update({ estado: 'archivado' }).eq('id', proyecto.id)
     setProyectos(p => p.filter(x => x.id !== proyecto.id))
-  }
-
-  const handleAbrir = (proyecto) => {
-    navigate(`/marca/admin/${proyecto.id}`)
   }
 
   const handleLogout = async () => {
@@ -205,7 +249,6 @@ function AdminContent({ empresa }) {
 
   return (
     <div className="min-h-screen bg-[#f5f5f3]">
-      {/* Header */}
       <header className="bg-white border-b border-[#e8e8e8] px-6 sm:px-10 py-4 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-4">
           <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
@@ -213,7 +256,7 @@ function AdminContent({ empresa }) {
           <span className="text-sm font-semibold text-[#1c1c1c]">Marca</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-[#888] hidden sm:block">{empresa.nombre}</span>
+          <span className="text-sm text-[#888] hidden sm:block">{cuenta.nombre}</span>
           <button
             onClick={handleLogout}
             className="flex items-center gap-1.5 text-sm text-[#666] hover:text-[#1c1c1c] bg-transparent border-none cursor-pointer transition-colors px-2 py-1">
@@ -222,12 +265,13 @@ function AdminContent({ empresa }) {
         </div>
       </header>
 
-      {/* Main */}
       <main className="max-w-[1100px] mx-auto px-6 sm:px-10 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-black text-[#1c1c1c]">Proyectos de marca</h1>
-            <p className="text-sm text-[#888] mt-1">{proyectos.length} proyecto{proyectos.length !== 1 ? 's' : ''} activo{proyectos.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-[#888] mt-1">
+              {proyectos.length} proyecto{proyectos.length !== 1 ? 's' : ''} activo{proyectos.length !== 1 ? 's' : ''}
+            </p>
           </div>
           <button
             onClick={() => setModalOpen(true)}
@@ -259,7 +303,7 @@ function AdminContent({ empresa }) {
               <ProyectoCard
                 key={p.id}
                 proyecto={p}
-                onAbrir={handleAbrir}
+                onAbrir={p => navigate(`/marca/admin/${p.id}`)}
                 onArchivar={handleArchivar}
               />
             ))}
@@ -269,65 +313,49 @@ function AdminContent({ empresa }) {
 
       {modalOpen && (
         <ModalNuevoProyecto
-          empresaId={empresa.id}
+          cuentaId={cuenta.id}
           onClose={() => setModalOpen(false)}
-          onCreado={handleCreado}
+          onCreado={p => setProyectos(prev => [p, ...prev])}
         />
       )}
     </div>
   )
 }
 
-function AdminApp() {
-  const { user, empresa, setUser, cargarEmpresa } = useAppStore()
-  const [cargando, setCargando] = useState(true)
-
-  useEffect(() => {
-    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
-      const u = session?.user || null
-      setUser(u)
-      if (u) await cargarEmpresa()
-      setCargando(false)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
-
-  if (cargando) return (
-    <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="w-10 h-10 rounded-full border-4 border-[#e3e3e3] border-t-[#111] animate-spin" />
-    </div>
-  )
-
-  if (!empresa) return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-8 text-center">
-      <div>
-        <h2 className="text-lg font-bold mb-2">Necesitás tener un catálogo configurado</h2>
-        <p className="text-sm text-[#888] mb-4">El módulo de Marca usa la misma cuenta que el Catálogo.</p>
-        <a href="/catalogo" className="text-[#1c1c1c] font-semibold underline text-sm">Ir a Catálogo</a>
-      </div>
-    </div>
-  )
-
-  return <AdminContent empresa={empresa} />
-}
-
+// ── Auth wrapper ─────────────────────────────────────────────
 export default function MarcaAdmin() {
-  const [authChecked, setAuthChecked] = useState(false)
-  const [initialUser, setInitialUser] = useState(undefined)
+  const [state, setState] = useState({ checked: false, user: null, cuenta: null })
 
   useEffect(() => {
-    db.auth.getSession().then(({ data: { session } }) => {
-      setInitialUser(session?.user || null)
-      setAuthChecked(true)
+    db.auth.getSession().then(async ({ data: { session } }) => {
+      const user = session?.user || null
+      if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
+
+      const { data: cuenta } = await db
+        .from('cuentas_marca')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      setState({ checked: true, user, cuenta: cuenta || null })
     })
   }, [])
 
-  if (!authChecked) return null
+  if (!state.checked) return null
 
-  if (initialUser === null) {
+  if (!state.user) {
     window.location.href = '/marca'
     return null
   }
 
-  return <AdminApp />
+  if (!state.cuenta) {
+    return (
+      <Onboarding
+        user={state.user}
+        onCreada={cuenta => setState(s => ({ ...s, cuenta }))}
+      />
+    )
+  }
+
+  return <AdminContent cuenta={state.cuenta} user={state.user} />
 }
