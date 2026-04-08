@@ -56,6 +56,18 @@ function LoginModal({ open, onClose }) {
     onClose()
   }
 
+  const handleRegistro = async () => {
+    setError(''); setLoading(true)
+    const { data, error } = await db.auth.signUp({ email, password: pass })
+    setLoading(false)
+    if (error) { setError(error.message); return }
+    if (data?.session) {
+      window.location.href = '/marca/admin'
+    } else {
+      setSuccess('¡Cuenta creada! Revisá tu correo para confirmar.')
+    }
+  }
+
   const handleMagic = async () => {
     setError(''); setLoading(true)
     const { error } = await db.auth.signInWithOtp({ email })
@@ -74,8 +86,8 @@ function LoginModal({ open, onClose }) {
 
         {tab !== 'magic' && (
           <div className="flex mb-6 border-b-2 border-[#dde3ed]">
-            {[['login', 'Iniciar sesión']].map(([t, label]) => (
-              <button key={t} onClick={() => { setTab(t); setError('') }}
+            {[['login', 'Iniciar sesión'], ['registro', 'Crear cuenta']].map(([t, label]) => (
+              <button key={t} onClick={() => { setTab(t); setError(''); setSuccess('') }}
                 className={`flex-1 py-2.5 text-sm font-semibold border-none cursor-pointer transition-colors bg-transparent
                   ${tab === t ? 'text-[#1c1c1c] border-b-[3px] border-[#1c1c1c] -mb-0.5' : 'text-[#6b7a90]'}`}>
                 {label}
@@ -84,7 +96,7 @@ function LoginModal({ open, onClose }) {
           </div>
         )}
 
-        {tab === 'login' && (
+        {(tab === 'login' || tab === 'registro') && (
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold mb-1.5 text-[#111]">Email</label>
@@ -95,7 +107,7 @@ function LoginModal({ open, onClose }) {
               <label className="block text-xs font-semibold mb-1.5 text-[#111]">Contraseña</label>
               <div className="relative">
                 <input type={showPass ? 'text' : 'password'} value={pass} onChange={e => setPass(e.target.value)}
-                  placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                  placeholder="••••••••" onKeyDown={e => e.key === 'Enter' && (tab === 'login' ? handleLogin() : handleRegistro())}
                   className={inputCls + ' pr-10'} />
                 <button type="button" onClick={() => setShowPass(v => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#aaa] hover:text-[#555] transition-colors bg-transparent border-none cursor-pointer p-0">
@@ -104,17 +116,22 @@ function LoginModal({ open, onClose }) {
               </div>
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
-            <button onClick={handleLogin} disabled={loading}
+            {success && <p className="text-green-600 text-xs">{success}</p>}
+            <button onClick={tab === 'login' ? handleLogin : handleRegistro} disabled={loading}
               className="w-full py-3 bg-[#1c1c1c] text-white rounded-lg font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 border-none">
-              {loading ? 'Ingresando…' : 'Iniciar sesión'}
+              {loading ? '…' : tab === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
             </button>
-            <div className="flex items-center gap-2 text-[#aaa] text-xs">
-              <div className="flex-1 h-px bg-[#e0e0e0]" />o<div className="flex-1 h-px bg-[#e0e0e0]" />
-            </div>
-            <button onClick={() => { setTab('magic'); setError('') }}
-              className="w-full py-2.5 border border-[#dde3ed] rounded-lg text-sm font-semibold bg-white text-[#111] cursor-pointer hover:bg-[#f4f4f4] transition-colors border-solid">
-              Acceder sin contraseña
-            </button>
+            {tab === 'login' && (
+              <>
+                <div className="flex items-center gap-2 text-[#aaa] text-xs">
+                  <div className="flex-1 h-px bg-[#e0e0e0]" />o<div className="flex-1 h-px bg-[#e0e0e0]" />
+                </div>
+                <button onClick={() => { setTab('magic'); setError('') }}
+                  className="w-full py-2.5 border border-[#dde3ed] rounded-lg text-sm font-semibold bg-white text-[#111] cursor-pointer hover:bg-[#f4f4f4] transition-colors border-solid">
+                  Acceder sin contraseña
+                </button>
+              </>
+            )}
           </div>
         )}
 
