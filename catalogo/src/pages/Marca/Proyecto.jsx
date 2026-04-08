@@ -1,14 +1,132 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link } from 'lucide-react'
+import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X } from 'lucide-react'
 import { db } from '../../lib/supabase'
+
+const PREGUNTAS_DEFAULT = [
+  '¿A qué se dedica la empresa?',
+  '¿Quién es el cliente ideal?',
+  '¿Cuáles son los valores de la marca?',
+  '¿Qué personalidad tiene la marca? (ej: seria, divertida, joven, clásica…)',
+  '¿Qué marcas admira o usa como referencia?',
+]
 
 // ── Panels ───────────────────────────────────────────────────
 function PanelBrief({ proyecto }) {
+  const [preguntas, setPreguntas] = useState([])
+  const [respuestas, setRespuestas] = useState({})
+  const [editando, setEditando] = useState(null) // id de la pregunta en edición
+  const [textoEdit, setTextoEdit] = useState('')
+  const [cargando, setCargando] = useState(true)
+  const inputRef = useRef(null)
+
+  useEffect(() => { cargar() }, [proyecto.id])
+  useEffect(() => { if (editando && inputRef.current) inputRef.current.focus() }, [editando])
+
+  const cargar = async () => {
+    setCargando(true)
+    let { data: preg } = await db
+      .from('brief_preguntas')
+      .select('*')
+      .eq('proyecto_id', proyecto.id)
+      .order('orden')
+
+    if (!preg || preg.length === 0) {
+      const inserts = PREGUNTAS_DEFAULT.map((texto, i) => ({
+        proyecto_id: proyecto.id, texto, orden: i,
+      }))
+      const { data: nuevas } = await db.from('brief_preguntas').insert(inserts).select()
+      preg = nuevas || []
+    }
+
+    const { data: resp } = await db
+      .from('brief_respuestas')
+      .select('*')
+      .eq('proyecto_id', proyecto.id)
+
+    const respMap = {}
+    resp?.forEach(r => { respMap[r.pregunta_id] = r.respuesta })
+
+    setPreguntas(preg)
+    setRespuestas(respMap)
+    setCargando(false)
+  }
+
+  const iniciarEdit = (p) => {
+    setEditando(p.id)
+    setTextoEdit(p.texto)
+  }
+
+  const guardarEdit = async () => {
+    if (!textoEdit.trim()) return
+    await db.from('brief_preguntas').update({ texto: textoEdit.trim() }).eq('id', editando)
+    setPreguntas(prev => prev.map(p => p.id === editando ? { ...p, texto: textoEdit.trim() } : p))
+    setEditando(null)
+  }
+
+  const cancelarEdit = () => setEditando(null)
+
+  if (cargando) return (
+    <div className="p-8 flex items-center justify-center py-20">
+      <div className="w-6 h-6 rounded-full border-2 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
+    </div>
+  )
+
   return (
-    <div className="p-8">
-      <h2 className="text-xl font-black text-[#1c1c1c] mb-2">Brief</h2>
-      <p className="text-sm text-[#888]">Próximamente — gestión del brief del cliente.</p>
+    <div className="p-8 max-w-[760px]">
+      <div className="mb-8">
+        <h2 className="text-2xl font-black text-[#1c1c1c] mb-1">Brief</h2>
+        <p className="text-sm text-[#888]">Estas preguntas se muestran al cliente para que complete el brief. Podés editar cualquiera.</p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        {preguntas.map((p, i) => (
+          <div key={p.id} className="bg-white rounded-[16px] border border-[#e8e8e8] p-5 group">
+            <div className="flex items-start gap-3">
+              <span className="text-xs font-bold text-[#bbb] mt-0.5 w-5 shrink-0">{i + 1}</span>
+
+              <div className="flex-1 min-w-0">
+                {editando === p.id ? (
+                  <div className="flex items-start gap-2">
+                    <textarea
+                      ref={inputRef}
+                      value={textoEdit}
+                      onChange={e => setTextoEdit(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); guardarEdit() } if (e.key === 'Escape') cancelarEdit() }}
+                      className="flex-1 text-sm text-[#1c1c1c] border border-[#1c1c1c] rounded-[8px] px-3 py-2 resize-none outline-none leading-relaxed"
+                      rows={2}
+                    />
+                    <div className="flex flex-col gap-1">
+                      <button onClick={guardarEdit} className="w-7 h-7 flex items-center justify-center bg-[#1c1c1c] text-white rounded-[6px] cursor-pointer border-none hover:opacity-80">
+                        <Check size={13} />
+                      </button>
+                      <button onClick={cancelarEdit} className="w-7 h-7 flex items-center justify-center bg-[#f0f0f0] text-[#666] rounded-[6px] cursor-pointer border-none hover:bg-[#e8e8e8]">
+                        <X size={13} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-[#1c1c1c] leading-relaxed">{p.texto}</p>
+                    <button
+                      onClick={() => iniciarEdit(p)}
+                      className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center text-[#aaa] hover:text-[#1c1c1c] hover:bg-[#f0f0f0] rounded-[6px] cursor-pointer border-none bg-transparent transition-all shrink-0">
+                      <Pencil size={13} />
+                    </button>
+                  </div>
+                )}
+
+                {respuestas[p.id] && editando !== p.id && (
+                  <div className="mt-3 pt-3 border-t border-[#f0f0f0]">
+                    <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest mb-1">Respuesta del cliente</p>
+                    <p className="text-sm text-[#555] leading-relaxed">{respuestas[p.id]}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
