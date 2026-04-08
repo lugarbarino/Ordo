@@ -256,18 +256,18 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
   const [selectorOpen, setSelectorOpen] = useState(false)
 
   return (
-    <aside className="w-[240px] shrink-0 bg-white border-r border-[#e8e8e8] flex flex-col h-screen sticky top-0">
+    <aside className="w-[288px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-[#f0f0f0]">
-        <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
+      <div className="px-8 h-[72px] flex items-center border-b border-[#f1f1f1]">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-[26px] w-auto" />
       </div>
 
       {/* Proyecto selector */}
-      <div className="px-3 py-3 border-b border-[#f0f0f0] relative">
+      <div className="px-4 py-3 border-b border-[#f1f1f1] relative">
         <button
           onClick={() => setSelectorOpen(v => !v)}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] hover:bg-[#f5f5f5] transition-colors bg-transparent border-none cursor-pointer text-left">
-          <div className="w-8 h-8 rounded-full bg-[#2d3561] text-white flex items-center justify-center text-xs font-bold shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#726d76] text-white flex items-center justify-center text-xs font-bold shrink-0">
             {proyecto.nombre?.[0]?.toUpperCase() || 'M'}
           </div>
           <span className="text-sm font-semibold text-[#1c1c1c] truncate flex-1">{proyecto.nombre}</span>
@@ -275,7 +275,7 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
         </button>
 
         {selectorOpen && (
-          <div className="absolute left-3 right-3 top-[52px] bg-white rounded-[12px] shadow-xl border border-[#e8e8e8] py-1.5 z-50">
+          <div className="absolute left-4 right-4 top-[58px] bg-white rounded-[12px] shadow-xl border border-[#e8e8e8] py-1.5 z-50">
             {proyectos.map(p => (
               <button
                 key={p.id}
@@ -290,7 +290,7 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4">
+      <nav className="flex-1 px-4 py-4">
         <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-2.5 mb-2">Links</p>
         {NAV.map(({ key, label, icon: Icon }) => (
           <button
@@ -308,15 +308,17 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
       </nav>
 
       {/* User + logout */}
-      <div className="px-4 py-4 border-t border-[#f0f0f0] flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-[#e0e0e0] shrink-0" />
-        <div className="min-w-0">
-          <div className="text-xs text-[#555] font-medium truncate">{cuenta.nombre}</div>
-          <button
-            onClick={onLogout}
-            className="text-xs text-[#999] underline bg-transparent border-none cursor-pointer p-0 hover:text-[#1c1c1c] transition-colors">
-            cerrar sesión
-          </button>
+      <div className="px-6 py-6 border-t border-[#e3e3e3]">
+        <div className="flex items-center gap-3 pt-3">
+          <div className="w-10 h-10 rounded-full bg-[#726d76] shrink-0" />
+          <div className="min-w-0">
+            <p className="text-[11.2px] text-[#484848] truncate">{cuenta.nombre}</p>
+            <button
+              onClick={onLogout}
+              className="text-[11.5px] text-[#111] underline bg-transparent border-none cursor-pointer p-0 hover:opacity-70">
+              cerrar sesión
+            </button>
+          </div>
         </div>
       </div>
     </aside>
