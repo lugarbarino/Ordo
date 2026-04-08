@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { LayoutGrid, Pen } from 'lucide-react'
+import { LayoutGrid, Brush } from 'lucide-react'
 
 const OPCIONES = [
   {
@@ -13,7 +13,7 @@ const OPCIONES = [
     key: 'marca',
     label: 'Marca',
     desc: 'Gestioná la identidad tus clientes y compartiels cada paso',
-    icon: Pen,
+    icon: Brush,
     path: '/marca',
   },
 ]
@@ -22,32 +22,34 @@ export default function Home() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-[#f0f0ee] flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-[#efefef] flex flex-col">
 
       {/* Nav */}
-      <nav className="px-8 py-6">
+      <nav className="px-10 py-7">
         <img src="/logo-ordo.svg" alt="ORDO" className="h-6 w-auto" />
       </nav>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col px-8 pt-8 pb-16">
-        <div className="mb-10">
-          <h1 className="text-[52px] font-black text-[#1c1c1c] leading-[1.05] tracking-tight mb-3">
-            ¿Qué necesitas<br />hacer hoy?
+      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-20">
+        <div className="w-full max-w-[900px] text-center mb-12">
+          <h1 className="text-[clamp(48px,8vw,96px)] font-medium text-[#111] leading-[1.1] mb-4">
+            ¿Qué necesitas hacer hoy?
           </h1>
-          <p className="text-[#888] text-base">Elegí una herramienta para arrancar.</p>
+          <p className="text-[clamp(16px,2vw,24px)] text-[#60606f]">
+            Elegí una herramienta para arrancar.
+          </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 max-w-[860px]">
+        <div className="flex flex-col sm:flex-row gap-5 w-full max-w-[900px]">
           {OPCIONES.map(({ key, label, desc, icon: Icon, path }) => (
             <button
               key={key}
               onClick={() => navigate(path)}
-              className="flex-1 bg-white rounded-[20px] p-10 cursor-pointer border-none text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col items-center gap-3"
+              className="flex-1 bg-white rounded-[22px] py-16 px-10 cursor-pointer border-none text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col items-center gap-4"
             >
-              <Icon size={28} strokeWidth={1.8} className="text-[#295e4f]" />
-              <div className="text-xl font-black text-[#1c1c1c]">{label}</div>
-              <div className="text-sm text-[#888] leading-relaxed max-w-[200px]">{desc}</div>
+              <Icon size={40} strokeWidth={1.5} className="text-[#111]" />
+              <div className="text-[clamp(28px,3.5vw,48px)] font-medium text-[#111] capitalize">{label}</div>
+              <div className="text-[clamp(14px,1.5vw,20px)] text-[#60606f] leading-[1.45] max-w-[280px]">{desc}</div>
             </button>
           ))}
         </div>
