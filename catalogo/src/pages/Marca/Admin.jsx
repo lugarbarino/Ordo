@@ -338,7 +338,7 @@ function AdminContent({ cuenta, user }) {
           <ModalNuevoProyecto
             cuentaId={cuenta.id}
             onClose={() => setModalOpen(false)}
-            onCreado={p => setProyectos([p])}
+            onCreado={p => navigate(`/marca/admin/${p.id}`)}
           />
         )}
       </div>
