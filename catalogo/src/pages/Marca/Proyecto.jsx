@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu } from 'lucide-react'
+import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu, LayoutDashboard } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 const PREGUNTAS_DEFAULT = [
@@ -301,10 +301,11 @@ function Dashboard({ proyecto, stats, onPanel }) {
 
 // ── Nav items ────────────────────────────────────────────────
 const NAV = [
-  { key: 'brief',       label: 'Brief',      icon: FileText },
-  { key: 'exploracion', label: 'Exploración', icon: Palette },
-  { key: 'finalista',   label: 'Finalistas',  icon: Star },
-  { key: 'manual',      label: 'Manual',      icon: BookOpen },
+  { key: 'dashboard',   label: 'Dashboard',   icon: LayoutDashboard },
+  { key: 'brief',       label: 'Brief',        icon: FileText },
+  { key: 'exploracion', label: 'Exploración',  icon: Palette },
+  { key: 'finalista',   label: 'Finalistas',   icon: Star },
+  { key: 'manual',      label: 'Manual',       icon: BookOpen },
 ]
 
 // ── Sidebar ──────────────────────────────────────────────────
