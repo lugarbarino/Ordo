@@ -362,27 +362,29 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-4 py-4 flex flex-col gap-4">
+      <nav className="flex-1 py-4 flex flex-col gap-4">
         <div>
           {NAV_TOP.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => onPanel(key)}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium cursor-pointer border-none transition-colors text-left
-                ${panel === key ? 'bg-[#f0f0f0] text-[#1c1c1c] font-semibold' : 'bg-transparent text-[#666] hover:bg-[#f5f5f5] hover:text-[#1c1c1c]'}`}>
+              className={`relative w-full flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium cursor-pointer border-none transition-colors text-left bg-transparent
+                ${panel === key ? 'text-[#111] font-semibold' : 'text-[#666] hover:text-[#111]'}`}>
+              {panel === key && <span className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-[#111] rounded-r-[4px]" />}
               <Icon size={15} className="shrink-0" />
               {label}
             </button>
           ))}
         </div>
         <div>
-          <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-2.5 mb-2">Links</p>
+          <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-5 mb-2">Links</p>
           {NAV_LINKS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => onPanel(key)}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium mb-0.5 cursor-pointer border-none transition-colors text-left
-                ${panel === key ? 'bg-[#f0f0f0] text-[#1c1c1c] font-semibold' : 'bg-transparent text-[#666] hover:bg-[#f5f5f5] hover:text-[#1c1c1c]'}`}>
+              className={`relative w-full flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium cursor-pointer border-none transition-colors text-left bg-transparent
+                ${panel === key ? 'text-[#111] font-semibold' : 'text-[#666] hover:text-[#111]'}`}>
+              {panel === key && <span className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-[#111] rounded-r-[4px]" />}
               <Icon size={15} className="shrink-0" />
               {label}
             </button>
