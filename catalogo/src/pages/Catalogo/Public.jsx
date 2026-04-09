@@ -201,43 +201,43 @@ function ModalCarrito({ carrito, empresa, onClose, onCambiarCantidad, onQuitar, 
   )
 }
 
-function ProductCard({ producto: p, brandColor, brandLight, enCarrito, onFoto, onAgregar }) {
+function ProductCard({ producto: p, enCarrito, onFoto, onAgregar }) {
   const precio = formatPrecio(p.precio)
 
   return (
-    <div className="bg-white rounded-xl border border-[#dde3ed] overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(0,0,0,.10)]">
-      <div className="w-full h-[185px] bg-white flex items-center justify-center overflow-hidden relative border-b border-[#eef1f6] cursor-zoom-in max-sm:h-[130px]"
-        onClick={p.imagen_url ? onFoto : undefined}>
+    <div className="bg-white rounded-xl border border-[#e8ecf2] overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(0,0,0,.08)]">
+
+      {/* Imagen */}
+      <div
+        className="w-full h-[160px] bg-[#f8f9fb] flex items-center justify-center overflow-hidden relative max-sm:h-[120px]"
+        onClick={p.imagen_url ? onFoto : undefined}
+        style={{ cursor: p.imagen_url ? 'zoom-in' : 'default' }}>
         {p.imagen_url
-          ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-3.5" />
-          : <Image size={32} className="text-[#d8dee6]" />
+          ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-4" />
+          : <Image size={28} className="text-[#d0d5de]" />
         }
       </div>
 
-      <div className="p-4 flex flex-col flex-1 max-sm:px-2.5 max-sm:py-2.5">
+      {/* Contenido */}
+      <div className="p-4 flex flex-col flex-1 gap-1.5">
         {p.categoria && (
-          <span className="self-start text-[.62rem] font-bold px-2.5 py-0.5 rounded-[20px] uppercase tracking-[.6px] mb-2"
-            style={{ background: brandLight, color: brandColor }}>
-            {p.categoria}
-          </span>
+          <p className="text-[.68rem] font-semibold text-[var(--brand)] uppercase tracking-wider truncate">{p.categoria}</p>
         )}
-        <div className="text-[.88rem] font-bold uppercase leading-snug mb-1.5 max-sm:text-[.8rem]">{p.nombre}</div>
+        <p className="text-[.86rem] font-bold text-[#1e2a3a] leading-snug">{p.nombre}</p>
         {p.descripcion && (
-          <div className="text-[.81rem] text-[#6b7a90] leading-relaxed flex-1 mb-3.5 max-sm:text-[.75rem] max-sm:mb-2">{p.descripcion}</div>
+          <p className="text-[.78rem] text-[#7a8799] leading-relaxed flex-1 line-clamp-2">{p.descripcion}</p>
         )}
         {precio && (
-          <div className="text-[.86rem] font-bold mb-3" style={{ color: brandColor }}>{precio}</div>
+          <p className="text-[.86rem] font-bold text-[var(--brand)] mt-1">{precio}</p>
         )}
         <button
           onClick={enCarrito ? undefined : onAgregar}
           disabled={enCarrito}
-          className="w-full h-[60px] border text-[.84rem] font-semibold flex items-center justify-center gap-1.5 transition-colors max-sm:h-12 max-sm:text-[.78rem]"
-          style={{ borderRadius: 'var(--radius-btn, 8px)', ...(enCarrito
-            ? { background: '#f0f0f0', border: 'none', color: '#6b7a90', cursor: 'default' }
-            : { background: 'white', borderColor: '#ccd6e0', color: '#1e2a3a' }
-          )}}
-          onMouseEnter={e => { if (!enCarrito) { e.currentTarget.style.background = '#f0f5fb'; e.currentTarget.style.borderColor = brandColor } }}
-          onMouseLeave={e => { if (!enCarrito) { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#ccd6e0' } }}>
+          className={`mt-2 w-full h-10 rounded-lg text-[.82rem] font-semibold flex items-center justify-center gap-1.5 border transition-colors
+            ${enCarrito
+              ? 'bg-[#f0f0f0] border-transparent text-[#999] cursor-default'
+              : 'bg-white border-[#dde3ed] text-[#1e2a3a] hover:bg-[var(--brand-light)] hover:border-[var(--brand)] hover:text-[var(--brand)]'
+            }`}>
           {enCarrito ? <><Check size={13} strokeWidth={2.5} /> Agregado</> : '+ Presupuestá'}
         </button>
       </div>
@@ -421,7 +421,7 @@ export default function CatalogoPublic() {
           <div className="grid gap-5 max-sm:gap-2.5"
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
             {productosFiltrados.map(p => (
-              <ProductCard key={p.id} producto={p} brandColor={brandColor} brandLight={brandLight}
+              <ProductCard key={p.id} producto={p}
                 enCarrito={carrito.some(x => x.id === p.id)}
                 onFoto={() => abrirFoto(p)}
                 onAgregar={() => agregarCarrito(p)} />
