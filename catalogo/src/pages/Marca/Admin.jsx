@@ -59,8 +59,15 @@ function Onboarding({ user, onCreada }) {
       .insert({ user_id: user.id, nombre: nombre.trim() })
       .select()
       .single()
+    if (err) {
+      // Si ya existe, recuperarla
+      const { data: existing } = await db.from('cuentas_marca').select('*').eq('user_id', user.id).limit(1)
+      setLoading(false)
+      if (existing?.[0]) { onCreada(existing[0]); return }
+      setError(err.message)
+      return
+    }
     setLoading(false)
-    if (err) { setError(err.message); return }
     onCreada(data)
   }
 
@@ -399,26 +406,44 @@ function AdminContent({ cuenta, user }) {
 }
 
 // ── Auth wrapper ─────────────────────────────────────────────
+async function cargarCuenta(userId) {
+  const { data } = await db.from('cuentas_marca').select('*').eq('user_id', userId).limit(1)
+  return data?.[0] || null
+}
+
 export default function MarcaAdmin() {
   const [state, setState] = useState({ checked: false, user: null, cuenta: null })
 
   useEffect(() => {
-    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+    let mounted = true
+
+    // Check session immediately — onAuthStateChange can fire null briefly before restoring
+    db.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return
       const user = session?.user || null
       if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
-
-      const { data: cuentas } = await db
-        .from('cuentas_marca')
-        .select('*')
-        .eq('user_id', user.id)
-        .limit(1)
-
-      setState({ checked: true, user, cuenta: cuentas?.[0] || null })
+      const cuenta = await cargarCuenta(user.id)
+      if (mounted) setState({ checked: true, user, cuenta })
     })
-    return () => subscription.unsubscribe()
+
+    // Listen for future changes (sign out, token refresh, sign in from another tab)
+    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'INITIAL_SESSION') return // already handled above
+      if (!mounted) return
+      const user = session?.user || null
+      if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
+      const cuenta = await cargarCuenta(user.id)
+      if (mounted) setState({ checked: true, user, cuenta })
+    })
+
+    return () => { mounted = false; subscription.unsubscribe() }
   }, [])
 
-  if (!state.checked) return null
+  if (!state.checked) return (
+    <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
+    </div>
+  )
 
   if (!state.user) {
     window.location.href = '/marca'
