@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { db } from '../../../lib/supabase'
+import { Plus, Trash2, Link } from 'lucide-react'
 
 export default function ClienteBrief() {
   const { nombre } = useParams()
   const [proyecto, setProyecto] = useState(null)
   const [preguntas, setPreguntas] = useState([])
   const [respuestas, setRespuestas] = useState({})
+  const [referencias, setReferencias] = useState([])
+  const [nuevoLink, setNuevoLink] = useState('')
+  const [nuevaDesc, setNuevaDesc] = useState('')
   const [guardando, setGuardando] = useState({})
   const [guardado, setGuardado] = useState({})
   const [cargando, setCargando] = useState(true)
@@ -31,6 +35,14 @@ export default function ClienteBrief() {
       .eq('proyecto_id', p.id)
       .order('orden')
 
+    // Deduplicar por texto
+    const seen = new Set()
+    const pregUnicas = (preg || []).filter(q => {
+      if (seen.has(q.texto)) return false
+      seen.add(q.texto)
+      return true
+    })
+
     const { data: resp } = await db
       .from('brief_respuestas')
       .select('*')
@@ -39,9 +51,15 @@ export default function ClienteBrief() {
     const respMap = {}
     resp?.forEach(r => { respMap[r.pregunta_id] = r })
 
+    const { data: refs } = await db
+      .from('brief_referencias')
+      .select('*')
+      .eq('proyecto_id', p.id)
+
     setProyecto(p)
-    setPreguntas(preg || [])
+    setPreguntas(pregUnicas)
     setRespuestas(respMap)
+    setReferencias(refs || [])
     setCargando(false)
   }
 
@@ -70,6 +88,20 @@ export default function ClienteBrief() {
     setGuardando(prev => ({ ...prev, [preguntaId]: false }))
     setGuardado(prev => ({ ...prev, [preguntaId]: true }))
     setTimeout(() => setGuardado(prev => ({ ...prev, [preguntaId]: false })), 2000)
+  }
+
+  const agregarRef = async () => {
+    if (!nuevoLink.trim()) return
+    const tipo = nuevoLink.match(/\.(jpg|jpeg|png|gif|webp|svg)/i) ? 'imagen' : 'link'
+    const { data } = await db.from('brief_referencias')
+      .insert({ proyecto_id: proyecto.id, url: nuevoLink.trim(), descripcion: nuevaDesc.trim() || null, tipo })
+      .select().single()
+    if (data) { setReferencias(prev => [...prev, data]); setNuevoLink(''); setNuevaDesc('') }
+  }
+
+  const eliminarRef = async (id) => {
+    await db.from('brief_referencias').delete().eq('id', id)
+    setReferencias(prev => prev.filter(r => r.id !== id))
   }
 
   if (cargando) return (
@@ -105,7 +137,8 @@ export default function ClienteBrief() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-6">
+        {/* Preguntas */}
+        <div className="flex flex-col gap-6 mb-12">
           {preguntas.map((p, i) => {
             const resp = respuestas[p.id]
             const valor = resp?.respuesta || ''
@@ -135,7 +168,67 @@ export default function ClienteBrief() {
           })}
         </div>
 
-        <p className="text-center text-xs text-[#bbb] mt-10">
+        {/* Referencias */}
+        <div className="mb-12">
+          <h2 className="text-lg font-black text-[#1c1c1c] mb-1">Referencias visuales</h2>
+          <p className="text-sm text-[#888] mb-5">
+            Pegá links de marcas, imágenes o estilos que te gusten. Pueden ser de Pinterest, Behance, Instagram o cualquier página.
+          </p>
+
+          {/* Input */}
+          <div className="bg-white border border-[#e8e8e8] rounded-[18px] p-5 mb-4">
+            <div className="flex flex-col gap-2">
+              <input
+                type="url"
+                value={nuevoLink}
+                onChange={e => setNuevoLink(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && agregarRef()}
+                placeholder="Pegá un link (Pinterest, Behance, Instagram…)"
+                className="w-full px-4 py-3 border border-[#e0e0e0] rounded-[10px] text-sm outline-none focus:border-[#1c1c1c] transition-colors"
+              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={nuevaDesc}
+                  onChange={e => setNuevaDesc(e.target.value)}
+                  placeholder="¿Por qué te gusta? (opcional)"
+                  className="flex-1 px-4 py-2.5 border border-[#e0e0e0] rounded-[10px] text-sm outline-none focus:border-[#1c1c1c] transition-colors"
+                />
+                <button
+                  onClick={agregarRef}
+                  className="flex items-center gap-1.5 bg-[#1c1c1c] text-white px-4 py-2.5 rounded-[10px] text-sm font-semibold cursor-pointer border-none hover:opacity-90 transition-opacity shrink-0">
+                  <Plus size={14} /> Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Lista de referencias */}
+          {referencias.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {referencias.map(r => (
+                <div key={r.id} className="bg-white border border-[#e8e8e8] rounded-[12px] p-4 flex items-center gap-3 group">
+                  <div className="w-8 h-8 rounded-[6px] bg-[#f5f5f5] flex items-center justify-center shrink-0">
+                    <Link size={14} className="text-[#888]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <a href={r.url} target="_blank" rel="noreferrer" className="text-sm text-[#1c1c1c] font-medium truncate block hover:underline no-underline">
+                      {r.url}
+                    </a>
+                    {r.descripcion && <p className="text-xs text-[#888] mt-0.5">{r.descripcion}</p>}
+                  </div>
+                  <button
+                    onClick={() => eliminarRef(r.id)}
+                    className="opacity-0 group-hover:opacity-100 w-7 h-7 flex items-center justify-center text-[#ccc] hover:text-red-400 rounded-[6px] cursor-pointer border-none bg-transparent transition-all shrink-0">
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <p className="text-center text-xs text-[#bbb]">
           Las respuestas se guardan automáticamente al salir de cada campo.
         </p>
       </div>
