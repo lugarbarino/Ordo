@@ -148,6 +148,11 @@ export default function ClienteBrief() {
     </div>
   )
 
+  const reabrirBrief = async () => {
+    await db.from('proyectos_marca').update({ brief_enviado_at: null }).eq('id', proyecto.id)
+    setEnviado(false)
+  }
+
   if (enviado) return (
     <div className="min-h-screen bg-white flex flex-col">
       <header className="px-8 py-5 border-b border-[#f0f0f0] flex items-center gap-3">
@@ -161,6 +166,11 @@ export default function ClienteBrief() {
         <p className="text-[#888] text-sm leading-relaxed max-w-[340px]">
           Ya recibimos toda tu información. Nos ponemos a trabajar y te avisamos cuando tengamos novedades.
         </p>
+        <button
+          onClick={reabrirBrief}
+          className="mt-6 text-xs text-[#bbb] hover:text-[#888] underline bg-transparent border-none cursor-pointer transition-colors">
+          Quiero agregar algo más
+        </button>
       </div>
     </div>
   )
