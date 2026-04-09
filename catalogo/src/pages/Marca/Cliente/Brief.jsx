@@ -212,7 +212,7 @@ export default function ClienteBrief() {
           <p className="text-[#888] text-[15px] leading-relaxed">
             Respondé con todo el detalle que puedas. Cuanto más sepamos, mejor vamos a poder trabajar.
           </p>
-          <p className="text-xs text-[#bbb] mt-3">
+          <p className="text-xs text-[#888] mt-3">
             Las respuestas se guardan automáticamente. Podés compartir este link y completarlo entre varias personas.
           </p>
         </div>
