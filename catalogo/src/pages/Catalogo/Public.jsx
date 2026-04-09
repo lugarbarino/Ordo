@@ -270,6 +270,7 @@ export default function CatalogoPublic() {
       document.title = emp.nombre + ' — Catálogo'
       const t = emp.tokens || {}
       const root = document.documentElement
+      if (emp.color)           root.style.setProperty('--brand',               emp.color)
       if (t.fontFamily)        root.style.setProperty('--font-family',         t.fontFamily)
       if (t.fontFamilyHeading) root.style.setProperty('--font-family-heading', t.fontFamilyHeading)
       if (t.fontScale)         root.style.setProperty('--font-scale',          t.fontScale)
