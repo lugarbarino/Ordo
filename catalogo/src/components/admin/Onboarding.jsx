@@ -173,7 +173,7 @@ function Paso2({ onNext }) {
           <input value={nombre} onChange={e => handleNombre(e.target.value)}
             placeholder="Nombre de tu empresa"
             className="w-full px-4 py-3 border border-[#e3e3e3] rounded-xl text-sm outline-none focus:border-[#295e4f] transition-colors bg-white" />
-          {slug && <p className="text-xs text-[#aaa] mt-1">Tu link: ordo.app/<strong>{slug}</strong></p>}
+          {slug && <p className="text-xs text-[#aaa] mt-1">Tu link: ordo-herramienta.vercel.app/catalogo/<strong>{slug}</strong></p>}
         </div>
 
         {/* Logo */}
