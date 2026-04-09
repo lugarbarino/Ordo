@@ -148,7 +148,7 @@ function PanelBrief({ proyecto }) {
         <div className="bg-white border border-[#e8e8e8] rounded-[16px] p-5 mb-4">
           <div className="flex flex-col gap-2">
             <input
-              type="url"
+              type="text"
               value={nuevoLink}
               onChange={e => setNuevoLink(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && agregarRef()}
