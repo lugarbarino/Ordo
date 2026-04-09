@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useAppStore } from '../../../store/useAppStore'
-import { db } from '../../../lib/supabase'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Tabs } from '../ui/Tabs'
@@ -80,15 +79,7 @@ export function DesignPanel() {
     setSaving(true)
     const preset = RADIUS_PRESETS.find(r => r.card === radius) || RADIUS_PRESETS[1]
     const tokens = { fontPreset, fontFamily, fontFamilyHeading, fontScale, radiusCard: radius, radiusBtn: preset.btn }
-
-    // Siempre guardamos el color (columna básica)
-    const ok = await guardarEmpresa({ color })
-
-    // Intentamos guardar tokens (requiere: ALTER TABLE empresas ADD COLUMN tokens jsonb)
-    if (ok) {
-      const { error } = await db.from('empresas').update({ tokens }).eq('id', ok.id)
-      if (error) showToast('Color guardado ✓. Fuentes y radios requieren: ALTER TABLE empresas ADD COLUMN IF NOT EXISTS tokens jsonb', 'err')
-    }
+    await guardarEmpresa({ color, tokens })
     setSaving(false)
   }
 
