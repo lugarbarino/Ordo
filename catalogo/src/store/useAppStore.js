@@ -34,7 +34,10 @@ export const useAppStore = create((set, get) => ({
     const { data } = await db.from('empresas').select('*').eq('user_id', user.id).limit(1)
     const empresa = data?.[0] || null
     set({ empresa })
-    if (empresa?.color) document.documentElement.style.setProperty('--brand', empresa.color)
+    if (empresa?.color) {
+      document.documentElement.style.setProperty('--brand', empresa.color)
+      document.documentElement.style.setProperty('--brand-light', empresa.color + '22')
+    }
     applyTokens(empresa?.tokens)
     return empresa
   },
@@ -52,7 +55,10 @@ export const useAppStore = create((set, get) => ({
       result = data
     }
     set({ empresa: result })
-    if (result?.color) document.documentElement.style.setProperty('--brand', result.color)
+    if (result?.color) {
+      document.documentElement.style.setProperty('--brand', result.color)
+      document.documentElement.style.setProperty('--brand-light', result.color + '22')
+    }
     if (campos.tokens) applyTokens(campos.tokens)
     showToast('Guardado')
     return result
