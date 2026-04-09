@@ -284,9 +284,9 @@ function Dashboard({ proyecto, stats, onPanel }) {
       {/* Stats */}
       <p className="text-[10px] font-bold text-[#aaa] uppercase tracking-widest mb-3">Datos</p>
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <StatCard label="Vistas"        value={stats.vistas}    icon={Eye} />
-        <StatCard label="Respuestas"    value={stats.respuestas} icon={MessageSquare} />
-        <StatCard label="Pedidos nuevos" value={stats.pedidos}   icon={ShoppingBag} />
+        <StatCard label="Vistas"             value={stats.vistas}    icon={Eye} />
+        <StatCard label="Respuestas al brief" value={stats.respuestas} icon={MessageSquare} />
+        <StatCard label="Brief enviado"      value={stats.briefEnviado ? '✓' : '—'} icon={ShoppingBag} />
       </div>
 
       {/* Primeros pasos */}
@@ -415,7 +415,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const navigate = useNavigate()
   const [proyecto, setProyecto] = useState(proyectoInicial)
   const [panel, setPanel] = useState('dashboard')
-  const [stats, setStats] = useState({ vistas: 0, respuestas: 0, pedidos: 0 })
+  const [stats, setStats] = useState({ vistas: 0, respuestas: 0, briefEnviado: false })
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
@@ -423,11 +423,11 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   }, [proyecto.id])
 
   const cargarStats = async (proyectoId) => {
-    const [{ count: respuestas }, { count: pedidos }] = await Promise.all([
-      db.from('exploracion_feedback').select('*', { count: 'exact', head: true }).eq('proyecto_id', proyectoId),
-      db.from('opciones_marca').select('*', { count: 'exact', head: true }).eq('proyecto_id', proyectoId).eq('es_finalista', true),
+    const [{ count: respuestas }, { data: proyData }] = await Promise.all([
+      db.from('brief_respuestas').select('*', { count: 'exact', head: true }).eq('proyecto_id', proyectoId),
+      db.from('proyectos_marca').select('brief_enviado_at').eq('id', proyectoId).limit(1),
     ])
-    setStats({ vistas: 0, respuestas: respuestas || 0, pedidos: pedidos || 0 })
+    setStats({ vistas: 0, respuestas: respuestas || 0, briefEnviado: !!(proyData?.[0]?.brief_enviado_at) })
   }
 
   const handleProyecto = (p) => {

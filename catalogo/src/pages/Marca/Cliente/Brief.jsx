@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { db } from '../../../lib/supabase'
-import { Plus, Trash2, Link } from 'lucide-react'
+import { Plus, Trash2, Link, Send } from 'lucide-react'
 
 export default function ClienteBrief() {
   const { nombre } = useParams()
@@ -13,6 +13,8 @@ export default function ClienteBrief() {
   const [nuevaDesc, setNuevaDesc] = useState('')
   const [guardando, setGuardando] = useState({})
   const [guardado, setGuardado] = useState({})
+  const [enviando, setEnviando] = useState(false)
+  const [enviado, setEnviado] = useState(false)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
@@ -60,6 +62,8 @@ export default function ClienteBrief() {
     setPreguntas(pregUnicas)
     setRespuestas(respMap)
     setReferencias(refs || [])
+    // Si ya fue enviado, mostrar pantalla de confirmación
+    if (p.brief_enviado_at) setEnviado(true)
     setCargando(false)
   }
 
@@ -104,6 +108,26 @@ export default function ClienteBrief() {
     setReferencias(prev => prev.filter(r => r.id !== id))
   }
 
+  const enviar = async () => {
+    setEnviando(true)
+    // Guardar cualquier respuesta pendiente sin id todavía (que no se guardó en blur)
+    for (const [preguntaId, resp] of Object.entries(respuestas)) {
+      const texto = resp?.respuesta?.trim()
+      if (texto && !resp?.id) {
+        const { data } = await db.from('brief_respuestas')
+          .insert({ pregunta_id: preguntaId, proyecto_id: proyecto.id, respuesta: texto })
+          .select().single()
+        if (data) setRespuestas(prev => ({ ...prev, [preguntaId]: data }))
+      }
+    }
+    // Marcar como enviado en el proyecto
+    await db.from('proyectos_marca')
+      .update({ brief_enviado_at: new Date().toISOString() })
+      .eq('id', proyecto.id)
+    setEnviando(false)
+    setEnviado(true)
+  }
+
   if (cargando) return (
     <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
       <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
@@ -115,6 +139,30 @@ export default function ClienteBrief() {
       <p className="text-[#888] text-sm">{error}</p>
     </div>
   )
+
+  if (enviado) return (
+    <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
+      <div className="bg-white border-b border-[#e8e8e8] px-6 py-5 flex items-center gap-4">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
+        <div className="w-px h-5 bg-[#e0e0e0]" />
+        <div>
+          <p className="text-xs text-[#888]">Brief de marca</p>
+          <p className="text-sm font-bold text-[#1c1c1c]">{proyecto.nombre}</p>
+        </div>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+        <div className="w-16 h-16 rounded-full bg-[#1c1c1c] flex items-center justify-center mb-6">
+          <Send size={24} className="text-white" />
+        </div>
+        <h1 className="text-2xl font-black text-[#1c1c1c] mb-3">¡Brief enviado!</h1>
+        <p className="text-[#888] text-sm leading-relaxed max-w-[380px]">
+          Ya recibimos toda tu información. Nos ponemos a trabajar y te avisamos cuando tengamos novedades.
+        </p>
+      </div>
+    </div>
+  )
+
+  const respuestasCount = Object.values(respuestas).filter(r => r?.respuesta?.trim()).length
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
@@ -228,7 +276,26 @@ export default function ClienteBrief() {
           )}
         </div>
 
-        <p className="text-center text-xs text-[#bbb]">
+        {/* Enviar */}
+        <div className="bg-white border border-[#e8e8e8] rounded-[18px] p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-bold text-[#1c1c1c]">¿Está todo listo?</p>
+            <p className="text-xs text-[#888] mt-0.5">
+              {respuestasCount > 0
+                ? `Respondiste ${respuestasCount} de ${preguntas.length} preguntas.`
+                : 'Completá al menos una respuesta antes de enviar.'}
+            </p>
+          </div>
+          <button
+            onClick={enviar}
+            disabled={enviando || respuestasCount === 0}
+            className="flex items-center gap-2 bg-[#1c1c1c] text-white px-6 py-3 rounded-[12px] text-sm font-bold cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed shrink-0">
+            <Send size={15} />
+            {enviando ? 'Enviando…' : 'Enviar brief'}
+          </button>
+        </div>
+
+        <p className="text-center text-xs text-[#bbb] mt-6">
           Las respuestas se guardan automáticamente al salir de cada campo.
         </p>
       </div>
