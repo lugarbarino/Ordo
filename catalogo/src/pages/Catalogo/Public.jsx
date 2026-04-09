@@ -209,7 +209,7 @@ function ProductCard({ producto: p, enCarrito, onFoto, onAgregar }) {
 
       {/* Imagen */}
       <div
-        className="w-full h-[160px] bg-[#f8f9fb] flex items-center justify-center overflow-hidden relative max-sm:h-[120px]"
+        className="w-full h-[160px] bg-white flex items-center justify-center overflow-hidden relative max-sm:h-[120px]"
         onClick={p.imagen_url ? onFoto : undefined}
         style={{ cursor: p.imagen_url ? 'zoom-in' : 'default' }}>
         {p.imagen_url
