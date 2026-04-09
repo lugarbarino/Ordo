@@ -72,7 +72,7 @@ export function ConfigPanel() {
     setSaving(false)
   }
 
-  const slugPreview = form.slug ? `${window.location.origin}/${form.slug}` : '—'
+  const slugPreview = form.slug ? `${window.location.origin}/catalogo/${form.slug}` : '—'
   const bannerIsVideo = isVideo(form.banner_url)
 
   return (
