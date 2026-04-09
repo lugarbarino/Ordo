@@ -403,7 +403,7 @@ export default function MarcaAdmin() {
   const [state, setState] = useState({ checked: false, user: null, cuenta: null })
 
   useEffect(() => {
-    db.auth.getSession().then(async ({ data: { session } }) => {
+    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
       const user = session?.user || null
       if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
 
@@ -415,6 +415,7 @@ export default function MarcaAdmin() {
 
       setState({ checked: true, user, cuenta: cuentas?.[0] || null })
     })
+    return () => subscription.unsubscribe()
   }, [])
 
   if (!state.checked) return null

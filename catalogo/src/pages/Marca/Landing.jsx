@@ -230,6 +230,12 @@ const STEPS = [
 export default function MarcaLanding() {
   const [loginOpen, setLoginOpen] = useState(false)
 
+  useEffect(() => {
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) window.location.href = '/marca/admin'
+    })
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#f8f8f8] text-[#373c42]">
 
