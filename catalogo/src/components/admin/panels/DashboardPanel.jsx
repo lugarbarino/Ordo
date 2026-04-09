@@ -18,7 +18,8 @@ function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
       {/* Mobile layout */}
       <div className="flex items-center justify-between md:hidden">
         <div className="text-3xl font-bold text-[#111]">{value ?? '—'}</div>
-        <div className="w-8 h-8 bg-[#eef3ff] rounded-lg flex items-center justify-center text-[var(--brand)]">
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--brand)]"
+          style={{ background: 'color-mix(in srgb, var(--brand) 12%, white)' }}>
           <Icon size={17} />
         </div>
       </div>
@@ -29,7 +30,8 @@ function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
         <div className="text-2xl font-bold text-[#111]">{value ?? '—'}</div>
         <div className="text-sm text-[#666] mt-0.5">{label}</div>
       </div>
-      <div className="hidden md:flex absolute right-4 top-4 w-10 h-10 bg-[#eef3ff] rounded-lg items-center justify-center text-[var(--brand)]">
+      <div className="hidden md:flex absolute right-4 top-4 w-10 h-10 rounded-lg items-center justify-center text-[var(--brand)]"
+        style={{ background: 'color-mix(in srgb, var(--brand) 12%, white)' }}>
         <Icon size={22} />
       </div>
     </div>
