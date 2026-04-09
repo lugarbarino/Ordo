@@ -49,7 +49,7 @@ export function DesignPanel() {
     setFontFamilyHeading(t.fontFamilyHeading || null)
     setFontScale(t.fontScale  || '1')
     setRadius(t.radiusCard || '12px')
-  }, [empresa])
+  }, [empresa?.id])
 
   const applyColor = (c) => {
     setColor(c)
