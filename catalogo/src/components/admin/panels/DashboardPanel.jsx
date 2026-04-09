@@ -7,7 +7,9 @@ import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { Badge } from '../ui/Badge'
 
-function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
+function StatCard({ label, shortLabel, value, icon: Icon, onClick, brandColor }) {
+  const iconBg = brandColor ? brandColor + '20' : '#eef3ff'
+  const iconColor = brandColor || '#3949ab'
   return (
     <div
       className={`bg-white border border-[#e3e3e3] rounded-xl transition-colors ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''}
@@ -18,8 +20,8 @@ function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
       {/* Mobile layout */}
       <div className="flex items-center justify-between md:hidden">
         <div className="text-3xl font-bold text-[#111]">{value ?? '—'}</div>
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--brand)]"
-          style={{ background: 'color-mix(in srgb, var(--brand) 12%, white)' }}>
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center"
+          style={{ background: iconBg, color: iconColor }}>
           <Icon size={17} />
         </div>
       </div>
@@ -30,8 +32,8 @@ function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
         <div className="text-2xl font-bold text-[#111]">{value ?? '—'}</div>
         <div className="text-sm text-[#666] mt-0.5">{label}</div>
       </div>
-      <div className="hidden md:flex absolute right-4 top-4 w-10 h-10 rounded-lg items-center justify-center text-[var(--brand)]"
-        style={{ background: 'color-mix(in srgb, var(--brand) 12%, white)' }}>
+      <div className="hidden md:flex absolute right-4 top-4 w-10 h-10 rounded-lg items-center justify-center"
+        style={{ background: iconBg, color: iconColor }}>
         <Icon size={22} />
       </div>
     </div>
@@ -96,6 +98,7 @@ export function DashboardPanel() {
 
   const categorias = new Set(productos.map(p => p.categoria).filter(Boolean)).size
   const catalogoUrl = empresa?.slug ? `${window.location.origin}/catalogo/${empresa.slug}` : null
+  const brandColor = empresa?.color || null
 
   const copiarLink = () => {
     if (!catalogoUrl) return
@@ -141,9 +144,9 @@ export function DashboardPanel() {
       <div className="mt-4 md:mt-0">
         <div className="text-xs font-bold text-[#666] uppercase tracking-wide mb-3">Este mes</div>
         <div className="grid grid-cols-3 gap-3">
-          <StatCard label="Visitas al catálogo" shortLabel="Visitas" value={visitasEsteMes} icon={TrendingUp} />
-          <StatCard label="Presupuestos" value={pedidosEsteMes} icon={Receipt} onClick={() => setPanel('pedidos')} />
-          <StatCard label="Pendientes" value={pedidosPendientes} icon={Clock} onClick={() => setPanel('pedidos')} />
+          <StatCard label="Visitas al catálogo" shortLabel="Visitas" value={visitasEsteMes} icon={TrendingUp} brandColor={brandColor} />
+          <StatCard label="Presupuestos" value={pedidosEsteMes} icon={Receipt} onClick={() => setPanel('pedidos')} brandColor={brandColor} />
+          <StatCard label="Pendientes" value={pedidosPendientes} icon={Clock} onClick={() => setPanel('pedidos')} brandColor={brandColor} />
         </div>
       </div>
 
