@@ -43,13 +43,13 @@ export const useAppStore = create((set, get) => ({
     const { user, empresa, showToast } = get()
     let result
     if (empresa) {
-      const { data, error } = await db.from('empresas').update(campos).eq('id', empresa.id).select().limit(1)
+      const { data, error } = await db.from('empresas').update(campos).eq('id', empresa.id).select().single()
       if (error) { showToast('Error al guardar: ' + error.message, 'err'); return null }
-      result = data?.[0]
+      result = data
     } else {
-      const { data, error } = await db.from('empresas').insert({ ...campos, user_id: user.id }).select().limit(1)
+      const { data, error } = await db.from('empresas').insert({ ...campos, user_id: user.id }).select().single()
       if (error) { showToast('Error al guardar: ' + error.message, 'err'); return null }
-      result = data?.[0]
+      result = data
     }
     set({ empresa: result })
     if (result?.color) document.documentElement.style.setProperty('--brand', result.color)
