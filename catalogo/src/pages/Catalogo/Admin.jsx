@@ -33,19 +33,42 @@ function AdminApp() {
   const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
-    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+    let mounted = true
+
+    const init = async () => {
+      const { data: { session } } = await db.auth.getSession()
+      if (!mounted) return
       const u = session?.user || null
       setUser(u)
       if (u) {
         const emp = await cargarEmpresa()
-        if (emp) {
+        if (emp && mounted) {
           cargarProductos(emp.id)
           cargarPedidos(emp.id)
         }
       }
-      setCargando(false)
+      if (mounted) setCargando(false)
+    }
+
+    init()
+
+    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'INITIAL_SESSION') return
+      if (!mounted) return
+      const u = session?.user || null
+      setUser(u)
+      if (u) {
+        const emp = await cargarEmpresa()
+        if (emp && mounted) {
+          cargarProductos(emp.id)
+          cargarPedidos(emp.id)
+        }
+      } else {
+        if (mounted) setCargando(false)
+      }
     })
-    return () => subscription.unsubscribe()
+
+    return () => { mounted = false; subscription.unsubscribe() }
   }, [])
 
   useEffect(() => {
