@@ -17,6 +17,7 @@ export default function ClienteBrief() {
   const [enviado, setEnviado] = useState(false)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [errorRef, setErrorRef] = useState('')
 
   useEffect(() => { cargar() }, [nombre])
 
@@ -96,11 +97,26 @@ export default function ClienteBrief() {
 
   const agregarRef = async () => {
     if (!nuevoLink.trim()) return
+    setErrorRef('')
     const tipo = nuevoLink.match(/\.(jpg|jpeg|png|gif|webp|svg)/i) ? 'imagen' : 'link'
-    const { data } = await db.from('brief_referencias')
-      .insert({ proyecto_id: proyecto.id, url: nuevoLink.trim(), descripcion: nuevaDesc.trim() || null, tipo })
+    // Optimistic: agregar inmediatamente con id temporal
+    const tempId = `temp-${Date.now()}`
+    const tempRef = { id: tempId, url: nuevoLink.trim(), descripcion: nuevaDesc.trim() || null, tipo }
+    setReferencias(prev => [...prev, tempRef])
+    setNuevoLink('')
+    setNuevaDesc('')
+    // Guardar en DB
+    const { data, error: dbErr } = await db.from('brief_referencias')
+      .insert({ proyecto_id: proyecto.id, url: tempRef.url, descripcion: tempRef.descripcion, tipo })
       .select().single()
-    if (data) { setReferencias(prev => [...prev, data]); setNuevoLink(''); setNuevaDesc('') }
+    if (data) {
+      // Reemplazar temp con el real
+      setReferencias(prev => prev.map(r => r.id === tempId ? data : r))
+    } else {
+      // Dejar la ref visible en la sesión pero avisar
+      console.error('brief_referencias insert error:', dbErr)
+      setErrorRef('No se pudo guardar el link en la base de datos. Verificá que la tabla brief_referencias tenga RLS deshabilitado.')
+    }
   }
 
   const eliminarRef = async (id) => {
@@ -179,10 +195,18 @@ export default function ClienteBrief() {
       {/* Content */}
       <div className="max-w-[680px] mx-auto px-6 py-10">
         <div className="mb-10">
-          <h1 className="text-3xl font-black text-[#1c1c1c] mb-2">Contanos sobre tu marca</h1>
-          <p className="text-[#888] text-sm leading-relaxed">
+          <h1 className="text-3xl font-black text-[#1c1c1c] mb-3">Contanos sobre tu marca</h1>
+          <p className="text-[#888] text-sm leading-relaxed mb-4">
             Respondé las preguntas con todo el detalle que puedas. Cuanto más sepamos, mejor vamos a poder trabajar juntos.
           </p>
+          <div className="bg-[#f0f0f0] rounded-[12px] px-4 py-3 flex flex-col gap-1">
+            <p className="text-xs text-[#555] leading-relaxed">
+              <span className="font-semibold text-[#1c1c1c]">Tus respuestas se guardan automáticamente</span> — no hace falta hacer nada extra al salir de cada campo.
+            </p>
+            <p className="text-xs text-[#555] leading-relaxed">
+              Podés compartir este link y completarlo entre varias personas del equipo, las respuestas se mantienen para todos.
+            </p>
+          </div>
         </div>
 
         {/* Preguntas */}
@@ -251,6 +275,10 @@ export default function ClienteBrief() {
             </div>
           </div>
 
+          {errorRef && (
+            <p className="text-xs text-red-500 mb-3">{errorRef}</p>
+          )}
+
           {/* Lista de referencias */}
           {referencias.length > 0 && (
             <div className="flex flex-col gap-2">
@@ -295,9 +323,6 @@ export default function ClienteBrief() {
           </button>
         </div>
 
-        <p className="text-center text-xs text-[#bbb] mt-6">
-          Las respuestas se guardan automáticamente al salir de cada campo.
-        </p>
       </div>
     </div>
   )
