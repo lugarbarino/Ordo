@@ -168,7 +168,7 @@ export default function ClienteBrief() {
         </p>
         <button
           onClick={reabrirBrief}
-          className="mt-6 text-xs text-[#bbb] hover:text-[#888] underline bg-transparent border-none cursor-pointer transition-colors">
+          className="mt-6 text-xs text-[#888] hover:text-[#1c1c1c] underline bg-transparent border-none cursor-pointer transition-colors">
           Quiero agregar algo más
         </button>
       </div>
