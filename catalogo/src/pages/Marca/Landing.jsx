@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FileText, Palette, Star, BookOpen, Eye, EyeOff } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
