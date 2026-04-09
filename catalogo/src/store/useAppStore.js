@@ -31,24 +31,25 @@ export const useAppStore = create((set, get) => ({
   cargarEmpresa: async () => {
     const { user } = get()
     if (!user) return
-    const { data } = await db.from('empresas').select('*').eq('user_id', user.id).single()
-    set({ empresa: data || null })
-    if (data?.color) document.documentElement.style.setProperty('--brand', data.color)
-    applyTokens(data?.tokens)
-    return data
+    const { data } = await db.from('empresas').select('*').eq('user_id', user.id).limit(1)
+    const empresa = data?.[0] || null
+    set({ empresa })
+    if (empresa?.color) document.documentElement.style.setProperty('--brand', empresa.color)
+    applyTokens(empresa?.tokens)
+    return empresa
   },
 
   guardarEmpresa: async (campos) => {
     const { user, empresa, showToast } = get()
     let result
     if (empresa) {
-      const { data, error } = await db.from('empresas').update(campos).eq('id', empresa.id).select().single()
+      const { data, error } = await db.from('empresas').update(campos).eq('id', empresa.id).select().limit(1)
       if (error) { showToast('Error al guardar: ' + error.message, 'err'); return null }
-      result = data
+      result = data?.[0]
     } else {
-      const { data, error } = await db.from('empresas').insert({ ...campos, user_id: user.id }).select().single()
+      const { data, error } = await db.from('empresas').insert({ ...campos, user_id: user.id }).select().limit(1)
       if (error) { showToast('Error al guardar: ' + error.message, 'err'); return null }
-      result = data
+      result = data?.[0]
     }
     set({ empresa: result })
     if (result?.color) document.documentElement.style.setProperty('--brand', result.color)
