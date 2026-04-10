@@ -175,10 +175,10 @@ function LogoCard({ url, label, sub, dark, nombreBase }) {
 }
 
 const LOGO_GRUPOS = [
-  { key: 'iso',   label: 'Isotipo',    sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
-  { key: 'texto', label: 'Solo texto', sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'texto_claro', oscuro: 'texto_oscuro' },
-  { key: 'horiz', label: 'Horizontal', sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
-  { key: 'vert',  label: 'Vertical',   sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
+  { key: 'iso',   label: 'Isotipo',              desc: 'Para espacios pequeños o cuando la marca ya es reconocible sin texto. Ej: app icon, favicon, avatar.',        claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
+  { key: 'texto', label: 'Logotipo',              desc: 'Cuando es clave que se lea el nombre. Ej: documentos, presentaciones, piezas institucionales.',               claro: 'texto_claro', oscuro: 'texto_oscuro' },
+  { key: 'horiz', label: 'Imagotipo horizontal',  desc: 'Uso principal y más versátil. Ej: web, banners, papelería.',                                                   claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
+  { key: 'vert',  label: 'Imagotipo vertical',    desc: 'Para espacios más altos que anchos.',                                                                          claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
 ]
 
 const TEMPLATE_CATS = [
@@ -324,17 +324,17 @@ export default function MarcaManual() {
         <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24">
           <SectionHeader num={nextNum()} label="Logotipo" />
           <div className="flex flex-col gap-16">
-            {LOGO_GRUPOS.map(({ key, label, sub_c, sub_o, claro, oscuro }) => {
+            {LOGO_GRUPOS.map(({ key, label, desc, claro, oscuro }) => {
               const urlClaro = logos[claro]
               const urlOscuro = logos[oscuro]
               if (!urlClaro && !urlOscuro) return null
               return (
                 <div key={key}>
-                  <p className="text-[16px] font-semibold text-[#363645] mb-1">{label}</p>
-                  <p className="text-[14px] text-[#52586f] mb-6">{urlClaro && urlOscuro ? 'Versiones sobre fondo claro y oscuro.' : urlClaro ? 'Versión sobre fondo claro.' : 'Versión sobre fondo oscuro.'}</p>
+                  <p className="text-[18px] font-semibold text-[#363645] mb-1">{label}</p>
+                  {desc && <p className="text-[14px] text-[#52586f] mb-6 max-w-[560px]">{desc}</p>}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {urlClaro && <LogoCard url={urlClaro} label="Sobre claro" sub={sub_c} dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
-                    {urlOscuro && <LogoCard url={urlOscuro} label="Sobre oscuro" sub={sub_o} dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
+                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
+                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
                   </div>
                 </div>
               )
