@@ -182,9 +182,9 @@ const LOGO_GRUPOS = [
 ]
 
 const TEMPLATE_CATS = [
-  { key: 'foto',    label: 'Foto de perfil' },
-  { key: 'portada', label: 'Portada'        },
-  { key: 'posts',   label: 'Posts'          },
+  { key: 'foto',    label: 'Foto de perfil', aspect: 'aspect-square'      },
+  { key: 'portada', label: 'Portada',        aspect: 'aspect-[16/9]'      },
+  { key: 'posts',   label: 'Posts',          aspect: 'aspect-square'      },
 ]
 
 // ── Main ──────────────────────────────────────────────────────
@@ -535,31 +535,32 @@ export default function MarcaManual() {
           <div>
             <SectionHeader num={nextNum()} label="Templates para redes" />
             <div className="flex flex-col gap-12">
-              {TEMPLATE_CATS.map(({ key, label }) => {
+              {TEMPLATE_CATS.map(({ key, label, aspect }) => {
                 const items = (templates[key] || []).filter(t => t?.preview_url || t?.canva_url)
                 if (!items.length) return null
+                const isPortada = key === 'portada'
                 return (
                   <div key={key}>
                     <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px] mb-6">{label}</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <div className={`grid gap-4 ${isPortada ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
                       {items.map((tmpl, i) => (
                         <div key={i} className="flex flex-col gap-3">
                           {tmpl.preview_url ? (
-                            <div className="bg-[#ececf0] rounded-2xl overflow-hidden flex items-end justify-center pt-4 px-4 min-h-[200px]">
-                              <img src={tmpl.preview_url} alt={label} className="w-full max-h-[180px] object-contain object-bottom" />
+                            <div className={`bg-[#ececf0] rounded-2xl overflow-hidden ${aspect} w-full`}>
+                              <img src={tmpl.preview_url} alt={label} className="w-full h-full object-cover" />
                             </div>
                           ) : getCanvaEmbedUrl(tmpl.canva_url) ? (
-                            <div className="rounded-2xl overflow-hidden min-h-[200px] bg-[#f5f5f5] border border-[#e8e8ee]">
+                            <div className={`rounded-2xl overflow-hidden ${aspect} w-full bg-[#f5f5f5] border border-[#e8e8ee]`}>
                               <iframe
                                 src={getCanvaEmbedUrl(tmpl.canva_url)}
-                                className="w-full h-[200px] border-0 pointer-events-none"
+                                className="w-full h-full border-0 pointer-events-none"
                                 allow="fullscreen"
                                 loading="lazy"
                                 title={label}
                               />
                             </div>
                           ) : (
-                            <div className="bg-[#ececf0] rounded-2xl min-h-[200px] flex items-center justify-center">
+                            <div className={`bg-[#ececf0] rounded-2xl ${aspect} w-full flex items-center justify-center`}>
                               <p className="text-[12px] text-[#aaa]">Sin preview</p>
                             </div>
                           )}
