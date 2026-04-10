@@ -158,6 +158,7 @@ export default function MarcaManual() {
   const atributo = manual?.atributo || ''
   const tagline = manual?.tagline || ''
   const concepto = manual?.concepto || ''
+  const descripcion = manual?.descripcion || ''
   const colores = manual?.colores || []
   const tipografias = manual?.tipografias || []
   const mockups = manual?.mockups || []
@@ -214,7 +215,7 @@ export default function MarcaManual() {
       </div>
 
       {/* CONCEPTO */}
-      {(atributo || tagline || concepto) && (
+      {(atributo || tagline || concepto || descripcion) && (
         <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-20">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-center">
             {/* Texto */}
@@ -222,12 +223,14 @@ export default function MarcaManual() {
               {atributo && (
                 <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.4px]">{atributo}</p>
               )}
-              <h2 className="text-[64px] sm:text-[80px] font-bold text-[#363645] leading-none">{proyecto.nombre}</h2>
               {tagline && (
-                <p className="text-[18px] font-bold text-[#363645] leading-snug">{tagline}</p>
+                <h2 className="text-[64px] sm:text-[80px] font-bold text-[#363645] leading-none">{tagline}</h2>
               )}
               {concepto && (
-                <p className="text-[15px] text-[#52586f] leading-relaxed">{concepto}</p>
+                <p className="text-[18px] font-bold text-[#363645] leading-snug">{concepto}</p>
+              )}
+              {descripcion && (
+                <p className="text-[15px] text-[#52586f] leading-relaxed">{descripcion}</p>
               )}
             </div>
             {/* Logo card */}
