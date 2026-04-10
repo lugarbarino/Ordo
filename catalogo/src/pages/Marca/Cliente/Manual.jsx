@@ -109,7 +109,9 @@ export default function MarcaManual() {
 
   useEffect(() => {
     const cargar = async () => {
-      const { data: proyectos } = await db.from('proyectos_marca').select('*').or(`slug.eq.${nombre},id.eq.${nombre}`).limit(1)
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(nombre)
+      const q = db.from('proyectos_marca').select('*')
+      const { data: proyectos } = await (isUuid ? q.eq('id', nombre) : q.eq('slug', nombre)).limit(1)
       const p = proyectos?.[0]
       if (!p) { setCargando(false); return }
       setProyecto(p)

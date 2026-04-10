@@ -3,6 +3,7 @@ import { clsx } from '../../../lib/utils'
 
 const variants = {
   primary: 'bg-[var(--brand)] text-white hover:opacity-90 disabled:opacity-50',
+  dark: 'bg-[#1c1c1c] text-white hover:bg-[#333] disabled:opacity-50',
   secondary: 'bg-white border border-[#e3e3e3] text-[#111] hover:bg-[#f5f5f5] disabled:opacity-50',
   ghost: 'bg-transparent text-[#111] hover:bg-[#f0f0f0] disabled:opacity-50',
   danger: 'bg-white border border-[#e3e3e3] text-red-500 hover:bg-red-50 disabled:opacity-50',

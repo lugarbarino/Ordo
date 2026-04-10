@@ -367,8 +367,8 @@ function TemplateCategoria({ label, items, onChange, proyectoId }) {
 // ── Section ───────────────────────────────────────────────────
 function Section({ title, hint, children }) {
   return (
-    <div className="mb-10">
-      <div className="pb-3 border-b border-[#f0f0f0] mb-4">
+    <div className="mb-6 bg-white border border-[#ececec] rounded-2xl p-6">
+      <div className="pb-4 border-b border-[#f0f0f0] mb-5">
         <h3 className="text-base font-black text-[#1c1c1c]">{title}</h3>
         {hint && <p className="text-xs text-[#999] mt-0.5">{hint}</p>}
       </div>
@@ -465,7 +465,7 @@ export function PanelManual({ proyecto }) {
   const nombreMarca = proyecto.nombre?.toLowerCase().replace(/\s+/g, '-') || 'logo'
 
   return (
-    <div className="px-8 py-6 max-w-[860px]">
+    <div className="max-w-[860px] px-8 py-8">
 
       {/* Header */}
       <div className="mb-8 flex items-start justify-between gap-4">
@@ -478,7 +478,7 @@ export function PanelManual({ proyecto }) {
             className="flex items-center gap-1.5 text-xs font-semibold text-[#1c1c1c] border border-[#e8e8e8] bg-white px-3 py-2 rounded-[8px] no-underline hover:border-[#ccc] transition-colors">
             <ExternalLink size={13} /> Ver link del cliente
           </a>
-          <Button variant="primary" loading={saving} onClick={guardar}>
+          <Button variant="dark" loading={saving} onClick={guardar}>
             {saved && !saving ? <><Check size={14} /> Guardado</> : 'Guardar'}
           </Button>
         </div>
