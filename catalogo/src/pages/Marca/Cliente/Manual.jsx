@@ -359,8 +359,8 @@ export default function MarcaManual() {
               <span className="text-[13px] font-semibold text-white/30 uppercase tracking-[1.4px] shrink-0">Paleta de colores</span>
             </div>
           </div>
-          {/* Strips full-width */}
-          <div className="flex h-[320px] sm:h-[360px]">
+          {/* Strips — vertical en mobile, horizontal en desktop */}
+          <div className="flex flex-col sm:flex-row sm:h-[360px]">
             {colores.map((c, i) => {
               const hex = c.hex?.startsWith('#') ? c.hex : `#${c.hex}`
               const r = parseInt(hex.slice(1,3),16)
@@ -372,7 +372,7 @@ export default function MarcaManual() {
               return (
                 <div
                   key={i}
-                  className="flex-1 flex flex-col justify-end p-8 sm:p-10 cursor-pointer select-none transition-all"
+                  className="sm:flex-1 flex flex-col justify-end p-6 sm:p-10 cursor-pointer select-none transition-all min-h-[100px] sm:min-h-0"
                   style={{ background: hex }}
                   onClick={() => {
                     navigator.clipboard.writeText(hex.toUpperCase()).catch(() => {})
@@ -382,8 +382,8 @@ export default function MarcaManual() {
                   }}
                   title="Clic para copiar"
                 >
-                  {c.nombre && <p className={`text-[18px] font-semibold mb-1 ${tc}`}>{c.nombre}</p>}
-                  <p className={`text-[13px] font-mono uppercase ${tc} opacity-80`}>
+                  {c.nombre && <p className={`text-[16px] sm:text-[18px] font-semibold mb-1 ${tc}`}>{c.nombre}</p>}
+                  <p className={`text-[12px] sm:text-[13px] font-mono uppercase ${tc} opacity-80`}>
                     {copied ? '¡Copiado!' : hex.toUpperCase()}
                   </p>
                   <p className={`text-[11px] font-mono ${tc} opacity-50 mt-0.5`}>RGB {r} · {g} · {b}</p>
