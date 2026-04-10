@@ -229,6 +229,7 @@ const STEPS = [
 
 export default function MarcaLanding() {
   const [loginOpen, setLoginOpen] = useState(false)
+  useEffect(() => { document.title = 'Marca — Ordo' }, [])
 
   return (
     <div className="min-h-screen bg-[#f8f8f8] text-[#373c42]">

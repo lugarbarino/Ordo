@@ -487,9 +487,8 @@ export default function MarcaProyecto() {
   const navigate = useNavigate()
   const [state, setState] = useState({ checked: false, cuenta: null, proyecto: null, proyectos: [] })
 
-  useEffect(() => {
-    load()
-  }, [proyectoId])
+  useEffect(() => { document.title = 'Marca — Ordo' }, [])
+  useEffect(() => { load() }, [proyectoId])
 
   const load = async () => {
     const { data: { session } } = await db.auth.getSession()

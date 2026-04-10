@@ -414,6 +414,7 @@ async function cargarCuenta(userId) {
 
 export default function MarcaAdmin() {
   const [state, setState] = useState({ checked: false, user: null, cuenta: null, error: null })
+  useEffect(() => { document.title = 'Marca — Ordo' }, [])
 
   useEffect(() => {
     let mounted = true
