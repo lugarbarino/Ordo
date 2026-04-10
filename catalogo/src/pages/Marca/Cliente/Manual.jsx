@@ -564,12 +564,20 @@ export default function MarcaManual() {
                               <p className="text-[12px] text-[#aaa]">Sin preview</p>
                             </div>
                           )}
-                          {tmpl.canva_url && (
-                            <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
-                              className="flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
-                              <ExternalLink size={11} /> Editar en Canva
-                            </a>
-                          )}
+                          <div className="flex gap-2">
+                            {tmpl.preview_url && (
+                              <a href={tmpl.preview_url} download target="_blank" rel="noreferrer"
+                                className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
+                                <Download size={11} /> Descargar
+                              </a>
+                            )}
+                            {tmpl.canva_url && (
+                              <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
+                                className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
+                                <ExternalLink size={11} /> Editar en Canva
+                              </a>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
