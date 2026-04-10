@@ -146,6 +146,9 @@ export default function MarcaManual() {
   const logos = manual?.logos || {}
   const tematica = manual?.tematica || ''
   const videoUrl = manual?.video_url || ''
+  const atributo = manual?.atributo || ''
+  const tagline = manual?.tagline || ''
+  const concepto = manual?.concepto || ''
   const colores = manual?.colores || []
   const tipografias = manual?.tipografias || []
   const mockups = manual?.mockups || []
@@ -200,6 +203,39 @@ export default function MarcaManual() {
           <p className="text-[10px] text-white uppercase tracking-[2px]">Scroll</p>
         </div>
       </div>
+
+      {/* CONCEPTO */}
+      {(atributo || tagline || concepto) && (
+        <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-center">
+            {/* Texto */}
+            <div className="flex flex-col gap-5">
+              {atributo && (
+                <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.4px]">{atributo}</p>
+              )}
+              <h2 className="text-[64px] sm:text-[80px] font-bold text-[#363645] leading-none">{proyecto.nombre}</h2>
+              {tagline && (
+                <p className="text-[18px] font-bold text-[#363645] leading-snug">{tagline}</p>
+              )}
+              {concepto && (
+                <p className="text-[15px] text-[#52586f] leading-relaxed">{concepto}</p>
+              )}
+            </div>
+            {/* Logo card */}
+            <div className="flex items-center justify-center">
+              {(logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']) && (
+                <div className="w-full max-w-[360px] border border-[#e8e8ee] rounded-2xl p-10 flex items-center justify-center bg-white">
+                  <img
+                    src={logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']}
+                    alt={proyecto.nombre}
+                    className="max-h-[120px] max-w-full object-contain"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* LOGOS */}
       {hayLogos && (
