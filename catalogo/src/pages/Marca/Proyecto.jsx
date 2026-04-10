@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu, LayoutDashboard } from 'lucide-react'
 import { db } from '../../lib/supabase'
+import { PanelManual } from './PanelManual'
 
 const PREGUNTAS_DEFAULT = [
   '¿A qué se dedica la empresa?',
@@ -218,14 +219,7 @@ function PanelFinalistas({ proyecto }) {
   )
 }
 
-function PanelManual({ proyecto }) {
-  return (
-    <div className="p-8">
-      <h2 className="text-xl font-black text-[#1c1c1c] mb-2">Manual de marca</h2>
-      <p className="text-sm text-[#888]">Próximamente — manual completo con logos, fuentes y aplicaciones.</p>
-    </div>
-  )
-}
+// PanelManual is imported from ./PanelManual
 
 // ── Stat card ────────────────────────────────────────────────
 function StatCard({ label, value, icon: Icon }) {
