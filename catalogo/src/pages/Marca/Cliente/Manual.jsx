@@ -44,6 +44,15 @@ async function downloadPng(url, nombre) {
   img.src = objUrl
 }
 
+function getCanvaEmbedUrl(url) {
+  if (!url) return null
+  try {
+    const u = new URL(url)
+    const path = u.pathname.replace(/\/(edit|view).*$/, '/view')
+    return `https://www.canva.com${path}?embed`
+  } catch { return null }
+}
+
 // ── Section header (01 ——— LOGOTIPO) ──────────────────────────
 function SectionHeader({ num, label }) {
   return (
@@ -458,6 +467,16 @@ export default function MarcaManual() {
                           {tmpl.preview_url ? (
                             <div className="bg-[#ececf0] rounded-2xl overflow-hidden flex items-end justify-center pt-4 px-4 min-h-[200px]">
                               <img src={tmpl.preview_url} alt={label} className="w-full max-h-[180px] object-contain object-bottom" />
+                            </div>
+                          ) : getCanvaEmbedUrl(tmpl.canva_url) ? (
+                            <div className="rounded-2xl overflow-hidden min-h-[200px] bg-[#f5f5f5] border border-[#e8e8ee]">
+                              <iframe
+                                src={getCanvaEmbedUrl(tmpl.canva_url)}
+                                className="w-full h-[200px] border-0 pointer-events-none"
+                                allow="fullscreen"
+                                loading="lazy"
+                                title={label}
+                              />
                             </div>
                           ) : (
                             <div className="bg-[#ececf0] rounded-2xl min-h-[200px] flex items-center justify-center">
