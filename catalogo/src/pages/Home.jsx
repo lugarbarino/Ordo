@@ -1,20 +1,28 @@
 import { useNavigate } from 'react-router-dom'
-import { LayoutGrid, Brush } from 'lucide-react'
+import { ArrowRight, LayoutGrid, Brush, Heart } from 'lucide-react'
 
 const OPCIONES = [
   {
     key: 'catalogo',
     label: 'Catálogo',
-    desc: 'Creá y compartí tu catálogo digital en minutos',
+    sub: 'Para vendedores y distribuidores',
+    desc: 'Creá tu catálogo digital, compartilo con clientes y recibí pedidos de presupuesto al instante.',
     icon: LayoutGrid,
     path: '/catalogo',
+    iconClass: 'icon-catalogo',
+    cardClass: 'card-catalogo',
+    features: ['Catálogo con fotos y precios', 'Link público para compartir', 'Pedidos de presupuesto'],
   },
   {
     key: 'marca',
     label: 'Marca',
-    desc: 'Gestioná la identidad de tus clientes y compartiles cada paso',
+    sub: 'Para diseñadores y agencias',
+    desc: 'Guiá a tu cliente por todo el proceso de identidad visual, desde el brief hasta el manual de marca.',
     icon: Brush,
     path: '/marca',
+    iconClass: 'icon-marca',
+    cardClass: 'card-marca',
+    features: ['Brief guiado con el cliente', 'Exploración y finalistas', 'Manual de marca profesional'],
   },
 ]
 
@@ -22,38 +30,100 @@ export default function Home() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-[#efefef] flex flex-col">
+    <div className="min-h-screen bg-[#f5f5f3] flex flex-col">
+      <style>{`
+        @keyframes grid-pop {
+          0%   { transform: scale(1) rotate(0deg); }
+          30%  { transform: scale(1.22) rotate(-6deg); }
+          60%  { transform: scale(1.18) rotate(5deg); }
+          100% { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes brush-sweep {
+          0%   { transform: rotate(0deg) translateY(0); }
+          20%  { transform: rotate(-18deg) translateY(-3px); }
+          50%  { transform: rotate(12deg) translateY(1px); }
+          75%  { transform: rotate(-6deg) translateY(-1px); }
+          100% { transform: rotate(0deg) translateY(0); }
+        }
+        .card-catalogo:hover .icon-catalogo {
+          animation: grid-pop 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+        .card-marca:hover .icon-marca {
+          animation: brush-sweep 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+        .tool-card {
+          transition: transform 0.22s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.22s ease;
+        }
+        .tool-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 24px 60px rgba(0,0,0,0.13);
+        }
+        .arrow-icon {
+          transition: transform 0.2s ease;
+        }
+        .tool-card:hover .arrow-icon {
+          transform: translateX(3px);
+        }
+      `}</style>
 
       {/* Nav */}
-      <nav className="px-10 py-7">
-        <img src="/logo-ordo.svg" alt="ORDO" className="h-6 w-auto" />
+      <nav className="px-8 sm:px-12 py-6 flex items-center justify-between">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
       </nav>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-20">
-        <div className="w-full max-w-[900px] text-center mb-12">
-          <h1 className="text-[clamp(48px,8vw,96px)] font-medium text-[#111] leading-[1.1] mb-4">
-            ¿Qué necesitas hacer hoy?
+      <div className="flex-1 flex flex-col items-center justify-center px-5 pb-16 pt-4">
+
+        {/* Header */}
+        <div className="text-center mb-14 max-w-[560px]">
+          <p className="text-xs font-semibold tracking-[0.14em] uppercase text-[#999] mb-4">Herramientas para tu negocio</p>
+          <h1 className="text-[clamp(36px,5vw,58px)] font-black text-[#111] leading-[1.08] tracking-tight mb-4">
+            ¿Qué querés hacer hoy?
           </h1>
-          <p className="text-[clamp(16px,2vw,24px)] text-[#60606f]">
-            Elegí una herramienta para arrancar.
+          <p className="text-[clamp(15px,1.8vw,18px)] text-[#777] leading-relaxed">
+            Elegí la herramienta que necesitás.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-5 w-full max-w-[900px]">
-          {OPCIONES.map(({ key, label, desc, icon: Icon, path }) => (
+        {/* Cards */}
+        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-[820px]">
+          {OPCIONES.map(({ key, label, sub, desc, icon: Icon, path, iconClass, cardClass, features }) => (
             <button
               key={key}
               onClick={() => navigate(path)}
-              className="flex-1 bg-white rounded-[22px] py-16 px-10 cursor-pointer border-none text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col items-center gap-4"
+              className={`${cardClass} tool-card flex-1 bg-white rounded-[24px] p-8 cursor-pointer border border-[#e8e8e6] text-left flex flex-col gap-6`}
             >
-              <Icon size={40} strokeWidth={1.5} className="text-[#111]" />
-              <div className="text-[clamp(28px,3.5vw,48px)] font-medium text-[#111] capitalize">{label}</div>
-              <div className="text-[clamp(14px,1.5vw,20px)] text-[#60606f] leading-[1.45] max-w-[280px]">{desc}</div>
+              {/* Top row */}
+              <div className="flex items-start justify-between">
+                <Icon size={26} strokeWidth={1.6} className={`${iconClass} text-[#1c1c1c]`} />
+                <ArrowRight size={18} className="arrow-icon text-[#bbb] mt-1" />
+              </div>
+
+              {/* Text */}
+              <div className="flex flex-col gap-2">
+                <p className="text-[11px] font-semibold text-[#aaa] uppercase tracking-widest">{sub}</p>
+                <h2 className="text-[clamp(24px,3vw,32px)] font-black text-[#111] leading-none tracking-tight">{label}</h2>
+                <p className="text-sm text-[#777] leading-relaxed mt-1">{desc}</p>
+              </div>
+
+              {/* Features */}
+              <ul className="flex flex-col gap-2 mt-auto pt-2">
+                {features.map(f => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm text-[#555]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1c1c1c] shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
             </button>
           ))}
         </div>
+
       </div>
+
+      <footer className="text-center pb-8 text-sm text-[#555]">
+        Hecho con <Heart size={13} className="inline text-[#e05c5c] fill-[#e05c5c] mx-0.5 -translate-y-px" /> en Argentina
+      </footer>
     </div>
   )
 }

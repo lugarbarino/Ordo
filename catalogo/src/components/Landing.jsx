@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Sparkles, Link, RefreshCw, Palette, Shield, Smartphone, Eye, EyeOff } from 'lucide-react'
+import { Sparkles, Link, RefreshCw, Palette, Shield, Smartphone, Eye, EyeOff, Heart } from 'lucide-react'
 import { db } from '../lib/supabase'
 import { Onboarding } from './Onboarding'
 
@@ -268,7 +268,7 @@ export function Landing() {
       {/* FOOTER */}
       <footer className="flex items-center justify-between px-4 sm:px-12 py-8 border-t border-[#e0e0e0] bg-[#f8f8f8]">
         <OrdoLogo className="h-[18px] w-auto opacity-50" />
-        <span className="text-sm sm:text-base text-[#333]">Hecho con <span className="text-[#c13e58]">❤</span> en Argentina</span>
+        <span className="text-sm text-[#555] flex items-center gap-1">Hecho con <Heart size={13} className="text-[#e05c5c] fill-[#e05c5c]" /> en Argentina</span>
       </footer>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onRegister={() => setMode('onboarding')} />
