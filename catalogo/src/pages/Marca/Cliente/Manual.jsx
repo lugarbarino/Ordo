@@ -87,6 +87,12 @@ const FRASES_POR_TEMA = {
     '"El estilo es la forma más silenciosa de presentarse al mundo."',
     '"Vestir bien no es vanidad; es respeto por uno mismo y por los demás."',
   ],
+  sostenibilidad: [
+    '"El futuro no se hereda; se construye con cada decisión del presente."',
+    '"Cuidar el planeta no es un costo; es la inversión más importante que existe."',
+    '"Lo sostenible no es lo que dura más, sino lo que deja menos huella al pasar."',
+    '"Cada acción consciente es un mensaje para las generaciones que aún no nacieron."',
+  ],
   generico: [
     '"Las marcas que perduran no venden productos; construyen significado."',
     '"La identidad de una marca vive en los detalles que la mayoría no nota."',
@@ -106,6 +112,7 @@ function generarFrase(tematica, idx) {
   else if (/gastro|restaurant|cocina|comida|café|food|catering/.test(t)) cat = 'gastronomia'
   else if (/educaci|escuela|formaci|academia|capacit|enseñ/.test(t)) cat = 'educacion'
   else if (/moda|ropa|indumen|fashion|textil|boutique/.test(t)) cat = 'moda'
+  else if (/sostenib|ecológ|verde|sustentab|medio ambiente|reciclaj|renovable/.test(t)) cat = 'sostenibilidad'
   const frases = FRASES_POR_TEMA[cat]
   return frases[idx % frases.length]
 }
