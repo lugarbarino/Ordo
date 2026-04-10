@@ -13,6 +13,8 @@ function loadGoogleFont(nombre) {
   document.head.appendChild(link)
 }
 
+const PAD = 16 // px padding inside card on download
+
 async function downloadSvg(url, nombre) {
   const res = await fetch(url)
   const blob = await res.blob()
@@ -31,10 +33,12 @@ async function downloadPng(url, nombre) {
   const img = new window.Image()
   img.onload = () => {
     const ratio = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1
-    const w = 1200; const h = Math.round(1200 / ratio)
+    const logoW = 1200; const logoH = Math.round(1200 / ratio)
     const canvas = document.createElement('canvas')
-    canvas.width = w; canvas.height = h
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+    canvas.width = logoW + PAD * 2; canvas.height = logoH + PAD * 2
+    const ctx = canvas.getContext('2d')
+    // transparent background — no fill
+    ctx.drawImage(img, PAD, PAD, logoW, logoH)
     const a = document.createElement('a')
     a.href = canvas.toDataURL('image/png')
     a.download = `${nombre}.png`
@@ -153,9 +157,9 @@ function LogoCard({ url, label, sub, dark, nombreBase, onZoom }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div onClick={() => onZoom?.(url)} className={`w-full h-[160px] rounded-2xl flex items-center justify-center p-8 border border-[#e0e0e6] cursor-zoom-in
+      <div onClick={() => onZoom?.({ url, dark })} className={`w-full h-[160px] rounded-2xl flex items-center justify-center p-8 border border-[#e0e0e6] cursor-zoom-in
         ${dark ? 'bg-[#363645]' : 'bg-white border-[#e0e0e6]'}`}>
-        <img src={url} alt={label} className="max-h-[90px] max-w-[80%] object-contain" />
+        <img src={url} alt={label} className="max-h-[90px] max-w-[80%] object-contain p-[16px]" />
       </div>
       <div>
         <p className="text-[14px] font-semibold text-[#363645]">{label}</p>
@@ -276,7 +280,13 @@ export default function MarcaManual() {
       {/* LIGHTBOX */}
       {lightbox && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm" onClick={() => setLightbox(null)}>
-          <img src={lightbox} alt="" className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl" onClick={e => e.stopPropagation()} />
+          <div
+            onClick={e => e.stopPropagation()}
+            className="rounded-2xl shadow-2xl flex items-center justify-center p-12"
+            style={{ backgroundColor: lightbox.dark ? '#363645' : '#ffffff', maxWidth: '80vw', maxHeight: '80vh' }}
+          >
+            <img src={lightbox.url} alt="" className="max-w-full max-h-full object-contain" style={{ maxHeight: '60vh' }} />
+          </div>
           <button onClick={() => setLightbox(null)} className="absolute top-5 right-5 text-white/60 hover:text-white bg-transparent border-none cursor-pointer p-2">
             <X size={24} />
           </button>
@@ -366,8 +376,8 @@ export default function MarcaManual() {
                     {ej && <p className="text-[13px] text-[#aaa]"><span className="font-semibold text-[#888]">Ej:</span> {ej}</p>}
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} onZoom={setLightbox} />}
-                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} onZoom={setLightbox} />}
+                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} onZoom={v => setLightbox(v)} />}
+                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} onZoom={v => setLightbox(v)} />}
                   </div>
                 </div>
               )
