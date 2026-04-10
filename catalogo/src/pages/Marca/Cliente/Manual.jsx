@@ -175,10 +175,10 @@ function LogoCard({ url, label, sub, dark, nombreBase }) {
 }
 
 const LOGO_GRUPOS = [
-  { key: 'iso',   label: 'Isotipo',              desc: 'Para espacios pequeños o cuando la marca ya es reconocible sin texto. Ej: app icon, favicon, avatar.',        claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
-  { key: 'texto', label: 'Logotipo',              desc: 'Cuando es clave que se lea el nombre. Ej: documentos, presentaciones, piezas institucionales.',               claro: 'texto_claro', oscuro: 'texto_oscuro' },
-  { key: 'horiz', label: 'Imagotipo horizontal',  desc: 'Uso principal y más versátil. Ej: web, banners, papelería.',                                                   claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
-  { key: 'vert',  label: 'Imagotipo vertical',    desc: 'Para espacios más altos que anchos.',                                                                          claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
+  { key: 'iso',   label: 'Isotipo',             uso: 'Para espacios pequeños o cuando la marca ya es reconocible sin texto.',  ej: 'App icon, favicon, avatar.',               claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
+  { key: 'texto', label: 'Logotipo',             uso: 'Cuando es clave que se lea el nombre completo de la marca.',            ej: 'Documentos, presentaciones, piezas institucionales.', claro: 'texto_claro', oscuro: 'texto_oscuro' },
+  { key: 'horiz', label: 'Imagotipo horizontal', uso: 'Uso principal y más versátil.',                                         ej: 'Web, banners, papelería.',                  claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
+  { key: 'vert',  label: 'Imagotipo vertical',   uso: 'Para espacios más altos que anchos.',                                   ej: 'Perfiles verticales, roll ups, señalética.', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
 ]
 
 const TEMPLATE_CATS = [
@@ -324,14 +324,17 @@ export default function MarcaManual() {
         <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24">
           <SectionHeader num={nextNum()} label="Logotipo" />
           <div className="flex flex-col gap-16">
-            {LOGO_GRUPOS.map(({ key, label, desc, claro, oscuro }) => {
+            {LOGO_GRUPOS.map(({ key, label, uso, ej, claro, oscuro }) => {
               const urlClaro = logos[claro]
               const urlOscuro = logos[oscuro]
               if (!urlClaro && !urlOscuro) return null
               return (
                 <div key={key}>
-                  <p className="text-[18px] font-semibold text-[#363645] mb-1">{label}</p>
-                  {desc && <p className="text-[14px] text-[#52586f] mb-6 max-w-[560px]">{desc}</p>}
+                  <p className="text-[18px] font-semibold text-[#363645] mb-2">{label}</p>
+                  <div className="flex flex-col gap-0.5 mb-6">
+                    {uso && <p className="text-[14px] text-[#52586f]">{uso}</p>}
+                    {ej && <p className="text-[13px] text-[#aaa]"><span className="font-semibold text-[#888]">Ej:</span> {ej}</p>}
+                  </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
                     {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
