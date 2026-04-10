@@ -9,7 +9,7 @@ function loadGoogleFont(nombre) {
   if (document.getElementById(id)) return
   const link = document.createElement('link')
   link.id = id; link.rel = 'stylesheet'
-  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(nombre)}:wght@400;700&display=swap`
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(nombre)}:wght@300;400;600;700;900&display=swap`
   document.head.appendChild(link)
 }
 
@@ -44,8 +44,19 @@ async function downloadPng(url, nombre) {
   img.src = objUrl
 }
 
+// ── Section header (01 ——— LOGOTIPO) ──────────────────────────
+function SectionHeader({ num, label }) {
+  return (
+    <div className="flex items-center gap-6 w-full mb-16">
+      <span className="text-[72px] font-bold text-[#ececf0] leading-none shrink-0">{num}</span>
+      <div className="flex-1 h-px bg-[#ececf0]" />
+      <span className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px] shrink-0">{label}</span>
+    </div>
+  )
+}
+
 // ── Logo card ─────────────────────────────────────────────────
-function LogoCard({ url, label, dark, nombreBase }) {
+function LogoCard({ url, label, sub, dark, nombreBase }) {
   const [dl, setDl] = useState('')
   if (!url) return null
 
@@ -60,13 +71,18 @@ function LogoCard({ url, label, dark, nombreBase }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className={`w-full h-[140px] rounded-2xl flex items-center justify-center p-6 ${dark ? 'bg-[#1a1a1a]' : 'bg-[#f5f5f5]'}`}>
-        <img src={url} alt={label} className="max-h-[100px] max-w-[85%] object-contain" />
+      <div className={`w-full h-[160px] rounded-2xl flex items-center justify-center p-8 border border-[#e0e0e6]
+        ${dark ? 'bg-[#363645]' : 'bg-white border-[#e0e0e6]'}`}>
+        <img src={url} alt={label} className="max-h-[90px] max-w-[80%] object-contain" />
+      </div>
+      <div>
+        <p className="text-[14px] font-semibold text-[#363645]">{label}</p>
+        {sub && <p className="text-[12px] text-[#52586f]">{sub}</p>}
       </div>
       <div className="flex gap-2">
         {[['svg','SVG'],['png','PNG']].map(([tipo, lbl]) => (
           <button key={tipo} onClick={() => handle(tipo)} disabled={!!dl}
-            className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-2 rounded-lg border border-[#e3e3e3] bg-white text-[#555] hover:border-[#1c1c1c] hover:text-[#1c1c1c] transition-colors cursor-pointer disabled:opacity-50">
+            className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors cursor-pointer disabled:opacity-50 bg-white">
             {dl === tipo ? <div className="w-3 h-3 rounded-full border border-[#ccc] border-t-[#555] animate-spin" /> : <Download size={11} />}
             {lbl}
           </button>
@@ -76,12 +92,11 @@ function LogoCard({ url, label, dark, nombreBase }) {
   )
 }
 
-// ── Sections ──────────────────────────────────────────────────
 const LOGO_GRUPOS = [
-  { key: 'iso',   label: 'Isotipo',    claro: 'iso_claro',    oscuro: 'iso_oscuro'   },
-  { key: 'texto', label: 'Solo texto', claro: 'texto_claro',  oscuro: 'texto_oscuro' },
-  { key: 'horiz', label: 'Horizontal', claro: 'horiz_claro',  oscuro: 'horiz_oscuro' },
-  { key: 'vert',  label: 'Vertical',   claro: 'vert_claro',   oscuro: 'vert_oscuro'  },
+  { key: 'iso',   label: 'Isotipo',    sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
+  { key: 'texto', label: 'Solo texto', sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'texto_claro', oscuro: 'texto_oscuro' },
+  { key: 'horiz', label: 'Horizontal', sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
+  { key: 'vert',  label: 'Vertical',   sub_c: 'Fondo claro',  sub_o: 'Fondo oscuro', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
 ]
 
 const TEMPLATE_CATS = [
@@ -89,16 +104,6 @@ const TEMPLATE_CATS = [
   { key: 'portada', label: 'Portada'        },
   { key: 'posts',   label: 'Posts'          },
 ]
-
-function Divider({ label }) {
-  return (
-    <div className="flex items-center gap-4 my-16">
-      <div className="flex-1 h-px bg-[#e8e8e8]" />
-      <span className="text-xs font-semibold text-[#bbb] uppercase tracking-widest">{label}</span>
-      <div className="flex-1 h-px bg-[#e8e8e8]" />
-    </div>
-  )
-}
 
 // ── Main ──────────────────────────────────────────────────────
 export default function MarcaManual() {
@@ -118,7 +123,6 @@ export default function MarcaManual() {
       const { data: rows } = await db.from('manual_marca').select('*').eq('proyecto_id', p.id).limit(1)
       const m = rows?.[0] || null
       setManual(m)
-      // Precargar Google Fonts
       m?.tipografias?.forEach(t => { if (t.nombre) loadGoogleFont(t.nombre) })
       setCargando(false)
     }
@@ -127,7 +131,7 @@ export default function MarcaManual() {
 
   if (cargando) return (
     <div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#1c1c1c] animate-spin" />
+      <div className="w-8 h-8 rounded-full border-4 border-[#e3e3e3] border-t-[#363645] animate-spin" />
     </div>
   )
 
@@ -153,149 +157,169 @@ export default function MarcaManual() {
   const hayUsos = usosCorrectos.length > 0 || usosIncorrectos.length > 0
   const hayTemplates = TEMPLATE_CATS.some(({ key }) => (templates[key] || []).some(t => t?.preview_url || t?.canva_url))
 
-  const vacio = !hayLogos && !hayColores && !hayTipos && !hayMockups && !hayUsos && !hayTemplates
+  let sectionNum = 0
+  const nextNum = () => String(++sectionNum).padStart(2, '0')
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-[Inter,sans-serif]">
 
-      {/* Header */}
-      <header className="border-b border-[#f0f0f0] px-6 sm:px-16 py-5 flex items-center justify-between sticky top-0 bg-white z-10">
-        <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto opacity-60" />
-        <p className="text-sm font-semibold text-[#1c1c1c]">{proyecto.nombre}</p>
-      </header>
-
-      {/* Hero */}
-      <div className="bg-[#1c1c1c] px-6 sm:px-16 py-20 sm:py-28">
-        <p className="text-white/40 text-xs font-semibold uppercase tracking-[0.2em] mb-4">Manual de marca</p>
-        <h1 className="text-4xl sm:text-6xl font-black text-white leading-none tracking-tight">{proyecto.nombre}</h1>
+      {/* HERO */}
+      <div className="bg-[#363645] min-h-[560px] flex flex-col items-center justify-center px-8 py-24 relative overflow-hidden">
+        {/* Subtle gradient glow */}
+        <div className="absolute inset-0 opacity-10" style={{
+          background: 'radial-gradient(ellipse at 20% 50%, #c63f3f 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, #52586f 0%, transparent 50%)'
+        }} />
+        <div className="relative flex flex-col items-center gap-8 max-w-[480px] text-center">
+          <p className="text-[11px] font-semibold text-white/40 uppercase tracking-[2px]">Guía de Identidad de Marca</p>
+          <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight">{proyecto.nombre}</h1>
+          <div className="w-16 h-px bg-white/20" />
+          <p className="text-[13px] text-white/40">{new Date().getFullYear()}</p>
+        </div>
+        {/* Scroll hint */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
+          <div className="w-px h-10 bg-white" />
+          <p className="text-[10px] text-white uppercase tracking-[2px]">Scroll</p>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-[900px] mx-auto px-6 sm:px-8 py-16">
-
-        {vacio && (
-          <div className="text-center py-20">
-            <p className="text-[#bbb] text-sm">El manual todavía no tiene contenido.</p>
-          </div>
-        )}
+      {/* CONTENT */}
+      <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24 flex flex-col gap-24">
 
         {/* LOGOS */}
         {hayLogos && (
-          <>
-            <Divider label="Logotipo" />
-            <div className="flex flex-col gap-12">
-              {LOGO_GRUPOS.map(({ key, label, claro, oscuro }) => {
+          <div>
+            <SectionHeader num={nextNum()} label="Logotipo" />
+            <div className="flex flex-col gap-16">
+              {LOGO_GRUPOS.map(({ key, label, sub_c, sub_o, claro, oscuro }) => {
                 const urlClaro = logos[claro]
                 const urlOscuro = logos[oscuro]
                 if (!urlClaro && !urlOscuro) return null
                 return (
                   <div key={key}>
-                    <p className="text-xs font-semibold text-[#aaa] uppercase tracking-widest mb-4">{label}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {urlClaro && <LogoCard url={urlClaro} label={`${label} — fondo claro`} dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
-                      {urlOscuro && <LogoCard url={urlOscuro} label={`${label} — fondo oscuro`} dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
+                    <p className="text-[16px] font-semibold text-[#363645] mb-1">{label}</p>
+                    <p className="text-[14px] text-[#52586f] mb-6">{urlClaro && urlOscuro ? 'Versiones sobre fondo claro y oscuro.' : urlClaro ? 'Versión sobre fondo claro.' : 'Versión sobre fondo oscuro.'}</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {urlClaro && <LogoCard url={urlClaro} label="Sobre claro" sub={sub_c} dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
+                      {urlOscuro && <LogoCard url={urlOscuro} label="Sobre oscuro" sub={sub_o} dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
                     </div>
                   </div>
                 )
               })}
             </div>
-          </>
+          </div>
         )}
 
         {/* COLORES */}
         {hayColores && (
-          <>
-            <Divider label="Paleta de colores" />
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {colores.map((c, i) => (
-                <div key={i} className="flex flex-col gap-2">
-                  <div className="w-full aspect-square rounded-2xl border border-black/5" style={{ background: c.hex }} />
-                  <div>
-                    <p className="text-xs font-bold text-[#1c1c1c]">{c.nombre || 'Sin nombre'}</p>
-                    <p className="text-xs font-mono text-[#888] uppercase">{c.hex}</p>
-                    {c.uso && <p className="text-xs text-[#aaa] mt-0.5">{c.uso}</p>}
+          <div>
+            <SectionHeader num={nextNum()} label="Paleta de colores" />
+            <div className="flex rounded-2xl overflow-hidden h-[280px] sm:h-[320px]">
+              {colores.map((c, i) => {
+                const isLight = parseInt(c.hex.slice(1,3),16)*0.299 + parseInt(c.hex.slice(3,5),16)*0.587 + parseInt(c.hex.slice(5,7),16)*0.114 > 160
+                return (
+                  <div key={i} className="flex-1 flex flex-col justify-end p-6 sm:p-8" style={{ background: c.hex }}>
+                    {c.nombre && <p className={`text-[16px] font-semibold mb-1 ${isLight ? 'text-[#363645]' : 'text-white'}`}>{c.nombre}</p>}
+                    <p className={`text-[13px] font-mono uppercase ${isLight ? 'text-[#363645]/80' : 'text-white/80'}`}>{c.hex}</p>
+                    {c.uso && <p className={`text-[11px] mt-1 ${isLight ? 'text-[#363645]/50' : 'text-white/50'}`}>{c.uso}</p>}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
-          </>
+          </div>
         )}
 
         {/* TIPOGRAFÍA */}
         {hayTipos && (
-          <>
-            <Divider label="Tipografía" />
-            <div className="flex flex-col gap-8">
+          <div>
+            <SectionHeader num={nextNum()} label="Tipografía" />
+            <div className="flex flex-col gap-20">
               {tipografias.map((t, i) => (
-                <div key={i} className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <div>
-                      <p className="text-base font-bold text-[#1c1c1c]">{t.nombre}</p>
-                      {t.uso && <p className="text-xs text-[#888]">{t.uso}</p>}
+                <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-start">
+                  {/* Left: info */}
+                  <div className="flex flex-col gap-4">
+                    <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.2px]">{i === 0 ? 'Fuente principal' : 'Fuente secundaria'}</p>
+                    <p className="text-[80px] sm:text-[96px] font-normal leading-none text-[#363645]" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>{t.nombre}</p>
+                    {t.uso && <p className="text-[14px] text-[#52586f] leading-relaxed">{t.uso}</p>}
+                    <div className="flex flex-col gap-2 pt-2">
+                      {['Light','Regular','Bold','Black'].map(w => (
+                        <div key={w} className="flex items-baseline gap-6">
+                          <span className="text-[12px] text-[#52586f] w-14 shrink-0">{w}</span>
+                          <span className="text-[22px] text-[#363645]" style={{ fontFamily: `'${t.nombre}', sans-serif`, fontWeight: w === 'Light' ? 300 : w === 'Regular' ? 400 : w === 'Bold' ? 700 : 900 }}>
+                            Aa Bb Cc 123
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 pt-2">
                       {t.url && (
                         <a href={t.url} target="_blank" rel="noreferrer"
-                          className="flex items-center gap-1.5 text-xs font-semibold py-2 px-3 rounded-lg border border-[#e3e3e3] bg-white text-[#555] hover:border-[#1c1c1c] hover:text-[#1c1c1c] transition-colors no-underline">
+                          className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline bg-white">
                           <ExternalLink size={11} /> Google Fonts
                         </a>
                       )}
                       {t.archivo_url && (
                         <button onClick={() => {
-                          const a = document.createElement('a')
                           fetch(t.archivo_url).then(r => r.blob()).then(b => {
+                            const a = document.createElement('a')
                             a.href = URL.createObjectURL(b); a.download = t.archivo_nombre || 'fuente'; a.click()
                           })
-                        }} className="flex items-center gap-1.5 text-xs font-semibold py-2 px-3 rounded-lg border border-[#e3e3e3] bg-white text-[#555] hover:border-[#1c1c1c] hover:text-[#1c1c1c] transition-colors cursor-pointer">
+                        }} className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors cursor-pointer bg-white">
                           <Download size={11} /> Descargar fuente
                         </button>
                       )}
                     </div>
                   </div>
-                  <p className="text-5xl text-[#1c1c1c] leading-tight font-normal mt-2" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
-                    Aa Bb Cc 123
-                  </p>
-                  <p className="text-base text-[#555] leading-relaxed" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
-                    La identidad visual define cómo el mundo percibe a una marca.
-                  </p>
+                  {/* Right: specimen */}
+                  <div className="flex flex-col gap-4">
+                    <div className="bg-[#ececf0] rounded-2xl p-8 overflow-hidden" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
+                      <p className="text-[13px] font-bold text-[#52586f] tracking-[1.4px] mb-1">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+                      <p className="text-[13px] text-[#52586f] mb-1">abcdefghijklmnopqrstuvwxyz</p>
+                      <p className="text-[13px] text-[#52586f] mb-1">1234567890</p>
+                      <p className="text-[13px] text-[#52586f]">!@#$%&*().,;:'"-+=/</p>
+                    </div>
+                    <div className="bg-[#363645] rounded-2xl p-8" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
+                      <p className="text-[14px] font-light text-white leading-relaxed">
+                        "La identidad visual define cómo el mundo percibe una marca. Cada trazo comunica valores, visión y carácter."
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-          </>
+          </div>
         )}
 
-        {/* MOCKUPS */}
+        {/* APLICACIONES / MOCKUPS */}
         {hayMockups && (
-          <>
-            <Divider label="Aplicaciones" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <SectionHeader num={nextNum()} label="Aplicaciones" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {mockups.map((m, i) => (
-                <div key={i} className="flex flex-col gap-2">
-                  <img src={m.url} alt={m.caption || ''} className="w-full rounded-2xl object-cover" />
-                  {m.caption && <p className="text-xs text-[#888] text-center">{m.caption}</p>}
+                <div key={i} className="bg-[#ececf0] rounded-2xl overflow-hidden flex items-end justify-center pt-6 px-6 min-h-[280px]">
+                  <img src={m.url} alt={m.caption || ''} className="w-full max-h-[260px] object-contain object-bottom" />
                 </div>
               ))}
             </div>
-          </>
+          </div>
         )}
 
         {/* USOS */}
         {hayUsos && (
-          <>
-            <Divider label="Uso del logo" />
+          <div>
+            <SectionHeader num={nextNum()} label="Uso del logotipo" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {usosCorrectos.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-green-700 uppercase tracking-widest mb-4">✓ Usos correctos</p>
+                  <p className="text-[11px] font-bold text-green-700 uppercase tracking-[1.2px] mb-5">✓ Usos correctos</p>
                   <div className="flex flex-col gap-3">
                     {usosCorrectos.map((u, i) => (
-                      <div key={i} className="flex gap-3 items-start bg-green-50 rounded-xl p-3">
+                      <div key={i} className="flex gap-3 items-start bg-green-50 rounded-2xl p-4">
                         <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center shrink-0 mt-0.5">
                           <Check size={11} className="text-white" />
                         </div>
                         <div className="flex-1">
-                          {u.texto && <p className="text-sm text-[#333]">{u.texto}</p>}
-                          {u.imagen_url && <img src={u.imagen_url} alt="" className="mt-2 w-full max-h-[120px] object-contain rounded-lg bg-white border border-green-100" />}
+                          {u.texto && <p className="text-[14px] text-[#363645]">{u.texto}</p>}
+                          {u.imagen_url && <img src={u.imagen_url} alt="" className="mt-2 w-full max-h-[120px] object-contain rounded-xl bg-white border border-green-100" />}
                         </div>
                       </div>
                     ))}
@@ -304,16 +328,16 @@ export default function MarcaManual() {
               )}
               {usosIncorrectos.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-red-600 uppercase tracking-widest mb-4">✕ Usos incorrectos</p>
+                  <p className="text-[11px] font-bold text-red-600 uppercase tracking-[1.2px] mb-5">✕ Usos incorrectos</p>
                   <div className="flex flex-col gap-3">
                     {usosIncorrectos.map((u, i) => (
-                      <div key={i} className="flex gap-3 items-start bg-red-50 rounded-xl p-3">
+                      <div key={i} className="flex gap-3 items-start bg-red-50 rounded-2xl p-4">
                         <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center shrink-0 mt-0.5">
                           <X size={11} className="text-white" />
                         </div>
                         <div className="flex-1">
-                          {u.texto && <p className="text-sm text-[#333]">{u.texto}</p>}
-                          {u.imagen_url && <img src={u.imagen_url} alt="" className="mt-2 w-full max-h-[120px] object-contain rounded-lg bg-white border border-red-100" />}
+                          {u.texto && <p className="text-[14px] text-[#363645]">{u.texto}</p>}
+                          {u.imagen_url && <img src={u.imagen_url} alt="" className="mt-2 w-full max-h-[120px] object-contain rounded-xl bg-white border border-red-100" />}
                         </div>
                       </div>
                     ))}
@@ -321,29 +345,35 @@ export default function MarcaManual() {
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
 
         {/* TEMPLATES REDES */}
         {hayTemplates && (
-          <>
-            <Divider label="Templates para redes" />
-            <div className="flex flex-col gap-10">
+          <div>
+            <SectionHeader num={nextNum()} label="Templates para redes" />
+            <div className="flex flex-col gap-12">
               {TEMPLATE_CATS.map(({ key, label }) => {
                 const items = (templates[key] || []).filter(t => t?.preview_url || t?.canva_url)
                 if (!items.length) return null
                 return (
                   <div key={key}>
-                    <p className="text-xs font-semibold text-[#aaa] uppercase tracking-widest mb-4">{label}</p>
+                    <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px] mb-6">{label}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       {items.map((tmpl, i) => (
-                        <div key={i} className="flex flex-col gap-2">
-                          {tmpl.preview_url && (
-                            <img src={tmpl.preview_url} alt={label} className="w-full aspect-video object-cover rounded-xl border border-[#e3e3e3]" />
+                        <div key={i} className="flex flex-col gap-3">
+                          {tmpl.preview_url ? (
+                            <div className="bg-[#ececf0] rounded-2xl overflow-hidden flex items-end justify-center pt-4 px-4 min-h-[200px]">
+                              <img src={tmpl.preview_url} alt={label} className="w-full max-h-[180px] object-contain object-bottom" />
+                            </div>
+                          ) : (
+                            <div className="bg-[#ececf0] rounded-2xl min-h-[200px] flex items-center justify-center">
+                              <p className="text-[12px] text-[#aaa]">Sin preview</p>
+                            </div>
                           )}
                           {tmpl.canva_url && (
                             <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
-                              className="flex items-center justify-center gap-1.5 text-xs font-semibold py-2 rounded-lg border border-[#e3e3e3] bg-white text-[#555] hover:border-[#1c1c1c] hover:text-[#1c1c1c] transition-colors no-underline">
+                              className="flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
                               <ExternalLink size={11} /> Editar en Canva
                             </a>
                           )}
@@ -354,16 +384,28 @@ export default function MarcaManual() {
                 )
               })}
             </div>
-          </>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!hayLogos && !hayColores && !hayTipos && !hayMockups && !hayUsos && !hayTemplates && (
+          <div className="py-24 text-center">
+            <p className="text-[#bbb] text-sm">El manual todavía no tiene contenido.</p>
+          </div>
         )}
 
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-[#f0f0f0] px-6 sm:px-16 py-8 flex items-center justify-between mt-8">
-        <img src="/logo-ordo.svg" alt="ORDO" className="h-4 w-auto opacity-30" />
-        <p className="text-xs text-[#bbb]">{proyecto.nombre} · Manual de marca</p>
-      </footer>
+      {/* FOOTER */}
+      <div className="bg-[#363645] px-8 sm:px-16 py-12">
+        <div className="max-w-[1024px] mx-auto flex items-center justify-between">
+          <img src="/logo-ordo.svg" alt="ORDO" className="h-4 w-auto opacity-30 invert" />
+          <div className="text-right">
+            <p className="text-[12px] text-white/40">Guía de Identidad de Marca · {new Date().getFullYear()}</p>
+            <p className="text-[12px] text-white/30 mt-0.5">{proyecto.nombre}</p>
+          </div>
+        </div>
+      </div>
 
     </div>
   )
