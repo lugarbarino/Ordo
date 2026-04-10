@@ -328,8 +328,10 @@ export default function MarcaManual() {
                 const frase = t.frase || (tematica ? `"${tematica}"` : '"La tipografía da voz e identidad a cada mensaje de la marca."')
                 const isEven = i % 2 === 0
 
+                const gfUrl = t.url || (t.nombre ? `https://fonts.google.com/specimen/${encodeURIComponent(t.nombre)}` : null)
+
                 const infoPanel = (
-                  <div className="flex flex-col gap-4">
+                  <div className={`flex flex-col gap-4 ${isEven ? 'order-1' : 'order-1 sm:order-2'}`}>
                     <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.2px]">{i === 0 ? 'Fuente principal' : 'Fuente secundaria'}</p>
                     <p className="text-[72px] sm:text-[88px] font-normal leading-none text-[#363645]" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>{t.nombre}</p>
                     {t.uso && <p className="text-[14px] text-[#52586f] leading-relaxed">{t.uso}</p>}
@@ -344,8 +346,8 @@ export default function MarcaManual() {
                       ))}
                     </div>
                     <div className="flex gap-2 pt-2">
-                      {t.url && (
-                        <a href={t.url} target="_blank" rel="noreferrer"
+                      {gfUrl && (
+                        <a href={gfUrl} target="_blank" rel="noreferrer"
                           className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline bg-white">
                           <ExternalLink size={11} /> Google Fonts
                         </a>
@@ -365,7 +367,7 @@ export default function MarcaManual() {
                 )
 
                 const specimenPanel = (
-                  <div className="flex flex-col gap-4">
+                  <div className={`flex flex-col gap-4 ${isEven ? 'order-2' : 'order-2 sm:order-1'}`}>
                     <div className="bg-[#ececf0] rounded-2xl p-8 overflow-hidden" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
                       <p className="text-[13px] font-bold text-[#52586f] tracking-[1.4px] mb-1">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
                       <p className="text-[13px] text-[#52586f] mb-1">abcdefghijklmnopqrstuvwxyz</p>
@@ -382,8 +384,8 @@ export default function MarcaManual() {
 
                 return (
                   <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-start">
-                    {isEven ? infoPanel : specimenPanel}
-                    {isEven ? specimenPanel : infoPanel}
+                    {infoPanel}
+                    {specimenPanel}
                   </div>
                 )
               })}
