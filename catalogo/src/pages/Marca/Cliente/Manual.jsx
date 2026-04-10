@@ -157,9 +157,9 @@ function LogoCard({ url, label, sub, dark, nombreBase, onZoom }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div onClick={() => onZoom?.({ url, dark })} className={`w-full h-[160px] rounded-2xl flex items-center justify-center p-8 border border-[#e0e0e6] cursor-zoom-in
+      <div onClick={() => onZoom?.({ url, dark })} className={`w-full h-[200px] rounded-2xl flex items-center justify-center p-6 border border-[#e0e0e6] cursor-zoom-in
         ${dark ? 'bg-[#363645]' : 'bg-white border-[#e0e0e6]'}`}>
-        <img src={url} alt={label} className="max-h-[90px] max-w-[80%] object-contain p-[16px]" />
+        <img src={url} alt={label} className="max-h-full max-w-full object-contain" />
       </div>
       <div>
         <p className="text-[14px] font-semibold text-[#363645]">{label}</p>
