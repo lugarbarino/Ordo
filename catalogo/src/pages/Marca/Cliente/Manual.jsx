@@ -447,8 +447,8 @@ export default function MarcaManual() {
                       <p className="text-[13px] text-[#52586f] mb-1">1234567890</p>
                       <p className="text-[13px] text-[#52586f]">!@#$%&*().,;:'"-+=/</p>
                     </div>
-                    <div className="bg-[#363645] rounded-2xl p-8" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
-                      <p className="text-[15px] font-light text-white leading-relaxed italic">
+                    <div className="bg-[#363645] rounded-2xl p-8 sm:p-10" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
+                      <p className="text-[22px] sm:text-[26px] font-light text-white leading-snug italic">
                         {frase}
                       </p>
                     </div>
