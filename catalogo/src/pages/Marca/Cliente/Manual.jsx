@@ -233,6 +233,8 @@ export default function MarcaManual() {
   const concepto = manual?.concepto || ''
   const descripcion = manual?.descripcion || ''
   const colores = manual?.colores || []
+  const colorAcento = colores.find(c => c.esAcento) || colores[0]
+  const acento = colorAcento?.hex ? (colorAcento.hex.startsWith('#') ? colorAcento.hex : `#${colorAcento.hex}`) : '#c63f3f'
   const tipografias = manual?.tipografias || []
   const mockups = manual?.mockups || []
   const usosCorrectos = manual?.usos_correctos || []
@@ -291,7 +293,7 @@ export default function MarcaManual() {
             {/* Texto */}
             <div className="flex flex-col gap-5">
               {atributo && (
-                <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.4px]">{atributo}</p>
+                <p className="text-[11px] font-bold uppercase tracking-[1.4px]" style={{ color: acento }}>{atributo}</p>
               )}
               {tagline && (
                 <h2 className="text-[64px] sm:text-[80px] font-bold text-[#363645] leading-none">{tagline}</h2>
@@ -408,7 +410,7 @@ export default function MarcaManual() {
 
                 const infoPanel = (
                   <div className={`flex flex-col gap-4 ${isEven ? 'order-1' : 'order-1 sm:order-2'}`}>
-                    <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.2px]">{i === 0 ? 'Fuente principal' : 'Fuente secundaria'}</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[1.2px]" style={{ color: acento }}>{i === 0 ? 'Fuente principal' : 'Fuente secundaria'}</p>
                     <p className="text-[72px] sm:text-[88px] font-normal leading-none text-[#363645]" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>{t.nombre}</p>
                     {t.uso && <p className="text-[14px] text-[#52586f] leading-relaxed">{t.uso}</p>}
                     <div className="flex flex-col gap-2 pt-2">

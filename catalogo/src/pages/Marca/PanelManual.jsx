@@ -145,6 +145,13 @@ function ColorRow({ color, onChange, onDelete, onUp, onDown, isFirst, isLast }) 
         className="flex-1" placeholder="Ej: Azul principal" />
       <Input value={color.uso} onChange={e => onChange({ ...color, uso: e.target.value })}
         className="flex-1 text-[#888]" placeholder="Ej: Color primario" />
+      <button
+        onClick={() => onChange({ ...color, esAcento: !color.esAcento })}
+        title="Marcar como color de acento"
+        className={`shrink-0 text-[11px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer
+          ${color.esAcento ? 'bg-[#1c1c1c] text-white border-[#1c1c1c]' : 'bg-transparent text-[#bbb] border-[#e3e3e3] hover:border-[#999] hover:text-[#555]'}`}>
+        Acento
+      </button>
       <Button variant="ghost" size="sm" onClick={onDelete} className="text-[#ccc] hover:text-red-500 shrink-0">
         <Trash2 size={14} />
       </Button>
