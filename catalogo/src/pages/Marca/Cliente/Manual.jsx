@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { Download, ExternalLink, Check, X } from 'lucide-react'
 import { db } from '../../../lib/supabase'
@@ -111,6 +111,8 @@ export default function MarcaManual() {
   const [proyecto, setProyecto] = useState(null)
   const [manual, setManual] = useState(null)
   const [cargando, setCargando] = useState(true)
+  const [copiedIdx, setCopiedIdx] = useState(null)
+  const copyTimer = useRef(null)
 
   useEffect(() => {
     const cargar = async () => {
@@ -181,7 +183,7 @@ export default function MarcaManual() {
         <div className="relative flex flex-col items-center gap-8 max-w-[560px] text-center">
           {/* Logo horizontal oscuro */}
           {logos['horiz_oscuro'] && (
-            <img src={logos['horiz_oscuro']} alt={proyecto.nombre} className="h-12 sm:h-16 w-auto object-contain" />
+            <img src={logos['horiz_oscuro']} alt={proyecto.nombre} className="h-20 sm:h-28 w-auto object-contain" />
           )}
           {!logos['horiz_oscuro'] && (
             <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight">{proyecto.nombre}</h1>
@@ -243,10 +245,24 @@ export default function MarcaManual() {
               const b = parseInt(hex.slice(5,7),16)
               const isLight = r*0.299 + g*0.587 + b*0.114 > 160
               const tc = isLight ? 'text-[#363645]' : 'text-white'
+              const copied = copiedIdx === i
               return (
-                <div key={i} className="flex-1 flex flex-col justify-end p-8 sm:p-10" style={{ background: hex }}>
+                <div
+                  key={i}
+                  className="flex-1 flex flex-col justify-end p-8 sm:p-10 cursor-pointer select-none transition-all"
+                  style={{ background: hex }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(hex.toUpperCase()).catch(() => {})
+                    setCopiedIdx(i)
+                    clearTimeout(copyTimer.current)
+                    copyTimer.current = setTimeout(() => setCopiedIdx(null), 1800)
+                  }}
+                  title="Clic para copiar"
+                >
                   {c.nombre && <p className={`text-[18px] font-semibold mb-1 ${tc}`}>{c.nombre}</p>}
-                  <p className={`text-[13px] font-mono uppercase ${tc} opacity-80`}>{hex.toUpperCase()}</p>
+                  <p className={`text-[13px] font-mono uppercase ${tc} opacity-80`}>
+                    {copied ? '¡Copiado!' : hex.toUpperCase()}
+                  </p>
                   <p className={`text-[11px] font-mono ${tc} opacity-50 mt-0.5`}>RGB {r} · {g} · {b}</p>
                 </div>
               )

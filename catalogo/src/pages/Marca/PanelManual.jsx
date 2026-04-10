@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { Upload, Plus, Trash2, Check, X, Image, ExternalLink, Download } from 'lucide-react'
+import { Upload, Plus, Trash2, Check, X, Image, ExternalLink, Download, Search } from 'lucide-react'
 import { db, SUPABASE_URL } from '../../lib/supabase'
 import { Button } from '../../components/admin/ui/Button'
 import { Input } from '../../components/admin/ui/Input'
 import { Card } from '../../components/admin/ui/Card'
+import { PexelsPicker } from '../../components/PexelsPicker'
 
 // ── Upload helpers ────────────────────────────────────────────
 function subirArchivo(proyectoId, file) {
@@ -399,6 +400,7 @@ export function PanelManual({ proyecto }) {
   const [data, setData] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [pexelsOpen, setPexelsOpen] = useState(false)
   const [logos, setLogos] = useState({})
   const [tematica, setTematica] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
@@ -503,13 +505,21 @@ export function PanelManual({ proyecto }) {
             />
           </div>
           <div>
-            <p className="text-xs font-semibold text-[#555] mb-1">Video de fondo (URL)</p>
-            <p className="text-[11px] text-[#aaa] mb-2">Pegá el link directo al archivo de video (.mp4). Podés usar Pexels → "Descargar" → copiar URL.</p>
-            <Input
-              value={videoUrl}
-              onChange={e => setVideoUrl(e.target.value)}
-              placeholder="https://videos.pexels.com/video-files/..."
-            />
+            <p className="text-xs font-semibold text-[#555] mb-1">Video de fondo</p>
+            <div className="flex gap-2 items-start">
+              <Input
+                value={videoUrl}
+                onChange={e => setVideoUrl(e.target.value)}
+                placeholder="https://videos.pexels.com/video-files/..."
+                className="flex-1"
+              />
+              <Button size="sm" variant="secondary" onClick={() => setPexelsOpen(true)}>
+                <Search size={13} /> Pexels
+              </Button>
+            </div>
+            {videoUrl && (
+              <video src={videoUrl} muted className="mt-2 w-full max-h-[100px] object-cover rounded-xl" />
+            )}
           </div>
         </div>
       </Section>
@@ -590,6 +600,12 @@ export function PanelManual({ proyecto }) {
           ))}
         </div>
       </Section>
+
+      <PexelsPicker
+        open={pexelsOpen}
+        onClose={() => setPexelsOpen(false)}
+        onSelect={({ url }) => setVideoUrl(url)}
+      />
 
     </div>
   )
