@@ -400,6 +400,8 @@ export function PanelManual({ proyecto }) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [logos, setLogos] = useState({})
+  const [tematica, setTematica] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
   const [colores, setColores] = useState([])
   const [tipografias, setTipografias] = useState([])
   const [mockups, setMockups] = useState([])
@@ -415,6 +417,8 @@ export function PanelManual({ proyecto }) {
     if (!row) return
     setData(row)
     setLogos(row.logos || {})
+    setTematica(row.tematica || '')
+    setVideoUrl(row.video_url || '')
     setColores(row.colores || [])
     setTipografias(row.tipografias || [])
     setMockups(row.mockups || [])
@@ -425,7 +429,7 @@ export function PanelManual({ proyecto }) {
 
   const guardar = async () => {
     setSaving(true)
-    const payload = { proyecto_id: proyecto.id, logos, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates }
+    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates }
     if (data?.id) {
       await db.from('manual_marca').update(payload).eq('id', data.id)
     } else {
@@ -483,6 +487,32 @@ export function PanelManual({ proyecto }) {
           </Button>
         </div>
       </div>
+
+      {/* HERO */}
+      <Section title="Hero del manual" hint="Temática y video de fondo para la portada pública.">
+        <div className="flex flex-col gap-4">
+          <div>
+            <p className="text-xs font-semibold text-[#555] mb-1">Temática de la marca</p>
+            <p className="text-[11px] text-[#aaa] mb-2">Describí el rubro, estilo y valores. Ej: "estudio jurídico, profesional, confianza, modernidad".</p>
+            <textarea
+              value={tematica}
+              onChange={e => setTematica(e.target.value)}
+              placeholder="Ej: agencia de diseño, creativa, joven, minimalista..."
+              rows={3}
+              className="w-full border border-[#e3e3e3] rounded-xl px-3 py-2 text-sm text-[#1c1c1c] resize-none focus:outline-none focus:border-[#1c1c1c]"
+            />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#555] mb-1">Video de fondo (URL)</p>
+            <p className="text-[11px] text-[#aaa] mb-2">Pegá el link directo al archivo de video (.mp4). Podés usar Pexels → "Descargar" → copiar URL.</p>
+            <Input
+              value={videoUrl}
+              onChange={e => setVideoUrl(e.target.value)}
+              placeholder="https://videos.pexels.com/video-files/..."
+            />
+          </div>
+        </div>
+      </Section>
 
       {/* LOGOS */}
       <Section title="Logotipo" hint="Solo SVG. El cliente puede descargar en SVG o PNG.">

@@ -142,6 +142,8 @@ export default function MarcaManual() {
   )
 
   const logos = manual?.logos || {}
+  const tematica = manual?.tematica || ''
+  const videoUrl = manual?.video_url || ''
   const colores = manual?.colores || []
   const tipografias = manual?.tipografias || []
   const mockups = manual?.mockups || []
@@ -164,16 +166,31 @@ export default function MarcaManual() {
     <div className="min-h-screen bg-white font-[Inter,sans-serif]">
 
       {/* HERO */}
-      <div className="bg-[#363645] min-h-[560px] flex flex-col items-center justify-center px-8 py-24 relative overflow-hidden">
-        {/* Subtle gradient glow */}
-        <div className="absolute inset-0 opacity-10" style={{
-          background: 'radial-gradient(ellipse at 20% 50%, #c63f3f 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, #52586f 0%, transparent 50%)'
-        }} />
-        <div className="relative flex flex-col items-center gap-8 max-w-[480px] text-center">
-          <p className="text-[11px] font-semibold text-white/40 uppercase tracking-[2px]">Guía de Identidad de Marca</p>
-          <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight">{proyecto.nombre}</h1>
+      <div className="min-h-[600px] flex flex-col items-center justify-center px-8 py-24 relative overflow-hidden bg-[#1a1a1a]">
+        {/* Video de fondo */}
+        {videoUrl && (
+          <video
+            autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            src={videoUrl}
+          />
+        )}
+        {/* Overlay oscuro */}
+        <div className="absolute inset-0 bg-black/60" />
+
+        <div className="relative flex flex-col items-center gap-8 max-w-[560px] text-center">
+          {/* Logo horizontal oscuro */}
+          {logos['horiz_oscuro'] && (
+            <img src={logos['horiz_oscuro']} alt={proyecto.nombre} className="h-12 sm:h-16 w-auto object-contain" />
+          )}
+          {!logos['horiz_oscuro'] && (
+            <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight">{proyecto.nombre}</h1>
+          )}
           <div className="w-16 h-px bg-white/20" />
-          <p className="text-[13px] text-white/40">{new Date().getFullYear()}</p>
+          <p className="text-[11px] font-semibold text-white/40 uppercase tracking-[2px]">Guía de Identidad de Marca</p>
+          {tematica && (
+            <p className="text-[15px] text-white/60 leading-relaxed max-w-[380px]">{tematica}</p>
+          )}
         </div>
         {/* Scroll hint */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
