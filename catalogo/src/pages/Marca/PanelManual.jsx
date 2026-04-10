@@ -205,6 +205,13 @@ function TipoRow({ tipo, onChange, onDelete, proyectoId }) {
             </Button>
           )}
         </div>
+        <textarea
+          value={tipo.frase || ''}
+          onChange={e => onChange({ ...tipo, frase: e.target.value })}
+          placeholder="Frase para mostrar en el manual (opcional). Ej: una frase del rubro de la marca."
+          rows={2}
+          className="w-full border border-[#e3e3e3] rounded-xl px-3 py-2 text-sm text-[#1c1c1c] resize-none focus:outline-none focus:border-[#1c1c1c]"
+        />
         {tipo.nombre && (
           <p className="text-3xl text-[#1c1c1c] leading-tight px-1 mt-1" style={{ fontFamily: `'${tipo.nombre}', sans-serif` }}>
             Aa Bb Cc 123
@@ -449,7 +456,7 @@ export function PanelManual({ proyecto }) {
   const updateColor = (i, v) => setColores(c => c.map((x, idx) => idx === i ? v : x))
   const removeColor = (i) => setColores(c => c.filter((_, idx) => idx !== i))
 
-  const addTipo = () => setTipografias(t => [...t, { nombre: '', uso: '', url: '', archivo_url: '', archivo_nombre: '' }])
+  const addTipo = () => setTipografias(t => [...t, { nombre: '', uso: '', url: '', archivo_url: '', archivo_nombre: '', frase: '' }])
   const updateTipo = (i, v) => setTipografias(t => t.map((x, idx) => idx === i ? v : x))
   const removeTipo = (i) => setTipografias(t => t.filter((_, idx) => idx !== i))
 

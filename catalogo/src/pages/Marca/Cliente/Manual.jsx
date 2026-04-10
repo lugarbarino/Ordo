@@ -280,13 +280,7 @@ export default function MarcaManual() {
             <SectionHeader num={nextNum()} label="Tipografía" />
             <div className="flex flex-col gap-20">
               {tipografias.map((t, i) => {
-                const frases = [
-                  '"El diseño no es solo cómo se ve, es cómo funciona. La tipografía da voz a las ideas."',
-                  '"Las palabras tienen poder. La tipografía les da forma, ritmo y personalidad propia."',
-                  '"Una fuente bien elegida transforma el mensaje en experiencia memorable."',
-                  '"El carácter de una marca vive en cada letra, en cada espacio, en cada trazo."',
-                ]
-                const frase = t.frase || frases[i % frases.length]
+                const frase = t.frase || (tematica ? `"${tematica}"` : '"La tipografía da voz e identidad a cada mensaje de la marca."')
                 const isEven = i % 2 === 0
 
                 const infoPanel = (
