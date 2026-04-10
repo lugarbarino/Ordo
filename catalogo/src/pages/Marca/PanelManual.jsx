@@ -303,41 +303,63 @@ function MockupGrid({ mockups, onMockups, proyectoId }) {
   )
 }
 
-// ── TemplateSlot ──────────────────────────────────────────────
-function TemplateSlot({ tmpl, onChange, proyectoId }) {
+// ── TemplateItem — una imagen + link Canva ────────────────────
+function TemplateItem({ item, onChange, onDelete, proyectoId }) {
   const ref = useRef()
   const [loading, setLoading] = useState(false)
 
   const handleFile = async (file) => {
     setLoading(true)
-    try { onChange({ ...tmpl, preview_url: await subirArchivo(proyectoId, file) }) }
+    try { onChange({ ...item, preview_url: await subirArchivo(proyectoId, file) }) }
     catch (e) { alert('Error: ' + e.message) }
     finally { setLoading(false) }
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {tmpl.preview_url ? (
-        <div className="relative aspect-video rounded-xl overflow-hidden border border-[#e0e0e0] group cursor-pointer" onClick={() => ref.current?.click()}>
-          <img src={tmpl.preview_url} alt="" className="w-full h-full object-cover" />
+    <Card className="flex flex-col gap-2 p-3">
+      {item.preview_url ? (
+        <div className="relative aspect-video rounded-lg overflow-hidden border border-[#e0e0e0] group cursor-pointer" onClick={() => ref.current?.click()}>
+          <img src={item.preview_url} alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Upload size={16} className="text-white" />
+            <Upload size={14} className="text-white" />
           </div>
-          <Button size="sm" variant="danger" onClick={e => { e.stopPropagation(); onChange({ ...tmpl, preview_url: '' }) }}
-            className="absolute top-1.5 right-1.5 !p-0.5 !rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-            <X size={9} />
-          </Button>
         </div>
       ) : (
         <Button variant="secondary" loading={loading} onClick={() => ref.current?.click()}
-          className="aspect-video flex-col gap-1.5 border-dashed !border-2 w-full">
-          <Upload size={15} className="text-[#ccc]" />
+          className="aspect-video flex-col gap-1 border-dashed !border-2 w-full">
+          <Upload size={14} className="text-[#ccc]" />
           <span className="text-[10px] text-[#ccc]">Preview</span>
         </Button>
       )}
-      <Input value={tmpl.canva_url || ''} onChange={e => onChange({ ...tmpl, canva_url: e.target.value })}
+      <Input value={item.canva_url || ''} onChange={e => onChange({ ...item, canva_url: e.target.value })}
         className="text-xs text-[#888]" placeholder="Link de Canva (opcional)" />
+      <Button variant="ghost" size="sm" onClick={onDelete} className="text-[#ccc] hover:text-red-500 self-end -mt-1">
+        <Trash2 size={12} /> Eliminar
+      </Button>
       <input ref={ref} type="file" accept="image/*" className="hidden" onChange={e => handleFile(e.target.files[0])} />
+    </Card>
+  )
+}
+
+// ── TemplateCategoria ─────────────────────────────────────────
+function TemplateCategoria({ label, items, onChange, proyectoId }) {
+  const addItem = () => onChange([...items, { preview_url: '', canva_url: '' }])
+  const updateItem = (i, v) => onChange(items.map((x, idx) => idx === i ? v : x))
+  const removeItem = (i) => onChange(items.filter((_, idx) => idx !== i))
+
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-xs font-semibold text-[#666] uppercase tracking-wide">{label}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {items.map((item, i) => (
+          <TemplateItem key={i} item={item} onChange={v => updateItem(i, v)} onDelete={() => removeItem(i)} proyectoId={proyectoId} />
+        ))}
+        <Button variant="secondary" onClick={addItem}
+          className="aspect-video flex-col gap-1.5 border-dashed !border-2">
+          <Plus size={16} className="text-[#ccc]" />
+          <span className="text-xs text-[#ccc]">Agregar</span>
+        </Button>
+      </div>
     </div>
   )
 }
@@ -366,15 +388,10 @@ const LOGO_VARIANTS = [
   { key: 'vert_oscuro',  label: 'Vertical',   sub: 'Fondo oscuro', dark: true  },
 ]
 
-const REDES = [
-  { key: 'ig_post',    label: 'Instagram Post',   sub: '1080 × 1080' },
-  { key: 'ig_story',   label: 'Instagram Story',  sub: '1080 × 1920' },
-  { key: 'fb_portada', label: 'Facebook Portada', sub: '1640 × 924'  },
-  { key: 'li_portada', label: 'LinkedIn Portada', sub: '1584 × 396'  },
-  { key: 'li_post',    label: 'LinkedIn Post',    sub: '1200 × 627'  },
-  { key: 'canva_1',    label: 'Template Canva 1', sub: 'Personalizado' },
-  { key: 'canva_2',    label: 'Template Canva 2', sub: 'Personalizado' },
-  { key: 'canva_3',    label: 'Template Canva 3', sub: 'Personalizado' },
+const TEMPLATE_CATS = [
+  { key: 'foto',     label: 'Foto de perfil' },
+  { key: 'portada',  label: 'Portada'        },
+  { key: 'posts',    label: 'Posts'          },
 ]
 
 // ── Main ──────────────────────────────────────────────────────
@@ -403,7 +420,7 @@ export function PanelManual({ proyecto }) {
     setMockups(row.mockups || [])
     setUsosCorrectos(row.usos_correctos || [])
     setUsosIncorrectos(row.usos_incorrectos || [])
-    setTemplates(row.templates || {})
+    setTemplates(row.templates || { foto: [], portada: [], posts: [] })
   }
 
   const guardar = async () => {
@@ -420,7 +437,7 @@ export function PanelManual({ proyecto }) {
   }
 
   const setLogo = (key, url) => setLogos(l => ({ ...l, [key]: url }))
-  const updateTemplate = (key, v) => setTemplates(t => ({ ...t, [key]: v }))
+  const updateTemplatesCat = (key, items) => setTemplates(t => ({ ...t, [key]: items }))
 
   const addColor = () => setColores(c => [...c, { hex: '#000000', nombre: '', uso: '' }])
   const updateColor = (i, v) => setColores(c => c.map((x, idx) => idx === i ? v : x))
@@ -527,14 +544,16 @@ export function PanelManual({ proyecto }) {
       </Section>
 
       {/* TEMPLATES REDES */}
-      <Section title="Templates para redes sociales" hint="Subí un preview de cada template y/o el link de Canva para que el cliente lo edite.">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {REDES.map(({ key, label, sub }) => (
-            <div key={key} className="flex flex-col gap-1">
-              <p className="text-[11px] font-bold text-[#1c1c1c]">{label}</p>
-              <p className="text-[10px] text-[#aaa] mb-1">{sub}</p>
-              <TemplateSlot tmpl={templates[key] || { preview_url: '', canva_url: '' }} onChange={v => updateTemplate(key, v)} proyectoId={proyecto.id} />
-            </div>
+      <Section title="Templates para redes sociales" hint="Preview + link de Canva para que el cliente edite cada template.">
+        <div className="flex flex-col gap-8">
+          {TEMPLATE_CATS.map(({ key, label }) => (
+            <TemplateCategoria
+              key={key}
+              label={label}
+              items={templates[key] || []}
+              onChange={items => updateTemplatesCat(key, items)}
+              proyectoId={proyecto.id}
+            />
           ))}
         </div>
       </Section>

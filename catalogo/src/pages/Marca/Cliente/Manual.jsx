@@ -84,16 +84,11 @@ const LOGO_GRUPOS = [
   { key: 'vert',  label: 'Vertical',   claro: 'vert_claro',   oscuro: 'vert_oscuro'  },
 ]
 
-const REDES_LABELS = {
-  ig_post:    'Instagram Post',
-  ig_story:   'Instagram Story',
-  fb_portada: 'Facebook Portada',
-  li_portada: 'LinkedIn Portada',
-  li_post:    'LinkedIn Post',
-  canva_1:    'Template 1',
-  canva_2:    'Template 2',
-  canva_3:    'Template 3',
-}
+const TEMPLATE_CATS = [
+  { key: 'foto',    label: 'Foto de perfil' },
+  { key: 'portada', label: 'Portada'        },
+  { key: 'posts',   label: 'Posts'          },
+]
 
 function Divider({ label }) {
   return (
@@ -154,7 +149,7 @@ export default function MarcaManual() {
   const hayTipos = tipografias.length > 0
   const hayMockups = mockups.length > 0
   const hayUsos = usosCorrectos.length > 0 || usosIncorrectos.length > 0
-  const hayTemplates = Object.values(templates).some(t => t?.preview_url || t?.canva_url)
+  const hayTemplates = TEMPLATE_CATS.some(({ key }) => (templates[key] || []).some(t => t?.preview_url || t?.canva_url))
 
   const vacio = !hayLogos && !hayColores && !hayTipos && !hayMockups && !hayUsos && !hayTemplates
 
@@ -331,21 +326,28 @@ export default function MarcaManual() {
         {hayTemplates && (
           <>
             <Divider label="Templates para redes" />
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-              {Object.entries(templates).map(([key, tmpl]) => {
-                if (!tmpl?.preview_url && !tmpl?.canva_url) return null
+            <div className="flex flex-col gap-10">
+              {TEMPLATE_CATS.map(({ key, label }) => {
+                const items = (templates[key] || []).filter(t => t?.preview_url || t?.canva_url)
+                if (!items.length) return null
                 return (
-                  <div key={key} className="flex flex-col gap-2">
-                    {tmpl.preview_url && (
-                      <img src={tmpl.preview_url} alt={REDES_LABELS[key] || key} className="w-full aspect-video object-cover rounded-xl border border-[#e3e3e3]" />
-                    )}
-                    <p className="text-xs font-semibold text-[#1c1c1c]">{REDES_LABELS[key] || key}</p>
-                    {tmpl.canva_url && (
-                      <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
-                        className="flex items-center justify-center gap-1.5 text-xs font-semibold py-2 rounded-lg border border-[#e3e3e3] bg-white text-[#555] hover:border-[#1c1c1c] hover:text-[#1c1c1c] transition-colors no-underline">
-                        <ExternalLink size={11} /> Editar en Canva
-                      </a>
-                    )}
+                  <div key={key}>
+                    <p className="text-xs font-semibold text-[#aaa] uppercase tracking-widest mb-4">{label}</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {items.map((tmpl, i) => (
+                        <div key={i} className="flex flex-col gap-2">
+                          {tmpl.preview_url && (
+                            <img src={tmpl.preview_url} alt={label} className="w-full aspect-video object-cover rounded-xl border border-[#e3e3e3]" />
+                          )}
+                          {tmpl.canva_url && (
+                            <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
+                              className="flex items-center justify-center gap-1.5 text-xs font-semibold py-2 rounded-lg border border-[#e3e3e3] bg-white text-[#555] hover:border-[#1c1c1c] hover:text-[#1c1c1c] transition-colors no-underline">
+                              <ExternalLink size={11} /> Editar en Canva
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )
               })}
