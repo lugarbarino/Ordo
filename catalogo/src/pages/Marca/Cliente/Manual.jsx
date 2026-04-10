@@ -263,12 +263,20 @@ export default function MarcaManual() {
           <div>
             <SectionHeader num={nextNum()} label="Tipografía" />
             <div className="flex flex-col gap-20">
-              {tipografias.map((t, i) => (
-                <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-start">
-                  {/* Left: info */}
+              {tipografias.map((t, i) => {
+                const frases = [
+                  '"El diseño no es solo cómo se ve, es cómo funciona. La tipografía da voz a las ideas."',
+                  '"Las palabras tienen poder. La tipografía les da forma, ritmo y personalidad propia."',
+                  '"Una fuente bien elegida transforma el mensaje en experiencia memorable."',
+                  '"El carácter de una marca vive en cada letra, en cada espacio, en cada trazo."',
+                ]
+                const frase = t.frase || frases[i % frases.length]
+                const isEven = i % 2 === 0
+
+                const infoPanel = (
                   <div className="flex flex-col gap-4">
                     <p className="text-[11px] font-bold text-[#c63f3f] uppercase tracking-[1.2px]">{i === 0 ? 'Fuente principal' : 'Fuente secundaria'}</p>
-                    <p className="text-[80px] sm:text-[96px] font-normal leading-none text-[#363645]" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>{t.nombre}</p>
+                    <p className="text-[72px] sm:text-[88px] font-normal leading-none text-[#363645]" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>{t.nombre}</p>
                     {t.uso && <p className="text-[14px] text-[#52586f] leading-relaxed">{t.uso}</p>}
                     <div className="flex flex-col gap-2 pt-2">
                       {['Light','Regular','Bold','Black'].map(w => (
@@ -299,7 +307,9 @@ export default function MarcaManual() {
                       )}
                     </div>
                   </div>
-                  {/* Right: specimen */}
+                )
+
+                const specimenPanel = (
                   <div className="flex flex-col gap-4">
                     <div className="bg-[#ececf0] rounded-2xl p-8 overflow-hidden" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
                       <p className="text-[13px] font-bold text-[#52586f] tracking-[1.4px] mb-1">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
@@ -308,13 +318,20 @@ export default function MarcaManual() {
                       <p className="text-[13px] text-[#52586f]">!@#$%&*().,;:'"-+=/</p>
                     </div>
                     <div className="bg-[#363645] rounded-2xl p-8" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
-                      <p className="text-[14px] font-light text-white leading-relaxed">
-                        "La identidad visual define cómo el mundo percibe una marca. Cada trazo comunica valores, visión y carácter."
+                      <p className="text-[15px] font-light text-white leading-relaxed italic">
+                        {frase}
                       </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+
+                return (
+                  <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-start">
+                    {isEven ? infoPanel : specimenPanel}
+                    {isEven ? specimenPanel : infoPanel}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
