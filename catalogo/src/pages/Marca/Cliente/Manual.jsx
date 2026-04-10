@@ -199,51 +199,64 @@ export default function MarcaManual() {
         </div>
       </div>
 
-      {/* CONTENT */}
+      {/* LOGOS */}
+      {hayLogos && (
+        <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24">
+          <SectionHeader num={nextNum()} label="Logotipo" />
+          <div className="flex flex-col gap-16">
+            {LOGO_GRUPOS.map(({ key, label, sub_c, sub_o, claro, oscuro }) => {
+              const urlClaro = logos[claro]
+              const urlOscuro = logos[oscuro]
+              if (!urlClaro && !urlOscuro) return null
+              return (
+                <div key={key}>
+                  <p className="text-[16px] font-semibold text-[#363645] mb-1">{label}</p>
+                  <p className="text-[14px] text-[#52586f] mb-6">{urlClaro && urlOscuro ? 'Versiones sobre fondo claro y oscuro.' : urlClaro ? 'Versión sobre fondo claro.' : 'Versión sobre fondo oscuro.'}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {urlClaro && <LogoCard url={urlClaro} label="Sobre claro" sub={sub_c} dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
+                    {urlOscuro && <LogoCard url={urlOscuro} label="Sobre oscuro" sub={sub_o} dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* COLORES — full width, fondo oscuro */}
+      {hayColores && (
+        <div className="bg-[#363645]">
+          {/* Header dentro del fondo oscuro */}
+          <div className="max-w-[1024px] mx-auto px-6 sm:px-12 pt-20 pb-16">
+            <div className="flex items-center gap-6 w-full">
+              <span className="text-[72px] font-bold text-white/20 leading-none shrink-0">{nextNum()}</span>
+              <div className="flex-1 h-px bg-white/20" />
+              <span className="text-[13px] font-semibold text-white/30 uppercase tracking-[1.4px] shrink-0">Paleta de colores</span>
+            </div>
+          </div>
+          {/* Strips full-width */}
+          <div className="flex h-[320px] sm:h-[360px]">
+            {colores.map((c, i) => {
+              const hex = c.hex?.startsWith('#') ? c.hex : `#${c.hex}`
+              const r = parseInt(hex.slice(1,3),16)
+              const g = parseInt(hex.slice(3,5),16)
+              const b = parseInt(hex.slice(5,7),16)
+              const isLight = r*0.299 + g*0.587 + b*0.114 > 160
+              const tc = isLight ? 'text-[#363645]' : 'text-white'
+              return (
+                <div key={i} className="flex-1 flex flex-col justify-end p-8 sm:p-10" style={{ background: hex }}>
+                  {c.nombre && <p className={`text-[18px] font-semibold mb-1 ${tc}`}>{c.nombre}</p>}
+                  <p className={`text-[13px] font-mono uppercase ${tc} opacity-80`}>{hex.toUpperCase()}</p>
+                  <p className={`text-[11px] font-mono ${tc} opacity-50 mt-0.5`}>RGB {r} · {g} · {b}</p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* REST OF CONTENT */}
       <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24 flex flex-col gap-24">
-
-        {/* LOGOS */}
-        {hayLogos && (
-          <div>
-            <SectionHeader num={nextNum()} label="Logotipo" />
-            <div className="flex flex-col gap-16">
-              {LOGO_GRUPOS.map(({ key, label, sub_c, sub_o, claro, oscuro }) => {
-                const urlClaro = logos[claro]
-                const urlOscuro = logos[oscuro]
-                if (!urlClaro && !urlOscuro) return null
-                return (
-                  <div key={key}>
-                    <p className="text-[16px] font-semibold text-[#363645] mb-1">{label}</p>
-                    <p className="text-[14px] text-[#52586f] mb-6">{urlClaro && urlOscuro ? 'Versiones sobre fondo claro y oscuro.' : urlClaro ? 'Versión sobre fondo claro.' : 'Versión sobre fondo oscuro.'}</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      {urlClaro && <LogoCard url={urlClaro} label="Sobre claro" sub={sub_c} dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
-                      {urlOscuro && <LogoCard url={urlOscuro} label="Sobre oscuro" sub={sub_o} dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* COLORES */}
-        {hayColores && (
-          <div>
-            <SectionHeader num={nextNum()} label="Paleta de colores" />
-            <div className="flex rounded-2xl overflow-hidden h-[280px] sm:h-[320px]">
-              {colores.map((c, i) => {
-                const isLight = parseInt(c.hex.slice(1,3),16)*0.299 + parseInt(c.hex.slice(3,5),16)*0.587 + parseInt(c.hex.slice(5,7),16)*0.114 > 160
-                return (
-                  <div key={i} className="flex-1 flex flex-col justify-end p-6 sm:p-8" style={{ background: c.hex }}>
-                    {c.nombre && <p className={`text-[16px] font-semibold mb-1 ${isLight ? 'text-[#363645]' : 'text-white'}`}>{c.nombre}</p>}
-                    <p className={`text-[13px] font-mono uppercase ${isLight ? 'text-[#363645]/80' : 'text-white/80'}`}>{c.hex}</p>
-                    {c.uso && <p className={`text-[11px] mt-1 ${isLight ? 'text-[#363645]/50' : 'text-white/50'}`}>{c.uso}</p>}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
 
         {/* TIPOGRAFÍA */}
         {hayTipos && (
