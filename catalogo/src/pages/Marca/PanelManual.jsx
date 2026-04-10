@@ -467,18 +467,21 @@ export function PanelManual({ proyecto }) {
   return (
     <div className="px-8 py-6 max-w-[860px]">
 
-      {/* Header sticky */}
-      <div className="sticky top-0 z-20 bg-white border-b border-[#f0f0f0] -mx-8 px-8 py-4 mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h2 className="text-base font-black text-[#1c1c1c]">Manual de marca</h2>
-          <a href={`/marca/${slug}`} target="_blank" rel="noreferrer"
-            className="flex items-center gap-1.5 text-xs text-[#888] hover:text-[#1c1c1c] no-underline transition-colors">
-            <ExternalLink size={12} /> Ver manual
-          </a>
+      {/* Header */}
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-[#1c1c1c] mb-1">Manual de marca</h2>
+          <p className="text-sm text-[#888]">Logos, colores, tipografía y más para entregar al cliente.</p>
         </div>
-        <Button variant="primary" loading={saving} onClick={guardar}>
-          {saved && !saving ? <><Check size={14} /> Guardado</> : 'Guardar'}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <a href={`/marca/${slug}`} target="_blank" rel="noreferrer"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#1c1c1c] border border-[#e8e8e8] bg-white px-3 py-2 rounded-[8px] no-underline hover:border-[#ccc] transition-colors">
+            <ExternalLink size={13} /> Ver link del cliente
+          </a>
+          <Button variant="primary" loading={saving} onClick={guardar}>
+            {saved && !saving ? <><Check size={14} /> Guardado</> : 'Guardar'}
+          </Button>
+        </div>
       </div>
 
       {/* LOGOS */}

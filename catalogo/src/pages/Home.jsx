@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, LayoutGrid, Brush } from 'lucide-react'
+import { ArrowRight, LayoutGrid, Brush, Heart } from 'lucide-react'
 
 const OPCIONES = [
   {
@@ -12,7 +12,6 @@ const OPCIONES = [
     iconClass: 'icon-catalogo',
     cardClass: 'card-catalogo',
     features: ['Catálogo con fotos y precios', 'Link público para compartir', 'Pedidos de presupuesto'],
-    accent: '#1c1c1c',
   },
   {
     key: 'marca',
@@ -24,7 +23,6 @@ const OPCIONES = [
     iconClass: 'icon-marca',
     cardClass: 'card-marca',
     features: ['Brief guiado con el cliente', 'Exploración y finalistas', 'Manual de marca profesional'],
-    accent: '#1c1c1c',
   },
 ]
 
@@ -97,9 +95,7 @@ export default function Home() {
             >
               {/* Top row */}
               <div className="flex items-start justify-between">
-                <div className="w-12 h-12 bg-[#f0f0ee] rounded-[14px] flex items-center justify-center">
-                  <Icon size={22} strokeWidth={1.8} className={`${iconClass} text-[#1c1c1c]`} />
-                </div>
+                <Icon size={26} strokeWidth={1.6} className={`${iconClass} text-[#1c1c1c]`} />
                 <ArrowRight size={18} className="arrow-icon text-[#bbb] mt-1" />
               </div>
 
@@ -111,7 +107,7 @@ export default function Home() {
               </div>
 
               {/* Features */}
-              <ul className="flex flex-col gap-2 mt-auto pt-2 border-t border-[#f0f0ee]">
+              <ul className="flex flex-col gap-2 mt-auto pt-2">
                 {features.map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-[#555]">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#1c1c1c] shrink-0" />
@@ -125,8 +121,8 @@ export default function Home() {
 
       </div>
 
-      <footer className="text-center pb-8 text-xs text-[#bbb]">
-        Hecho en Argentina
+      <footer className="text-center pb-8 text-sm text-[#555]">
+        Hecho con <Heart size={13} className="inline text-[#e05c5c] fill-[#e05c5c] mx-0.5 -translate-y-px" /> en Argentina
       </footer>
     </div>
   )
