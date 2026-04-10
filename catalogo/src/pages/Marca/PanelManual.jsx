@@ -134,11 +134,39 @@ function ColorRow({ color, onChange, onDelete }) {
   )
 }
 
+// Extrae nombre de fuente desde URL de Google Fonts
+// https://fonts.google.com/specimen/Playfair+Display → "Playfair Display"
+function extractGoogleFontName(url) {
+  if (!url) return ''
+  try {
+    const match = url.match(/specimen\/([^/?#]+)/) || url.match(/family=([^:&]+)/)
+    if (match) return decodeURIComponent(match[1].replace(/\+/g, ' '))
+  } catch {}
+  return ''
+}
+
+// Inyecta link de Google Fonts en el <head> si no existe ya
+function loadGoogleFont(nombre) {
+  if (!nombre) return
+  const id = `gfont-${nombre.replace(/\s+/g, '-')}`
+  if (document.getElementById(id)) return
+  const link = document.createElement('link')
+  link.id = id
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(nombre)}:wght@400;700&display=swap`
+  document.head.appendChild(link)
+}
+
 // ── TipoRow ───────────────────────────────────────────────────
 function TipoRow({ tipo, onChange, onDelete, proyectoId }) {
   const fontRef = useRef()
   const [uploading, setUploading] = useState(false)
   const [dlLoading, setDlLoading] = useState(false)
+
+  // Auto-carga la fuente de Google Fonts cuando hay nombre
+  useEffect(() => {
+    if (tipo.nombre) loadGoogleFont(tipo.nombre)
+  }, [tipo.nombre])
 
   const handleFontFile = async (file) => {
     setUploading(true)
@@ -147,18 +175,24 @@ function TipoRow({ tipo, onChange, onDelete, proyectoId }) {
     finally { setUploading(false) }
   }
 
+  const handleUrlChange = (url) => {
+    const nombre = extractGoogleFontName(url)
+    onChange({ ...tipo, url, ...(nombre ? { nombre } : {}) })
+    if (nombre) loadGoogleFont(nombre)
+  }
+
   return (
     <Card className="flex items-start gap-3 p-4">
       <div className="flex-1 flex flex-col gap-2">
         <div className="flex gap-2">
-          <Input value={tipo.nombre} onChange={e => onChange({ ...tipo, nombre: e.target.value })}
+          <Input value={tipo.nombre} onChange={e => { onChange({ ...tipo, nombre: e.target.value }); loadGoogleFont(e.target.value) }}
             className="flex-1 font-semibold" placeholder="Nombre (ej: Inter)" />
           <Input value={tipo.uso} onChange={e => onChange({ ...tipo, uso: e.target.value })}
             className="flex-1 text-[#888]" placeholder="Uso (ej: Títulos)" />
         </div>
         <div className="flex gap-2">
-          <Input value={tipo.url} onChange={e => onChange({ ...tipo, url: e.target.value })}
-            className="flex-1 text-[#888] text-xs" placeholder="URL Google Fonts (opcional)" />
+          <Input value={tipo.url} onChange={e => handleUrlChange(e.target.value)}
+            className="flex-1 text-[#888] text-xs" placeholder="Pegá el link de Google Fonts (se autodetecta el nombre)" />
           {tipo.archivo_url ? (
             <Button size="sm" variant="secondary" loading={dlLoading}
               onClick={async () => { setDlLoading(true); await descargarArchivo(tipo.archivo_url, tipo.archivo_nombre || 'fuente').catch(() => alert('Error')); setDlLoading(false) }}>

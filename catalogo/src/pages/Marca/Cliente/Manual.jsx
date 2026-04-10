@@ -3,6 +3,16 @@ import { useParams } from 'react-router-dom'
 import { Download, ExternalLink, Check, X } from 'lucide-react'
 import { db } from '../../../lib/supabase'
 
+function loadGoogleFont(nombre) {
+  if (!nombre) return
+  const id = `gfont-${nombre.replace(/\s+/g, '-')}`
+  if (document.getElementById(id)) return
+  const link = document.createElement('link')
+  link.id = id; link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(nombre)}:wght@400;700&display=swap`
+  document.head.appendChild(link)
+}
+
 async function downloadSvg(url, nombre) {
   const res = await fetch(url)
   const blob = await res.blob()
@@ -109,7 +119,10 @@ export default function MarcaManual() {
       if (!p) { setCargando(false); return }
       setProyecto(p)
       const { data: rows } = await db.from('manual_marca').select('*').eq('proyecto_id', p.id).limit(1)
-      setManual(rows?.[0] || null)
+      const m = rows?.[0] || null
+      setManual(m)
+      // Precargar Google Fonts
+      m?.tipografias?.forEach(t => { if (t.nombre) loadGoogleFont(t.nombre) })
       setCargando(false)
     }
     cargar()
