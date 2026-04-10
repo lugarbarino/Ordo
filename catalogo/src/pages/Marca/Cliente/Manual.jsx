@@ -44,6 +44,72 @@ async function downloadPng(url, nombre) {
   img.src = objUrl
 }
 
+const FRASES_POR_TEMA = {
+  juridico: [
+    '"El derecho es el arte de hacer lo correcto, incluso cuando nadie está mirando."',
+    '"La ley no protege solo los derechos; protege las personas detrás de ellos."',
+    '"La confianza se construye con actos, no con palabras. El derecho los respalda."',
+    '"Donde hay justicia, hay futuro. Donde hay rigor, hay tranquilidad."',
+  ],
+  salud: [
+    '"Cuidar es más que una profesión; es la forma más profunda de escuchar."',
+    '"La salud no es un destino, es el camino que recorremos juntos."',
+    '"Detrás de cada tratamiento, hay una persona que merece lo mejor."',
+    '"Sanar comienza con confiar. Confiar comienza con presencia."',
+  ],
+  tecnologia: [
+    '"La tecnología no reemplaza lo humano; amplifica lo que somos capaces de crear."',
+    '"Innovar es ver el problema antes de que el problema te encuentre."',
+    '"El código bien escrito es poesía que solo entienden las máquinas y sus autores."',
+    '"Cada solución digital empieza con una pregunta humana."',
+  ],
+  creativo: [
+    '"El diseño no decora el mundo; lo hace más comprensible."',
+    '"Una idea bien ejecutada puede cambiar cómo alguien ve su día."',
+    '"La creatividad no es talento; es la disciplina de hacerse preguntas incómodas."',
+    '"Lo que no se puede ver todavía, ya existe en la mente del diseñador."',
+  ],
+  gastronomia: [
+    '"Una mesa bien puesta no alimenta el cuerpo solo; alimenta el alma."',
+    '"El sabor que perdura en la memoria es el que se hizo con intención."',
+    '"Cocinar es transformar lo cotidiano en algo que vale la pena recordar."',
+    '"Los mejores ingredientes son la técnica, el tiempo y el cuidado."',
+  ],
+  educacion: [
+    '"Aprender no es llenar un recipiente; es encender una llama."',
+    '"La educación cambia lo que una persona puede imaginar para sí misma."',
+    '"Enseñar bien es saber cuándo hablar y cuándo dejar que el silencio enseñe."',
+    '"El conocimiento compartido es el único que crece al darlo."',
+  ],
+  moda: [
+    '"La moda no es lo que se usa; es lo que se dice sin abrir la boca."',
+    '"Cada prenda lleva el tiempo y la intención de quien la pensó."',
+    '"El estilo es la forma más silenciosa de presentarse al mundo."',
+    '"Vestir bien no es vanidad; es respeto por uno mismo y por los demás."',
+  ],
+  generico: [
+    '"Las marcas que perduran no venden productos; construyen significado."',
+    '"La identidad de una marca vive en los detalles que la mayoría no nota."',
+    '"Lo que distingue no es el logo sino la coherencia de cada decisión."',
+    '"Una marca fuerte no grita; susurra con tanta claridad que todos la escuchan."',
+  ],
+}
+
+function generarFrase(tematica, idx) {
+  if (!tematica) return FRASES_POR_TEMA.generico[idx % FRASES_POR_TEMA.generico.length]
+  const t = tematica.toLowerCase()
+  let cat = 'generico'
+  if (/juríd|legal|derecho|abogad|notaría|estudio/.test(t)) cat = 'juridico'
+  else if (/salud|médic|clinic|hospital|bienestar|nutrici/.test(t)) cat = 'salud'
+  else if (/tecnolog|software|digital|datos|desarroll|código|app/.test(t)) cat = 'tecnologia'
+  else if (/diseño|creativ|agencia|arte|visual|branding|publicidad/.test(t)) cat = 'creativo'
+  else if (/gastro|restaurant|cocina|comida|café|food|catering/.test(t)) cat = 'gastronomia'
+  else if (/educaci|escuela|formaci|academia|capacit|enseñ/.test(t)) cat = 'educacion'
+  else if (/moda|ropa|indumen|fashion|textil|boutique/.test(t)) cat = 'moda'
+  const frases = FRASES_POR_TEMA[cat]
+  return frases[idx % frases.length]
+}
+
 function getCanvaEmbedUrl(url) {
   if (!url) return null
   try {
@@ -325,7 +391,7 @@ export default function MarcaManual() {
             <SectionHeader num={nextNum()} label="Tipografía" />
             <div className="flex flex-col gap-20">
               {tipografias.map((t, i) => {
-                const frase = t.frase || (tematica ? `"${tematica}"` : '"La tipografía da voz e identidad a cada mensaje de la marca."')
+                const frase = t.frase || generarFrase(tematica, i)
                 const isEven = i % 2 === 0
 
                 const gfUrl = t.url || (t.nombre ? `https://fonts.google.com/specimen/${encodeURIComponent(t.nombre)}` : null)
