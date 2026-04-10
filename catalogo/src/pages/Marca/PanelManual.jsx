@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Upload, Plus, Trash2, Check, X, Image, ExternalLink, Download, Search } from 'lucide-react'
+import { Upload, Plus, Trash2, Check, X, Image, ExternalLink, Download, Search, ChevronUp, ChevronDown } from 'lucide-react'
 import { db, SUPABASE_URL } from '../../lib/supabase'
 import { Button } from '../../components/admin/ui/Button'
 import { Input } from '../../components/admin/ui/Input'
@@ -114,10 +114,27 @@ function LogoSlot({ url, onUrl, proyectoId, dark, nombreBase }) {
   )
 }
 
+// ── Reorder buttons ───────────────────────────────────────────
+function ReorderBtns({ onUp, onDown, disableUp, disableDown }) {
+  return (
+    <div className="flex flex-col gap-0.5 shrink-0">
+      <button onClick={onUp} disabled={disableUp}
+        className="p-0.5 rounded text-[#ccc] hover:text-[#555] disabled:opacity-20 cursor-pointer disabled:cursor-default bg-transparent border-none">
+        <ChevronUp size={14} />
+      </button>
+      <button onClick={onDown} disabled={disableDown}
+        className="p-0.5 rounded text-[#ccc] hover:text-[#555] disabled:opacity-20 cursor-pointer disabled:cursor-default bg-transparent border-none">
+        <ChevronDown size={14} />
+      </button>
+    </div>
+  )
+}
+
 // ── ColorRow ──────────────────────────────────────────────────
-function ColorRow({ color, onChange, onDelete }) {
+function ColorRow({ color, onChange, onDelete, onUp, onDown, isFirst, isLast }) {
   return (
     <Card className="flex items-center gap-3 p-3">
+      <ReorderBtns onUp={onUp} onDown={onDown} disableUp={isFirst} disableDown={isLast} />
       <div className="relative w-10 h-10 rounded-lg shrink-0 overflow-hidden border border-[#e0e0e0] cursor-pointer" style={{ background: color.hex }}>
         <input type="color" value={color.hex} onChange={e => onChange({ ...color, hex: e.target.value })}
           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
@@ -159,7 +176,7 @@ function loadGoogleFont(nombre) {
 }
 
 // ── TipoRow ───────────────────────────────────────────────────
-function TipoRow({ tipo, onChange, onDelete, proyectoId }) {
+function TipoRow({ tipo, onChange, onDelete, onUp, onDown, isFirst, isLast, proyectoId }) {
   const fontRef = useRef()
   const [uploading, setUploading] = useState(false)
   const [dlLoading, setDlLoading] = useState(false)
@@ -184,6 +201,7 @@ function TipoRow({ tipo, onChange, onDelete, proyectoId }) {
 
   return (
     <Card className="flex items-start gap-3 p-4">
+      <ReorderBtns onUp={onUp} onDown={onDown} disableUp={isFirst} disableDown={isLast} />
       <div className="flex-1 flex flex-col gap-2">
         <div className="flex gap-2">
           <Input value={tipo.nombre} onChange={e => { onChange({ ...tipo, nombre: e.target.value }); loadGoogleFont(e.target.value) }}
@@ -460,13 +478,23 @@ export function PanelManual({ proyecto }) {
   const setLogo = (key, url) => setLogos(l => ({ ...l, [key]: url }))
   const updateTemplatesCat = (key, items) => setTemplates(t => ({ ...t, [key]: items }))
 
+  const move = (setter, i, dir) => setter(arr => {
+    const next = [...arr]
+    const j = i + dir
+    if (j < 0 || j >= next.length) return arr
+    ;[next[i], next[j]] = [next[j], next[i]]
+    return next
+  })
+
   const addColor = () => setColores(c => [...c, { hex: '#000000', nombre: '', uso: '' }])
   const updateColor = (i, v) => setColores(c => c.map((x, idx) => idx === i ? v : x))
   const removeColor = (i) => setColores(c => c.filter((_, idx) => idx !== i))
+  const moveColor = (i, dir) => move(setColores, i, dir)
 
   const addTipo = () => setTipografias(t => [...t, { nombre: '', uso: '', url: '', archivo_url: '', archivo_nombre: '', frase: '' }])
   const updateTipo = (i, v) => setTipografias(t => t.map((x, idx) => idx === i ? v : x))
   const removeTipo = (i) => setTipografias(t => t.filter((_, idx) => idx !== i))
+  const moveTipo = (i, dir) => move(setTipografias, i, dir)
 
   const addUso = (tipo) => {
     const item = { texto: '', imagen_url: '' }
@@ -585,7 +613,7 @@ export function PanelManual({ proyecto }) {
       {/* COLORES */}
       <Section title="Paleta de colores">
         <div className="flex flex-col gap-2">
-          {colores.map((c, i) => <ColorRow key={i} color={c} onChange={v => updateColor(i, v)} onDelete={() => removeColor(i)} />)}
+          {colores.map((c, i) => <ColorRow key={i} color={c} onChange={v => updateColor(i, v)} onDelete={() => removeColor(i)} onUp={() => moveColor(i, -1)} onDown={() => moveColor(i, 1)} isFirst={i === 0} isLast={i === colores.length - 1} />)}
         </div>
         <Button variant="ghost" size="sm" onClick={addColor} className="mt-3 text-[#888]">
           <Plus size={14} /> Agregar color
@@ -595,7 +623,7 @@ export function PanelManual({ proyecto }) {
       {/* TIPOGRAFÍA */}
       <Section title="Tipografía" hint="Podés subir el archivo (TTF, OTF, WOFF) para que el cliente lo descargue.">
         <div className="flex flex-col gap-3">
-          {tipografias.map((t, i) => <TipoRow key={i} tipo={t} onChange={v => updateTipo(i, v)} onDelete={() => removeTipo(i)} proyectoId={proyecto.id} />)}
+          {tipografias.map((t, i) => <TipoRow key={i} tipo={t} onChange={v => updateTipo(i, v)} onDelete={() => removeTipo(i)} onUp={() => moveTipo(i, -1)} onDown={() => moveTipo(i, 1)} isFirst={i === 0} isLast={i === tipografias.length - 1} proyectoId={proyecto.id} />)}
         </div>
         <Button variant="ghost" size="sm" onClick={addTipo} className="mt-3 text-[#888]">
           <Plus size={14} /> Agregar tipografía
