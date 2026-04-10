@@ -131,7 +131,7 @@ function ReorderBtns({ onUp, onDown, disableUp, disableDown }) {
 }
 
 // ── ColorRow ──────────────────────────────────────────────────
-function ColorRow({ color, onChange, onDelete, onUp, onDown, isFirst, isLast }) {
+function ColorRow({ color, onChange, onDelete, onUp, onDown, isFirst, isLast, onSetAcento }) {
   return (
     <Card className="flex items-center gap-3 p-3">
       <ReorderBtns onUp={onUp} onDown={onDown} disableUp={isFirst} disableDown={isLast} />
@@ -146,7 +146,7 @@ function ColorRow({ color, onChange, onDelete, onUp, onDown, isFirst, isLast }) 
       <Input value={color.uso} onChange={e => onChange({ ...color, uso: e.target.value })}
         className="flex-1 text-[#888]" placeholder="Ej: Color primario" />
       <button
-        onClick={() => onChange({ ...color, esAcento: !color.esAcento })}
+        onClick={() => onSetAcento(!color.esAcento)}
         title="Marcar como color de acento"
         className={`shrink-0 text-[11px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer
           ${color.esAcento ? 'bg-[#1c1c1c] text-white border-[#1c1c1c]' : 'bg-transparent text-[#bbb] border-[#e3e3e3] hover:border-[#999] hover:text-[#555]'}`}>
@@ -620,7 +620,7 @@ export function PanelManual({ proyecto }) {
       {/* COLORES */}
       <Section title="Paleta de colores">
         <div className="flex flex-col gap-2">
-          {colores.map((c, i) => <ColorRow key={i} color={c} onChange={v => updateColor(i, v)} onDelete={() => removeColor(i)} onUp={() => moveColor(i, -1)} onDown={() => moveColor(i, 1)} isFirst={i === 0} isLast={i === colores.length - 1} />)}
+          {colores.map((c, i) => <ColorRow key={i} color={c} onChange={v => updateColor(i, v)} onDelete={() => removeColor(i)} onUp={() => moveColor(i, -1)} onDown={() => moveColor(i, 1)} isFirst={i === 0} isLast={i === colores.length - 1} onSetAcento={v => setColores(cs => cs.map((x, idx) => ({ ...x, esAcento: v ? idx === i : false })))} />)}
         </div>
         <Button variant="ghost" size="sm" onClick={addColor} className="mt-3 text-[#888]">
           <Plus size={14} /> Agregar color
