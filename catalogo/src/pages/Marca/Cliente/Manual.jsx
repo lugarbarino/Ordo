@@ -138,7 +138,7 @@ function SectionHeader({ num, label }) {
 }
 
 // ── Logo card ─────────────────────────────────────────────────
-function LogoCard({ url, label, sub, dark, nombreBase }) {
+function LogoCard({ url, label, sub, dark, nombreBase, onZoom }) {
   const [dl, setDl] = useState('')
   if (!url) return null
 
@@ -153,7 +153,7 @@ function LogoCard({ url, label, sub, dark, nombreBase }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className={`w-full h-[160px] rounded-2xl flex items-center justify-center p-8 border border-[#e0e0e6]
+      <div onClick={() => onZoom?.(url)} className={`w-full h-[160px] rounded-2xl flex items-center justify-center p-8 border border-[#e0e0e6] cursor-zoom-in
         ${dark ? 'bg-[#363645]' : 'bg-white border-[#e0e0e6]'}`}>
         <img src={url} alt={label} className="max-h-[90px] max-w-[80%] object-contain" />
       </div>
@@ -195,6 +195,17 @@ export default function MarcaManual() {
   const [cargando, setCargando] = useState(true)
   const [copiedIdx, setCopiedIdx] = useState(null)
   const copyTimer = useRef(null)
+  const [lightbox, setLightbox] = useState(null)
+
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-animate]')
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('anim-visible'); observer.unobserve(e.target) } }),
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    )
+    els.forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  })
 
   useEffect(() => {
     const cargar = async () => {
@@ -254,6 +265,23 @@ export default function MarcaManual() {
 
   return (
     <div className="min-h-screen bg-white font-[Inter,sans-serif]">
+      <style>{`
+        [data-animate] { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        [data-animate].anim-visible { opacity: 1; transform: translateY(0); }
+        [data-animate][data-delay="1"] { transition-delay: 0.1s; }
+        [data-animate][data-delay="2"] { transition-delay: 0.2s; }
+        [data-animate][data-delay="3"] { transition-delay: 0.3s; }
+      `}</style>
+
+      {/* LIGHTBOX */}
+      {lightbox && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm" onClick={() => setLightbox(null)}>
+          <img src={lightbox} alt="" className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl" onClick={e => e.stopPropagation()} />
+          <button onClick={() => setLightbox(null)} className="absolute top-5 right-5 text-white/60 hover:text-white bg-transparent border-none cursor-pointer p-2">
+            <X size={24} />
+          </button>
+        </div>
+      )}
 
       {/* HERO */}
       <div className="min-h-[600px] flex flex-col items-center justify-center px-8 py-24 relative overflow-hidden bg-[#1a1a1a]">
@@ -288,7 +316,7 @@ export default function MarcaManual() {
 
       {/* CONCEPTO */}
       {(atributo || tagline || concepto || descripcion) && (
-        <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-20">
+        <div data-animate className="max-w-[1024px] mx-auto px-6 sm:px-12 py-20">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 items-center">
             {/* Texto */}
             <div className="flex flex-col gap-5">
@@ -323,7 +351,7 @@ export default function MarcaManual() {
 
       {/* LOGOS */}
       {hayLogos && (
-        <div className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24">
+        <div data-animate className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24">
           <SectionHeader num={nextNum()} label="Logotipo" />
           <div className="flex flex-col gap-16">
             {LOGO_GRUPOS.map(({ key, label, uso, ej, claro, oscuro }) => {
@@ -338,8 +366,8 @@ export default function MarcaManual() {
                     {ej && <p className="text-[13px] text-[#aaa]"><span className="font-semibold text-[#888]">Ej:</span> {ej}</p>}
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} />}
-                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} />}
+                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} onZoom={setLightbox} />}
+                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} onZoom={setLightbox} />}
                   </div>
                 </div>
               )
@@ -399,7 +427,7 @@ export default function MarcaManual() {
 
         {/* TIPOGRAFÍA */}
         {hayTipos && (
-          <div>
+          <div data-animate>
             <SectionHeader num={nextNum()} label="Tipografía" />
             <div className="flex flex-col gap-20">
               {tipografias.map((t, i) => {
@@ -473,7 +501,7 @@ export default function MarcaManual() {
 
         {/* APLICACIONES / MOCKUPS */}
         {hayMockups && (
-          <div>
+          <div data-animate>
             <SectionHeader num={nextNum()} label="Aplicaciones" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {mockups.map((m, i) => (
@@ -487,7 +515,7 @@ export default function MarcaManual() {
 
         {/* USOS */}
         {hayUsos && (
-          <div>
+          <div data-animate>
             <SectionHeader num={nextNum()} label="Uso del logotipo" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {usosCorrectos.length > 0 && (
@@ -532,7 +560,7 @@ export default function MarcaManual() {
 
         {/* TEMPLATES REDES */}
         {hayTemplates && (
-          <div>
+          <div data-animate>
             <SectionHeader num={nextNum()} label="Templates para redes" />
             <div className="flex flex-col gap-12">
               {TEMPLATE_CATS.map(({ key, label, aspect }) => {
