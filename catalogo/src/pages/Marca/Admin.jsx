@@ -407,33 +407,37 @@ function AdminContent({ cuenta, user }) {
 
 // ── Auth wrapper ─────────────────────────────────────────────
 async function cargarCuenta(userId) {
-  const { data } = await db.from('cuentas_marca').select('*').eq('user_id', userId).limit(1)
+  const { data, error } = await db.from('cuentas_marca').select('*').eq('user_id', userId).limit(1)
+  if (error) throw error
   return data?.[0] || null
 }
 
 export default function MarcaAdmin() {
-  const [state, setState] = useState({ checked: false, user: null, cuenta: null })
+  const [state, setState] = useState({ checked: false, user: null, cuenta: null, error: null })
 
   useEffect(() => {
     let mounted = true
 
-    // Check session immediately — onAuthStateChange can fire null briefly before restoring
-    db.auth.getSession().then(async ({ data: { session } }) => {
-      if (!mounted) return
+    const init = async (session) => {
       const user = session?.user || null
-      if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
-      const cuenta = await cargarCuenta(user.id)
-      if (mounted) setState({ checked: true, user, cuenta })
+      if (!user) { if (mounted) setState({ checked: true, user: null, cuenta: null, error: null }); return }
+      try {
+        const cuenta = await cargarCuenta(user.id)
+        if (mounted) setState({ checked: true, user, cuenta, error: null })
+      } catch (err) {
+        if (mounted) setState({ checked: true, user, cuenta: null, error: err.message })
+      }
+    }
+
+    // Check session immediately
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (mounted) init(session)
     })
 
     // Listen for future changes (sign out, token refresh, sign in from another tab)
-    const { data: { subscription } } = db.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'INITIAL_SESSION') return // already handled above
-      if (!mounted) return
-      const user = session?.user || null
-      if (!user) { setState({ checked: true, user: null, cuenta: null }); return }
-      const cuenta = await cargarCuenta(user.id)
-      if (mounted) setState({ checked: true, user, cuenta })
+    const { data: { subscription } } = db.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') return
+      if (mounted) init(session)
     })
 
     return () => { mounted = false; subscription.unsubscribe() }
@@ -449,6 +453,19 @@ export default function MarcaAdmin() {
     window.location.href = '/marca'
     return null
   }
+
+  if (state.error) return (
+    <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center p-8">
+      <div className="bg-white rounded-[20px] p-8 max-w-[420px] w-full shadow-lg text-center">
+        <p className="text-sm font-semibold text-red-500 mb-2">Error al cargar la cuenta</p>
+        <p className="text-xs text-[#888] mb-6">{state.error}</p>
+        <button onClick={() => window.location.reload()}
+          className="px-5 py-2.5 bg-[#1c1c1c] text-white rounded-lg text-sm font-semibold border-none cursor-pointer hover:opacity-90">
+          Reintentar
+        </button>
+      </div>
+    </div>
+  )
 
   if (!state.cuenta) {
     return (
