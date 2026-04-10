@@ -411,6 +411,9 @@ export function PanelManual({ proyecto }) {
   const [logos, setLogos] = useState({})
   const [tematica, setTematica] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
+  const [atributo, setAtributo] = useState('')
+  const [tagline, setTagline] = useState('')
+  const [concepto, setConcepto] = useState('')
   const [colores, setColores] = useState([])
   const [tipografias, setTipografias] = useState([])
   const [mockups, setMockups] = useState([])
@@ -428,6 +431,9 @@ export function PanelManual({ proyecto }) {
     setLogos(row.logos || {})
     setTematica(row.tematica || '')
     setVideoUrl(row.video_url || '')
+    setAtributo(row.atributo || '')
+    setTagline(row.tagline || '')
+    setConcepto(row.concepto || '')
     setColores(row.colores || [])
     setTipografias(row.tipografias || [])
     setMockups(row.mockups || [])
@@ -438,7 +444,7 @@ export function PanelManual({ proyecto }) {
 
   const guardar = async () => {
     setSaving(true)
-    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates }
+    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates }
     if (data?.id) {
       await db.from('manual_marca').update(payload).eq('id', data.id)
     } else {
@@ -527,6 +533,32 @@ export function PanelManual({ proyecto }) {
             {videoUrl && (
               <video src={videoUrl} muted className="mt-2 w-full max-h-[100px] object-cover rounded-xl" />
             )}
+          </div>
+        </div>
+      </Section>
+
+      {/* CONCEPTO */}
+      <Section title="Concepto de la marca" hint="Intro que aparece debajo del hero junto al logo.">
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-[#555] mb-1">Atributo</p>
+              <Input value={atributo} onChange={e => setAtributo(e.target.value)} placeholder="Ej: Sociedad, Confianza, Innovación..." />
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#555] mb-1">Tagline</p>
+            <Input value={tagline} onChange={e => setTagline(e.target.value)} placeholder="Ej: Conexión moderna que impulsa el avance." />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#555] mb-1">Descripción del concepto</p>
+            <textarea
+              value={concepto}
+              onChange={e => setConcepto(e.target.value)}
+              placeholder="Describí el concepto detrás del logo: qué representa, sus formas, valores que transmite..."
+              rows={4}
+              className="w-full border border-[#e3e3e3] rounded-xl px-3 py-2 text-sm text-[#1c1c1c] resize-none focus:outline-none focus:border-[#1c1c1c]"
+            />
           </div>
         </div>
       </Section>
