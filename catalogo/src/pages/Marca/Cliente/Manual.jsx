@@ -203,9 +203,6 @@ export default function MarcaManual() {
           )}
           <div className="w-16 h-px bg-white/20" />
           <p className="text-[11px] font-semibold text-white/40 uppercase tracking-[2px]">Guía de Identidad de Marca</p>
-          {tematica && (
-            <p className="text-[15px] text-white/60 leading-relaxed max-w-[380px]">{tematica}</p>
-          )}
         </div>
         {/* Scroll hint */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
