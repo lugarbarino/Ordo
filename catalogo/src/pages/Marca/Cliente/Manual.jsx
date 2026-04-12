@@ -294,9 +294,9 @@ export default function MarcaManual() {
           <div
             onClick={e => e.stopPropagation()}
             className="rounded-2xl shadow-2xl flex items-center justify-center p-10"
-            style={{ backgroundColor: lightbox.dark ? '#363645' : '#ffffff', width: '80vw', height: '70vh' }}
+            style={{ backgroundColor: lightbox.dark ? '#363645' : '#ffffff', maxWidth: '60vw', maxHeight: '50vh' }}
           >
-            <img src={lightbox.url} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+            <img src={lightbox.url} alt="" style={{ width: '50vw', maxHeight: '40vh', objectFit: 'contain' }} />
           </div>
           <button onClick={() => setLightbox(null)} className="absolute top-5 right-5 text-white/60 hover:text-white bg-transparent border-none cursor-pointer p-2">
             <X size={24} />
