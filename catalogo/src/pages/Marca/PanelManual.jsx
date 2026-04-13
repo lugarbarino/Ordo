@@ -483,7 +483,7 @@ export function PanelManual({ proyecto }) {
     setMockups(row.mockups || [])
     setUsosCorrectos(row.usos_correctos || [])
     setUsosIncorrectos(row.usos_incorrectos || [])
-    setTemplates(row.templates || { foto: [], portada: [], posts: [] })
+    setTemplates({ foto: [], portada: [], posts: [], brochure: [], otro: [], ...(row.templates || {}) })
   }
 
   const guardar = async () => {
