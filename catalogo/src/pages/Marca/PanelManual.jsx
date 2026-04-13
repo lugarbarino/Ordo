@@ -48,7 +48,7 @@ async function downloadPng(url, nombre) {
 }
 
 // ── Logo slot ─────────────────────────────────────────────────
-function LogoSlot({ url, onUrl, proyectoId, dark, nombreBase }) {
+function LogoSlot({ url, onUrl, proyectoId, dark, darkBg = '#1a1a1a', nombreBase }) {
   const ref = useRef()
   const [loading, setLoading] = useState(false)
   const [dlLoading, setDlLoading] = useState('')
@@ -76,7 +76,8 @@ function LogoSlot({ url, onUrl, proyectoId, dark, nombreBase }) {
         onClick={() => !loading && !url && ref.current?.click()}
         className={`relative w-full h-[100px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 transition-colors group
           ${url ? 'border-transparent cursor-default' : 'cursor-pointer hover:border-[#bbb]'}
-          ${dark ? 'bg-[#1a1a1a] border-[#333]' : 'bg-[#f5f5f5] border-[#e0e0e0]'}`}
+          ${dark ? 'border-transparent' : 'bg-[#f5f5f5] border-[#e0e0e0]'}`}
+          style={dark ? { backgroundColor: darkBg } : {}}
       >
         {url ? (
           <>
@@ -94,8 +95,8 @@ function LogoSlot({ url, onUrl, proyectoId, dark, nombreBase }) {
           <div className="w-5 h-5 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
         ) : (
           <>
-            <Upload size={15} className={dark ? 'text-[#444]' : 'text-[#ccc]'} />
-            <p className={`text-[10px] ${dark ? 'text-[#444]' : 'text-[#ccc]'}`}>SVG</p>
+            <Upload size={15} className={dark ? 'text-white/20' : 'text-[#ccc]'} />
+            <p className={`text-[10px] ${dark ? 'text-white/20' : 'text-[#ccc]'}`}>SVG</p>
           </>
         )}
       </div>
@@ -533,6 +534,8 @@ export function PanelManual({ proyecto }) {
 
   const slug = proyecto.slug || proyecto.id
   const nombreMarca = proyecto.nombre?.toLowerCase().replace(/\s+/g, '-') || 'logo'
+  const darkColor = colores.find(c => c.esDark)
+  const darkBg = darkColor?.hex ? (darkColor.hex.startsWith('#') ? darkColor.hex : `#${darkColor.hex}`) : '#1a1a1a'
 
   return (
     <div className="max-w-[860px] px-8 py-8">
@@ -625,7 +628,7 @@ export function PanelManual({ proyecto }) {
             <div key={key}>
               <p className="text-[11px] font-bold text-[#1c1c1c] mb-0.5">{label}</p>
               <p className="text-[10px] text-[#aaa] mb-2">{sub}</p>
-              <LogoSlot url={logos[key] || ''} onUrl={url => setLogo(key, url)} proyectoId={proyecto.id} dark={dark} nombreBase={`${nombreMarca}-${key}`} />
+              <LogoSlot url={logos[key] || ''} onUrl={url => setLogo(key, url)} proyectoId={proyecto.id} dark={dark} darkBg={darkBg} nombreBase={`${nombreMarca}-${key}`} />
             </div>
           ))}
         </div>
