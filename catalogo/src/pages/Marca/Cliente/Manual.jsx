@@ -433,7 +433,7 @@ export default function MarcaManual() {
               return (
                 <div
                   key={i}
-                  className="sm:flex-1 flex flex-col justify-end p-6 sm:p-10 cursor-pointer select-none transition-all min-h-[100px] sm:min-h-0"
+                  className={`sm:flex-1 flex flex-col justify-end p-6 sm:p-10 cursor-pointer select-none transition-all min-h-[100px] sm:min-h-0 group relative overflow-hidden`}
                   style={{ background: hex }}
                   onClick={() => {
                     navigator.clipboard.writeText(hex.toUpperCase()).catch(() => {})
@@ -441,11 +441,16 @@ export default function MarcaManual() {
                     clearTimeout(copyTimer.current)
                     copyTimer.current = setTimeout(() => setCopiedIdx(null), 1800)
                   }}
-                  title="Clic para copiar"
                 >
+                  {/* Hover overlay */}
+                  <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${isLight ? 'bg-black/10' : 'bg-white/10'} ${copied ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                    <span className={`text-[11px] font-bold uppercase tracking-widest ${isLight ? 'text-black/60' : 'text-white/70'}`}>
+                      {copied ? '✓ Copiado' : 'Copiar'}
+                    </span>
+                  </div>
                   {c.nombre && <p className={`text-[16px] sm:text-[18px] font-semibold mb-1 ${tc}`}>{c.nombre}</p>}
                   <p className={`text-[12px] sm:text-[13px] font-mono uppercase ${tc} opacity-80`}>
-                    {copied ? '¡Copiado!' : hex.toUpperCase()}
+                    {hex.toUpperCase()}
                   </p>
                   <p className={`text-[11px] font-mono ${tc} opacity-50 mt-0.5`}>RGB {r} · {g} · {b}</p>
                 </div>
