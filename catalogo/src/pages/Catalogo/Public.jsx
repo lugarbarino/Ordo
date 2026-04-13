@@ -609,12 +609,12 @@ export default function CatalogoPublic() {
           style={{ background: 'linear-gradient(110deg, rgba(10,28,50,0.90) 0%, rgba(15,45,80,0.70) 55%, rgba(15,45,80,0.40) 100%)' }} />
 
         {/* Contenido */}
-        <div className="relative z-10 px-6 md:px-16 max-w-[700px]">
+        <div className="relative z-10 px-6 md:px-16 max-w-[860px]">
           <h1 className="text-4xl sm:text-5xl md:text-[3.5rem] font-black text-white leading-[1.1] mb-5">
             {empresa.titulo || empresa.nombre}
           </h1>
           {empresa.descripcion && (
-            <p className="text-base md:text-lg text-white/80 leading-relaxed mb-8 max-w-[520px]">
+            <p className="text-base md:text-lg text-white/80 leading-relaxed mb-8 max-w-[640px]">
               {empresa.descripcion}
             </p>
           )}
