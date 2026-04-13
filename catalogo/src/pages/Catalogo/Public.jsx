@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image, Check, Menu } from 'lucide-react'
+import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image, Check, Menu, ChevronRight } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 function formatPrecio(v) {
@@ -29,24 +29,120 @@ function Spinner({ color }) {
   )
 }
 
-function ModalFoto({ img, nombre, onClose }) {
+function ModalProducto({ producto: p, enCarrito, onAgregar, onQuitarDelCarrito, onClose, brandColor }) {
+  const [fotoExpanded, setFotoExpanded] = useState(false)
+  const precio = formatPrecio(p?.precio)
+
   useEffect(() => {
-    const h = e => e.key === 'Escape' && onClose()
+    const h = e => e.key === 'Escape' && (fotoExpanded ? setFotoExpanded(false) : onClose())
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [onClose])
+  }, [onClose, fotoExpanded])
 
-  if (!img) return null
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  if (!p) return null
+
+  if (fotoExpanded) return (
+    <div className="fixed inset-0 bg-black/90 z-[110] flex items-center justify-center p-5"
+      onClick={() => setFotoExpanded(false)}>
+      <button onClick={() => setFotoExpanded(false)}
+        className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border-none cursor-pointer flex items-center justify-center text-white transition-colors">
+        <X size={18} />
+      </button>
+      <img src={p.imagen_url} alt={p.nombre} className="max-w-[92vw] max-h-[88vh] object-contain" />
+    </div>
+  )
+
   return (
-    <div className="fixed inset-0 bg-black/82 z-[100] flex items-center justify-center p-5"
+    <div className="fixed inset-0 bg-black/50 z-[100] flex items-end md:items-center justify-center"
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white rounded-2xl p-4 max-w-[90vw] max-h-[90vh] flex flex-col items-center gap-3 relative">
-        <button onClick={onClose}
-          className="absolute top-2.5 right-3.5 text-[#6b7a90] bg-transparent border-none cursor-pointer">
-          <X size={20} />
-        </button>
-        <img src={img} alt={nombre} className="max-w-[80vw] max-h-[72vh] object-contain rounded-lg" />
-        {nombre && <div className="text-sm font-bold text-center">{nombre}</div>}
+
+      {/* Panel */}
+      <div className="bg-white w-full md:max-w-[780px] md:rounded-2xl rounded-t-2xl overflow-hidden flex flex-col md:flex-row max-h-[92vh] md:max-h-[82vh]">
+
+        {/* Imagen — izquierda desktop / top mobile */}
+        <div className="relative bg-[#f7f8fa] md:w-[340px] shrink-0 flex items-center justify-center
+          h-[240px] md:h-auto cursor-zoom-in"
+          onClick={p.imagen_url ? () => setFotoExpanded(true) : undefined}
+          style={{ cursor: p.imagen_url ? 'zoom-in' : 'default' }}>
+          {p.imagen_url
+            ? <img src={p.imagen_url} alt={p.nombre} className="w-full h-full object-contain p-8" />
+            : <Image size={40} className="text-[#d0d5de]" />
+          }
+          {/* Cerrar — sólo en mobile */}
+          <button onClick={e => { e.stopPropagation(); onClose() }}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white shadow-sm border border-[#e8ecf2] flex items-center justify-center cursor-pointer text-[#6b7a90] hover:text-[#1e2a3a] transition-colors md:hidden">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Info — derecha desktop / abajo mobile */}
+        <div className="flex flex-col flex-1 overflow-y-auto">
+
+          {/* Header con X desktop */}
+          <div className="flex items-start justify-between px-6 pt-6 pb-2">
+            <div className="flex-1 pr-4">
+              {p.categoria && (
+                <p className="text-[.7rem] font-bold uppercase tracking-widest mb-1.5"
+                  style={{ color: brandColor }}>
+                  {p.categoria}
+                </p>
+              )}
+              <h2 className="text-xl font-black text-[#1e2a3a] leading-snug">{p.nombre}</h2>
+            </div>
+            <button onClick={onClose}
+              className="hidden md:flex w-8 h-8 rounded-full border border-[#e8ecf2] items-center justify-center cursor-pointer text-[#6b7a90] hover:text-[#1e2a3a] transition-colors shrink-0 bg-white">
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Precio */}
+          {precio && (
+            <div className="px-6 py-2">
+              <p className="text-2xl font-black" style={{ color: brandColor }}>{precio}</p>
+            </div>
+          )}
+
+          {/* Descripción */}
+          {p.descripcion && (
+            <div className="px-6 py-2 flex-1">
+              <p className="text-sm text-[#4a5568] leading-relaxed">{p.descripcion}</p>
+            </div>
+          )}
+
+          {/* Código */}
+          {p.codigo && (
+            <div className="px-6 py-2">
+              <p className="text-xs text-[#9aa5b4]">Código: <span className="font-semibold">{p.codigo}</span></p>
+            </div>
+          )}
+
+          {/* Acción */}
+          <div className="px-6 py-5 mt-auto border-t border-[#f0f2f5]">
+            {enCarrito ? (
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-12 rounded-xl bg-[#f0f0f0] flex items-center justify-center gap-2 text-sm font-semibold text-[#999]">
+                  <Check size={15} strokeWidth={2.5} /> Agregado al presupuesto
+                </div>
+                <button onClick={onQuitarDelCarrito}
+                  className="h-12 px-4 rounded-xl border border-[#dde3ed] text-[#999] hover:text-red-500 hover:border-red-200 transition-colors cursor-pointer bg-white">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ) : (
+              <button onClick={onAgregar}
+                className="w-full h-12 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer border-none hover:opacity-90 transition-opacity"
+                style={{ background: brandColor }}>
+                <ShoppingBag size={16} style={{ opacity: 0.8 }} />
+                Agregar al presupuesto
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -210,19 +306,18 @@ function ModalCarrito({ carrito, empresa, onClose, onCambiarCantidad, onQuitar, 
   )
 }
 
-function ProductCard({ producto: p, enCarrito, onFoto, onAgregar }) {
+function ProductCard({ producto: p, enCarrito, onDetalle, onAgregar }) {
   const precio = formatPrecio(p.precio)
 
   return (
-    <div className="bg-white rounded-xl border border-[#e8ecf2] overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(0,0,0,.08)]">
+    <div
+      onClick={onDetalle}
+      className="bg-white rounded-xl border border-[#e8ecf2] overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(0,0,0,.08)] cursor-pointer group">
 
       {/* Imagen */}
-      <div
-        className="w-full h-[160px] bg-white flex items-center justify-center overflow-hidden relative max-sm:h-[120px]"
-        onClick={p.imagen_url ? onFoto : undefined}
-        style={{ cursor: p.imagen_url ? 'zoom-in' : 'default' }}>
+      <div className="w-full h-[180px] bg-[#f7f8fa] flex items-center justify-center overflow-hidden relative max-sm:h-[140px]">
         {p.imagen_url
-          ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-4" />
+          ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-5 transition-transform group-hover:scale-[1.03]" />
           : <Image size={28} className="text-[#d0d5de]" />
         }
       </div>
@@ -234,10 +329,10 @@ function ProductCard({ producto: p, enCarrito, onFoto, onAgregar }) {
           <p className="text-[.78rem] text-[#7a8799] leading-relaxed flex-1 line-clamp-2">{p.descripcion}</p>
         )}
         {precio && (
-          <p className="text-[.86rem] font-bold text-[var(--brand)] mt-1">{precio}</p>
+          <p className="text-[.9rem] font-black text-[var(--brand)] mt-1">{precio}</p>
         )}
         <button
-          onClick={enCarrito ? undefined : onAgregar}
+          onClick={e => { e.stopPropagation(); enCarrito ? null : onAgregar() }}
           disabled={enCarrito}
           className={`mt-2 w-full h-10 rounded-lg text-[.82rem] font-semibold flex items-center justify-center gap-1.5 border transition-colors
             ${enCarrito
@@ -353,7 +448,7 @@ export default function CatalogoPublic() {
   const [catActiva, setCatActiva] = useState('')
   const [busqueda, setBusqueda] = useState('')
   const [carrito, setCarrito] = useState([])
-  const [fotoModal, setFotoModal] = useState(null)
+  const [productoDetalle, setProductoDetalle] = useState(null)
   const [carritoOpen, setCarritoOpen] = useState(false)
   const catalogoRef = useRef(null)
 
@@ -411,8 +506,8 @@ export default function CatalogoPublic() {
     setCarrito(c => c.map(x => x.id === id ? { ...x, cantidad: Math.max(1, x.cantidad + delta) } : x))
   }, [])
 
-  const abrirFoto = (producto) => {
-    setFotoModal({ url: producto.imagen_url, nombre: producto.nombre })
+  const abrirDetalle = (producto) => {
+    setProductoDetalle(producto)
     if (empresa)
       db.from('visitas').insert({ empresa_id: empresa.id, producto_id: producto.id }).then(() => {})
   }
@@ -584,7 +679,7 @@ export default function CatalogoPublic() {
             {productosFiltrados.map(p => (
               <ProductCard key={p.id} producto={p}
                 enCarrito={carrito.some(x => x.id === p.id)}
-                onFoto={() => abrirFoto(p)}
+                onDetalle={() => abrirDetalle(p)}
                 onAgregar={() => agregarCarrito(p)} />
             ))}
           </div>
@@ -608,7 +703,7 @@ export default function CatalogoPublic() {
                         {sinCat.map(p => (
                           <ProductCard key={p.id} producto={p}
                             enCarrito={carrito.some(x => x.id === p.id)}
-                            onFoto={() => abrirFoto(p)}
+                            onDetalle={() => abrirDetalle(p)}
                             onAgregar={() => agregarCarrito(p)} />
                         ))}
                       </div>
@@ -624,7 +719,7 @@ export default function CatalogoPublic() {
                         {items.map(p => (
                           <ProductCard key={p.id} producto={p}
                             enCarrito={carrito.some(x => x.id === p.id)}
-                            onFoto={() => abrirFoto(p)}
+                            onDetalle={() => abrirDetalle(p)}
                             onAgregar={() => agregarCarrito(p)} />
                         ))}
                       </div>
@@ -642,9 +737,16 @@ export default function CatalogoPublic() {
         Catálogo creado con <a href="/" className="font-semibold" style={{ color: brandColor }}>Ordo</a>
       </div>
 
-      {/* Modales */}
-      {fotoModal && (
-        <ModalFoto img={fotoModal.url} nombre={fotoModal.nombre} onClose={() => setFotoModal(null)} />
+      {/* Modal detalle producto */}
+      {productoDetalle && (
+        <ModalProducto
+          producto={productoDetalle}
+          enCarrito={carrito.some(x => x.id === productoDetalle.id)}
+          brandColor={brandColor}
+          onAgregar={() => agregarCarrito(productoDetalle)}
+          onQuitarDelCarrito={() => quitarCarrito(productoDetalle.id)}
+          onClose={() => setProductoDetalle(null)}
+        />
       )}
 
       {carritoOpen && (
