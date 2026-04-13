@@ -509,14 +509,15 @@ export default function CatalogoPublic() {
   }, [])
 
   useEffect(() => {
-    if (!heroRef.current) return
+    const el = heroRef.current
+    if (!el) return
     const obs = new IntersectionObserver(
       ([entry]) => setLogoBarVisible(!entry.isIntersecting),
       { threshold: 0 }
     )
-    obs.observe(heroRef.current)
+    obs.observe(el)
     return () => obs.disconnect()
-  }, [empresa]) // re-run once empresa loads so heroRef is set
+  }, [cargando]) // cargando → false = hero ya está en el DOM
 
   const abrirDetalle = (producto) => {
     setProductoDetalle(producto)
