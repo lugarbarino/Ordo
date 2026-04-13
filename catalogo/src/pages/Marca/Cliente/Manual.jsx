@@ -201,7 +201,7 @@ const TEMPLATE_CATS = [
   { key: 'foto',     label: 'Foto de perfil',    aspect: 'aspect-square'  },
   { key: 'portada',  label: 'Portada',            aspect: 'aspect-[16/9]' },
   { key: 'posts',    label: 'Posts',              aspect: 'aspect-square'  },
-  { key: 'brochure', label: 'Brochure / Impreso', aspect: 'aspect-[3/4]'  },
+  { key: 'brochure', label: 'Brochure', aspect: 'aspect-[3/4]'  },
   { key: 'otro',     label: 'Otro',               aspect: 'aspect-square'  },
 ]
 

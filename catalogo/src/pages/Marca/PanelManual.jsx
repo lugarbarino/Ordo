@@ -440,7 +440,7 @@ const TEMPLATE_CATS = [
   { key: 'foto',      label: 'Foto de perfil' },
   { key: 'portada',   label: 'Portada'        },
   { key: 'posts',     label: 'Posts'          },
-  { key: 'brochure',  label: 'Brochure / Impreso' },
+  { key: 'brochure',  label: 'Brochure' },
   { key: 'otro',      label: 'Otro'           },
 ]
 
