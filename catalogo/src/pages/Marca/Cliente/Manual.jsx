@@ -298,7 +298,7 @@ export default function MarcaManual() {
           <div
             onClick={e => e.stopPropagation()}
             className="rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ backgroundColor: lightbox.dark ? (lightbox.darkBg || '#363645') : (lightbox.lightBg || '#ffffff'), maxWidth: '60vw' }}
+            style={{ backgroundColor: lightbox.dark ? (lightbox.darkBg || '#363645') : '#ffffff', maxWidth: '60vw' }}
           >
             <div className="flex justify-end px-4 pt-4">
               <button onClick={() => setLightbox(null)} className={`cursor-pointer bg-transparent border-none p-1 ${lightbox.dark ? 'text-white/50 hover:text-white' : 'text-black/30 hover:text-black/70'}`}>
