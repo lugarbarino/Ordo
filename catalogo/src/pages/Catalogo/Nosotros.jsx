@@ -108,15 +108,6 @@ export default function CatalogoNosotros() {
         <div className="flex flex-col justify-center items-start px-10 md:px-16 py-16 md:w-1/2 relative overflow-hidden"
           style={{ backgroundColor: brandColor }}>
 
-          {/* Patrón decorativo de fondo */}
-          <div className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `radial-gradient(circle at 20% 80%, white 1px, transparent 1px),
-                radial-gradient(circle at 80% 20%, white 1px, transparent 1px),
-                radial-gradient(circle at 50% 50%, white 0.5px, transparent 0.5px)`,
-              backgroundSize: '60px 60px, 40px 40px, 20px 20px'
-            }} />
-
           <div className="relative z-10">
             {empresa.logo_url && (
               <img src={empresa.logo_url} alt={empresa.nombre}
@@ -147,20 +138,7 @@ export default function CatalogoNosotros() {
             <img src={empresa.banner_url} alt={empresa.nombre}
               className="absolute inset-0 w-full h-full object-cover" />
           ) : (
-            /* Sin imagen: bloque con patrón geométrico */
-            <div className="absolute inset-0 flex items-center justify-center"
-              style={{ backgroundColor: brandLight }}>
-              <div className="grid grid-cols-4 gap-3 opacity-40 p-10">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i}
-                    className="rounded-xl aspect-square"
-                    style={{
-                      backgroundColor: brandColor,
-                      opacity: 0.3 + (i % 4) * 0.15
-                    }} />
-                ))}
-              </div>
-            </div>
+            <div className="absolute inset-0" style={{ backgroundColor: brandLight }} />
           )}
         </div>
       </div>
@@ -366,16 +344,9 @@ export default function CatalogoNosotros() {
       )}
 
       {/* ── CTA CATÁLOGO ── */}
-      <div className="relative overflow-hidden px-6 md:px-16 py-16 md:py-24 flex items-center justify-center"
+      <div className="px-6 md:px-16 py-16 md:py-24 flex items-center justify-center"
         style={{ backgroundColor: brandColor }}>
-        {/* Patrón */}
-        <div className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `radial-gradient(circle at 10% 90%, white 2px, transparent 2px),
-              radial-gradient(circle at 90% 10%, white 2px, transparent 2px)`,
-            backgroundSize: '80px 80px'
-          }} />
-        <div className="relative z-10 text-center max-w-[560px]">
+        <div className="text-center max-w-[560px]">
           <ShoppingBag size={36} className="text-white/50 mx-auto mb-5" />
           <h2 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
             Explorá todo lo que tenemos para ofrecerte
