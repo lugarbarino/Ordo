@@ -168,8 +168,8 @@ function LogoCard({ url, label, sub, dark, darkBg, lightBg, nombreBase, onZoom }
 
   return (
     <div className="flex flex-col gap-3">
-      <div onClick={() => onZoom?.({ url, dark, darkBg, lightBg })} className={`w-full h-[200px] rounded-2xl flex items-center justify-center p-6 border border-[#e0e0e6] cursor-zoom-in`}
-        style={{ backgroundColor: dark ? (darkBg || '#363645') : (lightBg || '#ffffff') }}>
+      <div onClick={() => onZoom?.({ url, dark, darkBg, lightBg })} className="w-full h-[200px] rounded-2xl flex items-center justify-center p-6 cursor-zoom-in"
+        style={{ backgroundColor: dark ? (darkBg || '#363645') : (lightBg || '#ececf0') }}>
         <img src={url} alt={label} className="object-contain" style={{ maxHeight: '120px', maxWidth: '100%' }} />
       </div>
       <div>
@@ -362,12 +362,21 @@ export default function MarcaManual() {
                 <p className="text-[15px] text-[#52586f] leading-relaxed">{descripcion}</p>
               )}
             </div>
-            {/* Logo card */}
-            <div className="flex items-center justify-center">
-              {(logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']) && (
+            {/* Logo cards claro + oscuro */}
+            <div className="flex flex-col gap-4">
+              {(logos['horiz_claro'] || logos['iso_claro']) && (
                 <div className="w-full max-w-[360px] border border-[#e8e8ee] rounded-2xl p-10 flex items-center justify-center" style={{ backgroundColor: lightBg }}>
                   <img
-                    src={logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']}
+                    src={logos['horiz_claro'] || logos['iso_claro']}
+                    alt={proyecto.nombre}
+                    className="max-h-[120px] max-w-full object-contain"
+                  />
+                </div>
+              )}
+              {(logos['horiz_oscuro'] || logos['iso_oscuro']) && (
+                <div className="w-full max-w-[360px] rounded-2xl p-10 flex items-center justify-center" style={{ backgroundColor: darkBg }}>
+                  <img
+                    src={logos['horiz_oscuro'] || logos['iso_oscuro']}
                     alt={proyecto.nombre}
                     className="max-h-[120px] max-w-full object-contain"
                   />
