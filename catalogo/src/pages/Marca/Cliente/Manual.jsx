@@ -615,8 +615,8 @@ export default function MarcaManual() {
                       {items.map((tmpl, i) => (
                         <div key={i} className="flex flex-col gap-3">
                           {tmpl.preview_url ? (
-                            <div className={`rounded-2xl ${aspect} w-full flex items-center justify-center p-4`} style={{ backgroundColor: lightBg }}>
-                              <img src={tmpl.preview_url} alt={label} className="max-w-full max-h-full object-contain rounded-xl shadow-sm" />
+                            <div className="rounded-2xl overflow-hidden flex items-end justify-center pt-8 px-6 min-h-[280px]" style={{ backgroundColor: lightBg }}>
+                              <img src={tmpl.preview_url} alt={label} className="w-full max-h-[260px] object-contain object-bottom drop-shadow-lg" />
                             </div>
                           ) : getCanvaEmbedUrl(tmpl.canva_url) ? (
                             <div className={`rounded-2xl overflow-hidden ${aspect} w-full bg-[#f5f5f5] border border-[#e8e8ee]`}>
