@@ -65,7 +65,7 @@ function ModalProducto({ producto: p, enCarrito, onAgregar, onQuitarDelCarrito, 
       <div className="bg-white w-full md:max-w-[900px] md:rounded-2xl rounded-t-2xl overflow-hidden flex flex-col md:flex-row max-h-[92vh] md:max-h-[82vh]">
 
         {/* Imagen — izquierda desktop / top mobile */}
-        <div className="relative bg-[#f7f8fa] md:w-[360px] shrink-0 flex items-center justify-center
+        <div className="relative bg-white md:w-[360px] shrink-0 flex items-center justify-center
           h-[240px] md:h-auto cursor-zoom-in"
           onClick={p.imagen_url ? () => setFotoExpanded(true) : undefined}
           style={{ cursor: p.imagen_url ? 'zoom-in' : 'default' }}>
@@ -315,7 +315,7 @@ function ProductCard({ producto: p, enCarrito, onDetalle, onAgregar }) {
       className="bg-white rounded-xl border border-[#e8ecf2] overflow-hidden flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(0,0,0,.08)] cursor-pointer group">
 
       {/* Imagen */}
-      <div className="w-full h-[180px] bg-[#f7f8fa] flex items-center justify-center overflow-hidden relative max-sm:h-[140px]">
+      <div className="w-full h-[180px] bg-white flex items-center justify-center overflow-hidden relative max-sm:h-[140px]">
         {p.imagen_url
           ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-5 transition-transform group-hover:scale-[1.03]" />
           : <Image size={28} className="text-[#d0d5de]" />
