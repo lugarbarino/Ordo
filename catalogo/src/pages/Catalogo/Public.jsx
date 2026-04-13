@@ -229,9 +229,6 @@ function ProductCard({ producto: p, enCarrito, onFoto, onAgregar }) {
 
       {/* Contenido */}
       <div className="p-4 flex flex-col flex-1 gap-1.5">
-        {p.categoria && (
-          <p className="text-[.68rem] font-semibold text-[var(--brand)] uppercase tracking-wider truncate">{p.categoria}</p>
-        )}
         <p className="text-[.86rem] font-bold text-[#1e2a3a] leading-snug">{p.nombre}</p>
         {p.descripcion && (
           <p className="text-[.78rem] text-[#7a8799] leading-relaxed flex-1 line-clamp-2">{p.descripcion}</p>
@@ -580,7 +577,8 @@ export default function CatalogoPublic() {
             <h2 className="text-lg font-bold text-[#1e2a3a]">No hay productos todavía</h2>
             <p className="text-sm">Volvé a consultar pronto.</p>
           </div>
-        ) : (
+        ) : catActiva || busqueda ? (
+          /* Filtro activo — grid plano sin títulos */
           <div className="grid gap-5 max-sm:gap-2.5"
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
             {productosFiltrados.map(p => (
@@ -589,6 +587,52 @@ export default function CatalogoPublic() {
                 onFoto={() => abrirFoto(p)}
                 onAgregar={() => agregarCarrito(p)} />
             ))}
+          </div>
+        ) : (
+          /* Sin filtro — agrupado por categoría con título */
+          <div className="flex flex-col gap-10">
+            {/* Productos sin categoría primero, si los hay */}
+            {(() => {
+              const sinCat = productosFiltrados.filter(p => !p.categoria)
+              const conCat = categorias.map(cat => ({
+                cat,
+                items: productosFiltrados.filter(p => p.categoria === cat)
+              })).filter(g => g.items.length > 0)
+
+              return (
+                <>
+                  {sinCat.length > 0 && (
+                    <div>
+                      <div className="grid gap-5 max-sm:gap-2.5"
+                        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
+                        {sinCat.map(p => (
+                          <ProductCard key={p.id} producto={p}
+                            enCarrito={carrito.some(x => x.id === p.id)}
+                            onFoto={() => abrirFoto(p)}
+                            onAgregar={() => agregarCarrito(p)} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {conCat.map(({ cat, items }) => (
+                    <div key={cat}>
+                      <h2 className="text-lg font-black text-[#1e2a3a] mb-4 pb-3 border-b border-[#e8ecf2]">
+                        {cat}
+                      </h2>
+                      <div className="grid gap-5 max-sm:gap-2.5"
+                        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
+                        {items.map(p => (
+                          <ProductCard key={p.id} producto={p}
+                            enCarrito={carrito.some(x => x.id === p.id)}
+                            onFoto={() => abrirFoto(p)}
+                            onAgregar={() => agregarCarrito(p)} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )
+            })()}
           </div>
         )}
       </div>
