@@ -362,27 +362,17 @@ export default function MarcaManual() {
                 <p className="text-[15px] text-[#52586f] leading-relaxed">{descripcion}</p>
               )}
             </div>
-            {/* Logo cards claro + oscuro */}
-            <div className="flex flex-col gap-4">
-              {(logos['horiz_claro'] || logos['iso_claro']) && (
-                <div className="w-full max-w-[360px] border border-[#e8e8ee] rounded-2xl p-10 flex items-center justify-center" style={{ backgroundColor: lightBg }}>
-                  <img
-                    src={logos['horiz_claro'] || logos['iso_claro']}
-                    alt={proyecto.nombre}
-                    className="max-h-[120px] max-w-full object-contain"
-                  />
-                </div>
-              )}
-              {(logos['horiz_oscuro'] || logos['iso_oscuro']) && (
-                <div className="w-full max-w-[360px] rounded-2xl p-10 flex items-center justify-center" style={{ backgroundColor: darkBg }}>
-                  <img
-                    src={logos['horiz_oscuro'] || logos['iso_oscuro']}
-                    alt={proyecto.nombre}
-                    className="max-h-[120px] max-w-full object-contain"
-                  />
-                </div>
-              )}
-            </div>
+            {/* Logo card — fondo blanco con borde light */}
+            {(logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']) && (
+              <div className="w-full max-w-[360px] rounded-2xl p-10 flex items-center justify-center border"
+                style={{ backgroundColor: '#ffffff', borderColor: lightBg || '#ececf0' }}>
+                <img
+                  src={logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']}
+                  alt={proyecto.nombre}
+                  className="max-h-[120px] max-w-full object-contain"
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
