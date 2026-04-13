@@ -109,10 +109,6 @@ export default function CatalogoNosotros() {
           style={{ backgroundColor: brandColor }}>
 
           <div className="relative z-10">
-            {empresa.logo_url && (
-              <img src={empresa.logo_url} alt={empresa.nombre}
-                className="h-14 md:h-16 w-auto object-contain mb-8 brightness-0 invert" />
-            )}
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-3">
               Sobre nosotros
             </p>
