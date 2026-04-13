@@ -437,9 +437,11 @@ const LOGO_VARIANTS = [
 ]
 
 const TEMPLATE_CATS = [
-  { key: 'foto',     label: 'Foto de perfil' },
-  { key: 'portada',  label: 'Portada'        },
-  { key: 'posts',    label: 'Posts'          },
+  { key: 'foto',      label: 'Foto de perfil' },
+  { key: 'portada',   label: 'Portada'        },
+  { key: 'posts',     label: 'Posts'          },
+  { key: 'brochure',  label: 'Brochure / Impreso' },
+  { key: 'otro',      label: 'Otro'           },
 ]
 
 // ── Main ──────────────────────────────────────────────────────
@@ -683,8 +685,8 @@ export function PanelManual({ proyecto }) {
         </div>
       </Section>
 
-      {/* TEMPLATES REDES */}
-      <Section title="Templates para redes sociales" hint="Preview + link de Canva para que el cliente edite cada template.">
+      {/* DIFUSIÓN */}
+      <Section title="Difusión" hint="Redes sociales, brochures, impreso y cualquier pieza de comunicación. Preview + link de Canva.">
         <div className="flex flex-col gap-8">
           {TEMPLATE_CATS.map(({ key, label }) => (
             <TemplateCategoria
