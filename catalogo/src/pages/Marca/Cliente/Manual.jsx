@@ -213,6 +213,11 @@ export default function MarcaManual() {
   const [lightbox, setLightbox] = useState(null)
 
   useEffect(() => {
+    if (proyecto?.nombre) document.title = `${proyecto.nombre} — Manual de Marca`
+    return () => { document.title = 'ORDO' }
+  }, [proyecto?.nombre])
+
+  useEffect(() => {
     const els = document.querySelectorAll('[data-animate]')
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('anim-visible'); observer.unobserve(e.target) } }),
