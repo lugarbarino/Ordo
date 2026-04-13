@@ -198,9 +198,11 @@ const LOGO_GRUPOS = [
 ]
 
 const TEMPLATE_CATS = [
-  { key: 'foto',    label: 'Foto de perfil', aspect: 'aspect-square'      },
-  { key: 'portada', label: 'Portada',        aspect: 'aspect-[16/9]'      },
-  { key: 'posts',   label: 'Posts',          aspect: 'aspect-square'      },
+  { key: 'foto',     label: 'Foto de perfil',    aspect: 'aspect-square'  },
+  { key: 'portada',  label: 'Portada',            aspect: 'aspect-[16/9]' },
+  { key: 'posts',    label: 'Posts',              aspect: 'aspect-square'  },
+  { key: 'brochure', label: 'Brochure / Impreso', aspect: 'aspect-[3/4]'  },
+  { key: 'otro',     label: 'Otro',               aspect: 'aspect-square'  },
 ]
 
 // ── Main ──────────────────────────────────────────────────────
@@ -600,7 +602,7 @@ export default function MarcaManual() {
         {/* TEMPLATES REDES */}
         {hayTemplates && (
           <div data-animate>
-            <SectionHeader num={nextNum()} label="Templates para redes" />
+            <SectionHeader num={nextNum()} label="Difusión" />
             <div className="flex flex-col gap-12">
               {TEMPLATE_CATS.map(({ key, label, aspect }) => {
                 const items = (templates[key] || []).filter(t => t?.preview_url || t?.canva_url)
