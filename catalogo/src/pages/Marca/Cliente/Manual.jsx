@@ -169,8 +169,8 @@ function LogoCard({ url, label, sub, dark, darkBg, lightBg, nombreBase, onZoom }
 
   return (
     <div className="flex flex-col gap-3">
-      <div onClick={() => onZoom?.({ url, dark, darkBg: '#363645', lightBg })} className="w-full h-[200px] rounded-2xl flex items-center justify-center p-6 cursor-zoom-in border"
-        style={{ backgroundColor: dark ? '#363645' : '#ffffff', borderColor: dark ? 'transparent' : (lightBg || '#ececf0') }}>
+      <div onClick={() => onZoom?.({ url, dark, darkBg, lightBg })} className="w-full h-[200px] rounded-2xl flex items-center justify-center p-6 cursor-zoom-in border"
+        style={{ backgroundColor: dark ? (darkBg || '#363645') : '#ffffff', borderColor: dark ? 'transparent' : (lightBg || '#ececf0') }}>
         <img src={url} alt={label} className="object-contain" style={{ maxHeight: '120px', maxWidth: '100%' }} />
       </div>
       <div>
