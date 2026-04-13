@@ -318,7 +318,7 @@ const NAV_LINKS = [
 ]
 
 // ── Sidebar ──────────────────────────────────────────────────
-function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLogout }) {
+function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onLogout }) {
   const [selectorOpen, setSelectorOpen] = useState(false)
 
   return (
@@ -351,6 +351,14 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onLo
                 {p.nombre}
               </button>
             ))}
+            <div className="border-t border-[#f1f1f1] mt-1 pt-1">
+              <button
+                onClick={() => { onNuevo?.(); setSelectorOpen(false) }}
+                className="w-full text-left px-3.5 py-2 text-sm text-[#726d76] hover:bg-[#f5f5f5] bg-transparent border-none cursor-pointer transition-colors rounded-[8px] mx-1 flex items-center gap-2"
+                style={{ width: 'calc(100% - 8px)' }}>
+                <Plus size={13} /> Nueva marca
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -411,6 +419,21 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const [panel, setPanel] = useState('dashboard')
   const [stats, setStats] = useState({ vistas: 0, respuestas: 0, briefEnviado: false })
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [nuevoOpen, setNuevoOpen] = useState(false)
+  const [nuevoNombre, setNuevoNombre] = useState('')
+  const [nuevoError, setNuevoError] = useState('')
+  const [nuevoLoading, setNuevoLoading] = useState(false)
+
+  const handleCrearMarca = async () => {
+    if (!nuevoNombre.trim()) { setNuevoError('El nombre es obligatorio'); return }
+    setNuevoLoading(true)
+    const slug = nuevoNombre.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    const { data, error: err } = await db.from('proyectos_marca').insert({ cuenta_id: cuenta.id, nombre: nuevoNombre.trim(), estado: 'brief', slug }).select().single()
+    setNuevoLoading(false)
+    if (err) { setNuevoError(err.message); return }
+    setNuevoOpen(false); setNuevoNombre(''); setNuevoError('')
+    navigate(`/marca/admin/${data.id}`)
+  }
 
   useEffect(() => {
     cargarStats(proyecto.id)
@@ -461,6 +484,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
           panel={panel}
           onPanel={handlePanel}
           onProyecto={handleProyecto}
+          onNuevo={() => setNuevoOpen(true)}
           onLogout={handleLogout}
         />
       </div>
@@ -477,6 +501,40 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
         </div>
         {renderPanel()}
       </main>
+
+      {/* Modal nueva marca */}
+      {nuevoOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={e => e.target === e.currentTarget && setNuevoOpen(false)}>
+          <div className="bg-white rounded-[18px] p-8 w-full max-w-[420px] shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-black text-[#1c1c1c]">Nueva marca</h2>
+              <button onClick={() => setNuevoOpen(false)} className="text-[#999] bg-transparent border-none cursor-pointer p-0"><X size={18} /></button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1.5 text-[#111]">Nombre de la empresa cliente</label>
+                <input
+                  autoFocus
+                  type="text"
+                  value={nuevoNombre}
+                  onChange={e => { setNuevoNombre(e.target.value); setNuevoError('') }}
+                  onKeyDown={e => e.key === 'Enter' && handleCrearMarca()}
+                  placeholder="Ej: Café Mamá, Clínica Sur…"
+                  className="w-full px-3.5 py-2.5 border border-[#dde3ed] rounded-lg text-sm outline-none focus:border-[#1c1c1c] transition-colors"
+                />
+                {nuevoError && <p className="text-red-500 text-xs mt-1">{nuevoError}</p>}
+              </div>
+              <button
+                onClick={handleCrearMarca}
+                disabled={nuevoLoading}
+                className="w-full py-3 bg-[#1c1c1c] text-white rounded-lg font-semibold text-sm cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 border-none">
+                {nuevoLoading ? 'Creando…' : 'Crear proyecto'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
