@@ -333,7 +333,7 @@ export default function MarcaManual() {
         <div className="relative flex flex-col items-center gap-8 max-w-[560px] text-center">
           {/* Logo horizontal oscuro */}
           {logos['horiz_oscuro'] && (
-            <img src={logos['horiz_oscuro']} alt={proyecto.nombre} className="h-20 sm:h-28 w-auto object-contain max-w-[220px] sm:max-w-[320px]" />
+            <img src={logos['horiz_oscuro']} alt={proyecto.nombre} className="h-20 sm:h-28 w-auto object-contain max-w-[180px] sm:max-w-[270px]" />
           )}
           {!logos['horiz_oscuro'] && (
             <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight">{proyecto.nombre}</h1>
