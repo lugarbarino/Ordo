@@ -663,7 +663,7 @@ export default function MarcaManual() {
       </div>
 
       {/* FOOTER */}
-      <div className="bg-[#363645] px-8 sm:px-16 py-12">
+      <div className="px-8 sm:px-16 py-12" style={{ backgroundColor: darkBg }}>
         <div className="max-w-[1024px] mx-auto flex items-center justify-between">
           <img src="/logo-ordo.svg" alt="ORDO" className="h-4 w-auto opacity-30 invert" />
           <div className="text-right">
