@@ -301,7 +301,7 @@ export default function MarcaManual() {
                 <X size={18} />
               </button>
             </div>
-            <div className="flex-1 flex items-center justify-center px-10 pb-10">
+            <div className="flex-1 flex items-center justify-center px-10 py-10">
               <img src={lightbox.url} alt="" style={{ width: '50vw', maxHeight: '35vh', objectFit: 'contain' }} />
             </div>
           </div>
