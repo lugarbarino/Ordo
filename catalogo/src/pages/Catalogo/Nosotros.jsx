@@ -214,23 +214,6 @@ export default function CatalogoNosotros() {
         </div>
       )}
 
-      {/* ── IMAGEN FULL-WIDTH existente (si tiene banner) ── */}
-      {hasBanner && (
-        <div className="px-6 md:px-16 pb-16 md:pb-24">
-          <div className="rounded-2xl overflow-hidden h-[280px] md:h-[420px] relative">
-            {isVideo ? (
-              <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-                <source src={empresa.banner_url} />
-              </video>
-            ) : (
-              <img src={empresa.banner_url} alt={empresa.nombre}
-                className="w-full h-full object-cover" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-          </div>
-        </div>
-      )}
-
       {/* ── UBICACIÓN ── */}
       {tokens.direccion && (
         <div className="bg-white px-6 md:px-16 py-14 md:py-20">
