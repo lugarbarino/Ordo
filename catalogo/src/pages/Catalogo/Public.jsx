@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image, Check, Menu } from 'lucide-react'
 import { db } from '../../lib/supabase'
@@ -347,6 +347,7 @@ export default function CatalogoPublic() {
   const [carrito, setCarrito] = useState([])
   const [fotoModal, setFotoModal] = useState(null)
   const [carritoOpen, setCarritoOpen] = useState(false)
+  const catalogoRef = useRef(null)
 
   const brandColor = empresa?.color || '#285576'
   const brandLight = empresa?.color ? empresa.color + '22' : '#e8f0fc'
@@ -480,7 +481,7 @@ export default function CatalogoPublic() {
           )}
           <div className="flex flex-wrap gap-3">
             <button
-              onClick={() => setCarritoOpen(true)}
+              onClick={() => catalogoRef.current?.scrollIntoView({ behavior: 'smooth' })}
               className="px-6 h-12 rounded-xl text-white text-sm font-bold cursor-pointer border-none hover:opacity-90 transition-opacity"
               style={{ background: brandColor }}>
               Generá tu presupuesto
@@ -494,7 +495,7 @@ export default function CatalogoPublic() {
       </div>
 
       {/* Barra filtros sticky */}
-      <div className="bg-white border-b border-[#dde3ed] px-6 md:px-10 h-16 flex items-center gap-3 sticky top-[64px] z-20
+      <div ref={catalogoRef} className="bg-white border-b border-[#dde3ed] px-6 md:px-10 h-16 flex items-center gap-3 sticky top-[64px] z-20
         max-md:h-auto max-md:flex-wrap max-md:gap-2 max-md:py-2.5">
         <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-1 overflow-x-auto shrink min-w-0 max-md:order-1 max-md:w-full"
           style={{ scrollbarWidth: 'none' }}>
