@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Upload, Building2, Search } from 'lucide-react'
+import { Upload, Building2, Search, ExternalLink } from 'lucide-react'
 import { useAppStore } from '../../../store/useAppStore'
 import { db, SUPABASE_URL } from '../../../lib/supabase'
 import { Button } from '../ui/Button'
@@ -32,6 +32,7 @@ export function ConfigPanel() {
         nombre: empresa.nombre || '',
         slug: empresa.slug || '',
         email_contacto: empresa.email_contacto || empresa.email || user?.email || '',
+        whatsapp: empresa.whatsapp || '',
         color: empresa.color || '#3872fa',
         logo_url: empresa.logo_url || '',
         banner_url: empresa.banner_url || '',
@@ -39,7 +40,7 @@ export function ConfigPanel() {
         descripcion: empresa.descripcion || '',
       })
     } else {
-      setForm({ color: '#3872fa', email_contacto: user?.email || '', nombre: '', slug: '', logo_url: '', banner_url: '', titulo: '', descripcion: '' })
+      setForm({ color: '#3872fa', email_contacto: user?.email || '', whatsapp: '', nombre: '', slug: '', logo_url: '', banner_url: '', titulo: '', descripcion: '' })
     }
   }, [empresa, user])
 
@@ -230,6 +231,85 @@ export function ConfigPanel() {
             onChange={e => set('descripcion', e.target.value)}
             placeholder="Explicá un poco más tu servicio"
             rows={3}
+            className="w-full px-4 py-2.5 text-sm border border-[#e3e3e3] focus:outline-none focus:border-[var(--brand)] resize-none bg-white text-[#111] placeholder-[#aaa] transition-colors"
+            style={{ borderRadius: 'var(--radius-btn)' }}
+          />
+        </div>
+
+        <div className="flex justify-end">
+          <Button variant="primary" loading={saving} onClick={handleGuardar}>
+            Guardar
+          </Button>
+        </div>
+      </Card>
+
+      {/* ── 3. Quiénes somos card ──────────────────────── */}
+      <Card className="p-6 space-y-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-base font-bold mb-1">Quiénes somos</h3>
+            <p className="text-sm text-[#666]">Información que aparece en la página pública de presentación de tu empresa.</p>
+          </div>
+          {form.slug && (
+            <a
+              href={`/catalogo/${form.slug}/nosotros`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 text-xs font-semibold shrink-0 px-3 h-8 rounded-lg border border-[#e3e3e3] text-[#444] hover:border-[var(--brand)] hover:text-[var(--brand)] transition-colors"
+            >
+              <ExternalLink size={12} /> Ver página
+            </a>
+          )}
+        </div>
+
+        {/* Preview */}
+        <div className="rounded-xl overflow-hidden border border-[#e8ecf2]" style={{ height: 120 }}>
+          <div className="flex h-full">
+            <div className="flex-1 flex flex-col justify-center px-4 py-3"
+              style={{ backgroundColor: form.color || '#3872fa' }}>
+              {form.logo_url
+                ? <img src={form.logo_url} alt="logo" className="h-6 w-auto object-contain mb-2 brightness-0 invert max-w-[80px]" />
+                : <div className="h-5 w-16 rounded bg-white/30 mb-2" />
+              }
+              <p className="text-white text-xs font-black leading-snug line-clamp-2">
+                {form.nombre || 'Tu empresa'}
+              </p>
+              {form.descripcion && (
+                <p className="text-white/60 text-[10px] mt-0.5 line-clamp-1">{form.descripcion}</p>
+              )}
+            </div>
+            <div className="w-1/3 relative overflow-hidden">
+              {form.banner_url
+                ? <img src={form.banner_url} alt="banner" className="absolute inset-0 w-full h-full object-cover" />
+                : <div className="absolute inset-0" style={{ backgroundColor: form.color ? form.color + '44' : '#3872fa22' }} />
+              }
+            </div>
+          </div>
+        </div>
+
+        <Input
+          label="WhatsApp"
+          value={form.whatsapp || ''}
+          onChange={e => set('whatsapp', e.target.value.replace(/\D/g, ''))}
+          placeholder="5491112345678 (código de país sin +)"
+        />
+
+        <Input
+          label="Mail de contacto"
+          type="email"
+          value={form.email_contacto || ''}
+          onChange={e => set('email_contacto', e.target.value)}
+          placeholder="tumail@gmail.com"
+        />
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-[#666] uppercase tracking-wide">Descripción de la empresa</label>
+          <p className="text-xs text-[#999]">Aparece en el hero del catálogo y en la página Quiénes somos.</p>
+          <textarea
+            value={form.descripcion || ''}
+            onChange={e => set('descripcion', e.target.value)}
+            placeholder="Contá quiénes son, qué hacen y por qué elegirlos"
+            rows={4}
             className="w-full px-4 py-2.5 text-sm border border-[#e3e3e3] focus:outline-none focus:border-[var(--brand)] resize-none bg-white text-[#111] placeholder-[#aaa] transition-colors"
             style={{ borderRadius: 'var(--radius-btn)' }}
           />
