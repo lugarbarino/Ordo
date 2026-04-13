@@ -62,10 +62,10 @@ function ModalProducto({ producto: p, enCarrito, onAgregar, onQuitarDelCarrito, 
       onClick={e => e.target === e.currentTarget && onClose()}>
 
       {/* Panel */}
-      <div className="bg-white w-full md:max-w-[780px] md:rounded-2xl rounded-t-2xl overflow-hidden flex flex-col md:flex-row max-h-[92vh] md:max-h-[82vh]">
+      <div className="bg-white w-full md:max-w-[900px] md:rounded-2xl rounded-t-2xl overflow-hidden flex flex-col md:flex-row max-h-[92vh] md:max-h-[82vh]">
 
         {/* Imagen — izquierda desktop / top mobile */}
-        <div className="relative bg-[#f7f8fa] md:w-[340px] shrink-0 flex items-center justify-center
+        <div className="relative bg-[#f7f8fa] md:w-[360px] shrink-0 flex items-center justify-center
           h-[240px] md:h-auto cursor-zoom-in"
           onClick={p.imagen_url ? () => setFotoExpanded(true) : undefined}
           style={{ cursor: p.imagen_url ? 'zoom-in' : 'default' }}>
