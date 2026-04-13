@@ -365,7 +365,7 @@ export default function MarcaManual() {
             {/* Logo card */}
             <div className="flex items-center justify-center">
               {(logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']) && (
-                <div className="w-full max-w-[360px] border border-[#e8e8ee] rounded-2xl p-10 flex items-center justify-center bg-white">
+                <div className="w-full max-w-[360px] border border-[#e8e8ee] rounded-2xl p-10 flex items-center justify-center" style={{ backgroundColor: lightBg }}>
                   <img
                     src={logos['horiz_claro'] || logos['iso_claro'] || logos['horiz_oscuro']}
                     alt={proyecto.nombre}
