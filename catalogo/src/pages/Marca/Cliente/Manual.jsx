@@ -29,10 +29,11 @@ async function downloadSvg(url, nombre) {
   const vbVals = vb ? vb.split(/[\s,]+/).map(Number) : null
   const svgW = vbVals ? vbVals[2] : (parseFloat(svgEl.getAttribute('width')) || 100)
   const svgH = vbVals ? vbVals[3] : (parseFloat(svgEl.getAttribute('height')) || 100)
-  // Expand viewBox to add transparent padding
-  svgEl.setAttribute('viewBox', `${-PAD} ${-PAD} ${svgW + PAD * 2} ${svgH + PAD * 2}`)
-  svgEl.setAttribute('width', svgW + PAD * 2)
-  svgEl.setAttribute('height', svgH + PAD * 2)
+  // Padding proporcional: 12% del lado mayor, en unidades del SVG
+  const svgPad = Math.max(svgW, svgH) * 0.12
+  svgEl.setAttribute('viewBox', `${-svgPad} ${-svgPad} ${svgW + svgPad * 2} ${svgH + svgPad * 2}`)
+  svgEl.setAttribute('width', svgW + svgPad * 2)
+  svgEl.setAttribute('height', svgH + svgPad * 2)
   const blob = new Blob([new XMLSerializer().serializeToString(doc)], { type: 'image/svg+xml' })
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${nombre}.svg`; a.click(); URL.revokeObjectURL(a.href)
 }
