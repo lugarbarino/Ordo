@@ -293,14 +293,18 @@ export default function MarcaManual() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm" onClick={() => setLightbox(null)}>
           <div
             onClick={e => e.stopPropagation()}
-            className="rounded-2xl shadow-2xl flex items-center justify-center p-10"
+            className="rounded-2xl shadow-2xl flex flex-col overflow-hidden"
             style={{ backgroundColor: lightbox.dark ? '#363645' : '#ffffff', maxWidth: '60vw', maxHeight: '50vh' }}
           >
-            <img src={lightbox.url} alt="" style={{ width: '50vw', maxHeight: '40vh', objectFit: 'contain' }} />
+            <div className="flex justify-end px-4 pt-4">
+              <button onClick={() => setLightbox(null)} className={`cursor-pointer bg-transparent border-none p-1 ${lightbox.dark ? 'text-white/50 hover:text-white' : 'text-black/30 hover:text-black/70'}`}>
+                <X size={18} />
+              </button>
+            </div>
+            <div className="flex-1 flex items-center justify-center px-10 pb-10">
+              <img src={lightbox.url} alt="" style={{ width: '50vw', maxHeight: '35vh', objectFit: 'contain' }} />
+            </div>
           </div>
-          <button onClick={() => setLightbox(null)} className="absolute top-5 right-5 text-white/60 hover:text-white bg-transparent border-none cursor-pointer p-2">
-            <X size={24} />
-          </button>
         </div>
       )}
 
