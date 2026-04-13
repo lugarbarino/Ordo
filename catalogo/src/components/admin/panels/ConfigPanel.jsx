@@ -26,6 +26,7 @@ export function ConfigPanel() {
   const [uploadingBanner, setUploadingBanner] = useState(false)
   const [uploadingBannerServicio, setUploadingBannerServicio] = useState(false)
   const [pexelsOpen, setPexelsOpen] = useState(false)
+  const [pexelsServicioOpen, setPexelsServicioOpen] = useState(false)
   const logoRef = useRef()
   const bannerRef = useRef()
   const bannerServicioRef = useRef()
@@ -396,10 +397,15 @@ export function ConfigPanel() {
               />
             </div>
           )}
-          <Button size="sm" variant="secondary" loading={uploadingBannerServicio}
-            onClick={() => bannerServicioRef.current?.click()}>
-            <Upload size={13} /> {uploadingBannerServicio ? 'Subiendo…' : 'Subir imagen'}
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setPexelsServicioOpen(true)}>
+              <Search size={13} /> Buscar en Pexels
+            </Button>
+            <Button size="sm" variant="secondary" loading={uploadingBannerServicio}
+              onClick={() => bannerServicioRef.current?.click()}>
+              <Upload size={13} /> {uploadingBannerServicio ? 'Subiendo…' : 'Subir imagen'}
+            </Button>
+          </div>
           <input type="file" ref={bannerServicioRef} accept="image/*" className="hidden"
             onChange={e => subirToken(e.target.files[0], 'banners', setUploadingBannerServicio, 'banner_servicio_url')} />
         </div>
@@ -435,11 +441,18 @@ export function ConfigPanel() {
         </div>
       </Card>
 
-      {/* Pexels picker modal */}
+      {/* Pexels picker — banner principal */}
       <PexelsPicker
         open={pexelsOpen}
         onClose={() => setPexelsOpen(false)}
         onSelect={({ url }) => set('banner_url', url)}
+      />
+
+      {/* Pexels picker — banner de servicio */}
+      <PexelsPicker
+        open={pexelsServicioOpen}
+        onClose={() => setPexelsServicioOpen(false)}
+        onSelect={({ url }) => setToken('banner_servicio_url', url)}
       />
 
       </div>{/* end max-w-xl */}
