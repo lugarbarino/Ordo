@@ -450,7 +450,9 @@ export default function CatalogoPublic() {
   const [carrito, setCarrito] = useState([])
   const [productoDetalle, setProductoDetalle] = useState(null)
   const [carritoOpen, setCarritoOpen] = useState(false)
+  const [logoBarVisible, setLogoBarVisible] = useState(false)
   const catalogoRef = useRef(null)
+  const heroRef = useRef(null)
 
   const brandColor = empresa?.color || '#285576'
   const brandLight = empresa?.color ? empresa.color + '22' : '#e8f0fc'
@@ -506,6 +508,16 @@ export default function CatalogoPublic() {
     setCarrito(c => c.map(x => x.id === id ? { ...x, cantidad: Math.max(1, x.cantidad + delta) } : x))
   }, [])
 
+  useEffect(() => {
+    if (!heroRef.current) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setLogoBarVisible(!entry.isIntersecting),
+      { threshold: 0 }
+    )
+    obs.observe(heroRef.current)
+    return () => obs.disconnect()
+  }, [empresa]) // re-run once empresa loads so heroRef is set
+
   const abrirDetalle = (producto) => {
     setProductoDetalle(producto)
     if (empresa)
@@ -542,7 +554,7 @@ export default function CatalogoPublic() {
     }}>
 
       {/* Hero full-width — navbar flota encima */}
-      <div className="relative w-full h-[560px] md:h-[640px] flex items-center overflow-hidden">
+      <div ref={heroRef} className="relative w-full h-[560px] md:h-[640px] flex items-center overflow-hidden">
 
         {/* Navbar flotante sobre el hero */}
         <div className="absolute top-0 inset-x-0 z-20 flex items-center px-6 md:px-10 h-[64px]"
@@ -637,8 +649,10 @@ export default function CatalogoPublic() {
           ))}
         </div>
 
-        {/* Logo — centro */}
-        <Link to={`/catalogo/${slug}`} className="shrink-0 flex items-center justify-center px-2 mx-auto">
+        {/* Logo — centro, aparece cuando el hero sale de vista */}
+        <Link to={`/catalogo/${slug}`}
+          className="shrink-0 flex items-center justify-center px-2 mx-auto transition-all duration-200"
+          style={{ opacity: logoBarVisible ? 1 : 0, pointerEvents: logoBarVisible ? 'auto' : 'none' }}>
           {empresa.logo_url
             ? <img src={empresa.logo_url} alt={empresa.nombre} className="h-7 w-auto object-contain max-w-[100px]" />
             : <span className="text-sm font-black" style={{ color: brandColor }}>{empresa.nombre}</span>
