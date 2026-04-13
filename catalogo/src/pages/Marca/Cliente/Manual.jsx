@@ -619,10 +619,20 @@ export default function MarcaManual() {
                           )}
                           <div className="flex gap-2">
                             {tmpl.preview_url && (
-                              <a href={tmpl.preview_url} download target="_blank" rel="noreferrer"
-                                className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
+                              <button
+                                onClick={async () => {
+                                  const res = await fetch(tmpl.preview_url)
+                                  const blob = await res.blob()
+                                  const ext = tmpl.preview_url.split('?')[0].split('.').pop() || 'jpg'
+                                  const a = document.createElement('a')
+                                  a.href = URL.createObjectURL(blob)
+                                  a.download = `template.${ext}`
+                                  a.click()
+                                  URL.revokeObjectURL(a.href)
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors cursor-pointer">
                                 <Download size={11} /> Descargar
-                              </a>
+                              </button>
                             )}
                             {tmpl.canva_url && (
                               <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
