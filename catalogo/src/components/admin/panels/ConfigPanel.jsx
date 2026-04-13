@@ -65,6 +65,19 @@ export function ConfigPanel() {
     }
   }))
 
+  const buildCampos = (f) => ({
+    nombre:         f.nombre,
+    slug:           f.slug,
+    email_contacto: f.email_contacto,
+    color:          f.color,
+    logo_url:       f.logo_url,
+    banner_url:     f.banner_url,
+    titulo:         f.titulo,
+    descripcion:    f.descripcion,
+    tokens:         f.tokens || {},
+    ...(f.whatsapp !== undefined ? { whatsapp: f.whatsapp } : {}),
+  })
+
   const subirArchivo = async (file, bucket, setLoading, field) => {
     if (!file) return
     setLoading(true)
@@ -74,10 +87,9 @@ export function ConfigPanel() {
       const { error } = await db.storage.from(bucket).upload(path, file, { upsert: true })
       if (error) { showToast('Error al subir: ' + error.message, 'err'); return }
       const url = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`
-      // Update form and immediately save to DB
       const newForm = { ...form, [field]: url }
       setForm(newForm)
-      await guardarEmpresa(newForm)
+      await guardarEmpresa(buildCampos(newForm))
     } catch (e) {
       showToast('Error al subir: ' + e.message, 'err')
     } finally {
@@ -97,7 +109,7 @@ export function ConfigPanel() {
       // Usar setter funcional para leer el form más reciente y evitar closure stale
       setForm(prev => {
         const newForm = { ...prev, tokens: { ...(prev.tokens || {}), [tokenKey]: url } }
-        guardarEmpresa(newForm)
+        guardarEmpresa(buildCampos(newForm))
         return newForm
       })
     } catch (e) {
@@ -110,7 +122,7 @@ export function ConfigPanel() {
   const handleGuardar = async () => {
     if (!form.nombre?.trim()) { showToast('El nombre de empresa es requerido', 'err'); return }
     setSaving(true)
-    await guardarEmpresa(form)
+    await guardarEmpresa(buildCampos(form))
     setSaving(false)
   }
 
@@ -458,7 +470,7 @@ export function ConfigPanel() {
         onSelect={async ({ url }) => {
           const newForm = { ...form, tokens: { ...(form.tokens || {}), banner_servicio_url: url } }
           setForm(newForm)
-          await guardarEmpresa(newForm)
+          await guardarEmpresa(buildCampos(newForm))
         }}
       />
 
