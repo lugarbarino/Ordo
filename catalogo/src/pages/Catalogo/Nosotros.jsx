@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Mail, Phone, MapPin, ArrowRight } from 'lucide-react'
+import { Mail, ArrowRight, MessageCircle, ShoppingBag } from 'lucide-react'
 import { db } from '../../lib/supabase'
 import { Navbar } from './Public'
 
+function WhatsAppIcon({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.057 23.885a.5.5 0 0 0 .611.61l6.101-1.456A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.938 9.938 0 0 1-5.072-1.385l-.361-.214-3.762.898.938-3.669-.235-.375A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+    </svg>
+  )
+}
+
 function Spinner({ color }) {
   return (
-    <div className="flex items-center justify-center h-72">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-10 h-10 rounded-full border-4 border-[#e3e3e3] animate-spin"
         style={{ borderTopColor: color || '#285576' }} />
     </div>
@@ -20,28 +29,23 @@ export default function CatalogoNosotros() {
   const [cargando, setCargando] = useState(true)
 
   const brandColor = empresa?.color || '#285576'
-  const brandLight = empresa?.color ? empresa.color + '18' : '#e8f0fc'
+  const brandLight = empresa?.color ? empresa.color + '15' : '#e8f0fc'
+  const brandMid  = empresa?.color ? empresa.color + '30' : '#d0e4f5'
 
   useEffect(() => {
     if (!slug) { setError(true); setCargando(false); return }
-
     ;(async () => {
       const { data: emp } = await db.from('empresas').select('*').eq('slug', slug).single()
       if (!emp) { setError(true); setCargando(false); return }
       setEmpresa(emp)
-      document.title = emp.nombre + ' — Quiénes somos'
+      document.title = emp.nombre + ' — Sobre nosotros'
       const root = document.documentElement
       if (emp.color) root.style.setProperty('--brand', emp.color)
+      setCargando(false)
     })()
-
-    setCargando(false)
   }, [slug])
 
-  if (cargando) return (
-    <div className="min-h-screen bg-white">
-      <Spinner color={brandColor} />
-    </div>
-  )
+  if (cargando) return <Spinner color={brandColor} />
 
   if (error) return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 p-8 text-center">
@@ -51,16 +55,11 @@ export default function CatalogoNosotros() {
     </div>
   )
 
-  const contactar = () => {
-    if (empresa?.whatsapp) window.open(`https://wa.me/${empresa.whatsapp}`, '_blank')
-    else if (empresa?.email_contacto) window.open(`mailto:${empresa.email_contacto}`, '_blank')
-  }
+  const hasBanner = !!empresa.banner_url
+  const isVideo = hasBanner && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url)
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] text-[#1e2a3a]" style={{
-      '--brand': brandColor,
-      '--brand-light': brandLight,
-    }}>
+    <div className="min-h-screen bg-white text-[#1e2a3a]">
 
       {/* Navbar */}
       <Navbar
@@ -71,110 +70,189 @@ export default function CatalogoNosotros() {
         onCarrito={() => {}}
       />
 
-      {/* Hero */}
-      <div className="relative w-full h-[380px] md:h-[460px] flex items-end overflow-hidden">
-        {empresa?.banner_url && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url) ? (
-          <video key={empresa.banner_url} autoPlay muted loop playsInline
-            className="absolute inset-0 w-full h-full object-cover">
-            <source src={empresa.banner_url} />
-          </video>
-        ) : (
-          <div className="absolute inset-0" style={{
-            background: brandColor,
-            ...(empresa?.banner_url ? {
-              backgroundImage: `url(${empresa.banner_url})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            } : {})
-          }} />
-        )}
-        <div className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(10,20,40,0.85) 0%, rgba(10,20,40,0.35) 60%, transparent 100%)' }} />
+      {/* ── HERO SPLIT ── */}
+      <div className="flex flex-col md:flex-row min-h-[520px] md:min-h-[580px]">
 
-        <div className="relative z-10 px-6 md:px-16 pb-10 md:pb-14">
-          {empresa?.logo_url && (
-            <img src={empresa.logo_url} alt={empresa.nombre}
-              className="h-12 md:h-16 w-auto object-contain mb-5 brightness-0 invert" />
+        {/* Izquierda: color de marca + logo + nombre */}
+        <div className="flex flex-col justify-center items-start px-10 md:px-16 py-16 md:w-1/2 relative overflow-hidden"
+          style={{ backgroundColor: brandColor }}>
+
+          {/* Patrón decorativo de fondo */}
+          <div className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `radial-gradient(circle at 20% 80%, white 1px, transparent 1px),
+                radial-gradient(circle at 80% 20%, white 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, white 0.5px, transparent 0.5px)`,
+              backgroundSize: '60px 60px, 40px 40px, 20px 20px'
+            }} />
+
+          <div className="relative z-10">
+            {empresa.logo_url && (
+              <img src={empresa.logo_url} alt={empresa.nombre}
+                className="h-14 md:h-16 w-auto object-contain mb-8 brightness-0 invert" />
+            )}
+            <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-3">
+              Sobre nosotros
+            </p>
+            <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-6">
+              {empresa.titulo || empresa.nombre}
+            </h1>
+            {empresa.descripcion && (
+              <p className="text-white/75 text-base md:text-lg leading-relaxed max-w-[420px]">
+                {empresa.descripcion}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Derecha: imagen / video o bloque decorativo */}
+        <div className="md:w-1/2 min-h-[280px] md:min-h-0 relative overflow-hidden">
+          {isVideo ? (
+            <video key={empresa.banner_url} autoPlay muted loop playsInline
+              className="absolute inset-0 w-full h-full object-cover">
+              <source src={empresa.banner_url} />
+            </video>
+          ) : hasBanner ? (
+            <img src={empresa.banner_url} alt={empresa.nombre}
+              className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            /* Sin imagen: bloque con patrón geométrico */
+            <div className="absolute inset-0 flex items-center justify-center"
+              style={{ backgroundColor: brandLight }}>
+              <div className="grid grid-cols-4 gap-3 opacity-40 p-10">
+                {Array.from({ length: 16 }).map((_, i) => (
+                  <div key={i}
+                    className="rounded-xl aspect-square"
+                    style={{
+                      backgroundColor: brandColor,
+                      opacity: 0.3 + (i % 4) * 0.15
+                    }} />
+                ))}
+              </div>
+            </div>
           )}
-          <h1 className="text-3xl md:text-5xl font-black text-white leading-tight">
-            {empresa?.nombre}
-          </h1>
         </div>
       </div>
 
-      {/* Contenido principal */}
-      <div className="max-w-[900px] mx-auto px-6 md:px-10 py-14 md:py-20">
-
-        {/* Descripción */}
-        {empresa?.descripcion && (
-          <div className="mb-14">
-            <p className="text-[.72rem] font-bold uppercase tracking-widest mb-4"
-              style={{ color: brandColor }}>
-              Quiénes somos
-            </p>
-            <p className="text-xl md:text-2xl text-[#1e2a3a] leading-relaxed font-medium max-w-[700px]">
-              {empresa.descripcion}
-            </p>
+      {/* ── DESCRIPCIÓN DESTACADA ── */}
+      {empresa.descripcion && (
+        <div className="px-8 md:px-20 py-16 md:py-24 max-w-[1000px] mx-auto">
+          <div className="flex gap-6 md:gap-10 items-start">
+            <div className="w-1 rounded-full shrink-0 self-stretch mt-1"
+              style={{ backgroundColor: brandColor }} />
+            <div>
+              <p className="text-[.72rem] font-bold uppercase tracking-widest mb-5"
+                style={{ color: brandColor }}>
+                Quiénes somos
+              </p>
+              <p className="text-2xl md:text-3xl font-semibold text-[#1e2a3a] leading-relaxed">
+                {empresa.descripcion}
+              </p>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Línea divisora */}
-        {empresa?.descripcion && <div className="border-t border-[#e8ecf2] mb-14" />}
+      {/* ── IMAGEN FULL-WIDTH (si tiene banner) ── */}
+      {hasBanner && (
+        <div className="px-6 md:px-16 pb-16 md:pb-24">
+          <div className="rounded-2xl overflow-hidden h-[280px] md:h-[420px] relative">
+            {isVideo ? (
+              <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+                <source src={empresa.banner_url} />
+              </video>
+            ) : (
+              <img src={empresa.banner_url} alt={empresa.nombre}
+                className="w-full h-full object-cover" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          </div>
+        </div>
+      )}
 
-        {/* Contacto */}
-        {(empresa?.email_contacto || empresa?.whatsapp) && (
-          <div className="mb-14">
-            <p className="text-[.72rem] font-bold uppercase tracking-widest mb-6"
+      {/* ── CONTACTO ── */}
+      {(empresa.email_contacto || empresa.whatsapp) && (
+        <div className="px-6 md:px-16 pb-16 md:pb-24" style={{ backgroundColor: '#f7f8fa' }}>
+          <div className="max-w-[900px] mx-auto py-14 md:py-20">
+            <p className="text-[.72rem] font-bold uppercase tracking-widest mb-2"
               style={{ color: brandColor }}>
               Contacto
             </p>
-            <div className="flex flex-col gap-4">
-              {empresa?.email_contacto && (
-                <a href={`mailto:${empresa.email_contacto}`}
-                  className="flex items-center gap-3 text-[#1e2a3a] hover:opacity-70 transition-opacity group">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: brandLight }}>
-                    <Mail size={18} style={{ color: brandColor }} />
+            <h2 className="text-2xl md:text-3xl font-black text-[#1e2a3a] mb-10">
+              Hablemos
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {empresa.whatsapp && (
+                <a href={`https://wa.me/${empresa.whatsapp}`} target="_blank" rel="noreferrer"
+                  className="group flex flex-col gap-4 p-7 rounded-2xl border-2 border-transparent hover:border-current transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                  style={{ backgroundColor: '#e8f5e9', color: '#1b5e20' }}>
+                  <div className="w-12 h-12 rounded-xl bg-[#25D366] flex items-center justify-center text-white">
+                    <WhatsAppIcon size={22} />
                   </div>
-                  <span className="text-base font-medium">{empresa.email_contacto}</span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#388e3c] mb-1">WhatsApp</p>
+                    <p className="text-lg font-black text-[#1b5e20]">+{empresa.whatsapp}</p>
+                  </div>
+                  <span className="text-sm font-semibold text-[#2e7d32] flex items-center gap-1.5 mt-auto">
+                    Escribinos <ArrowRight size={14} />
+                  </span>
                 </a>
               )}
-              {empresa?.whatsapp && (
-                <a href={`https://wa.me/${empresa.whatsapp}`} target="_blank" rel="noreferrer"
-                  className="flex items-center gap-3 text-[#1e2a3a] hover:opacity-70 transition-opacity group">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: brandLight }}>
-                    <Phone size={18} style={{ color: brandColor }} />
+              {empresa.email_contacto && (
+                <a href={`mailto:${empresa.email_contacto}`}
+                  className="group flex flex-col gap-4 p-7 rounded-2xl border-2 border-transparent hover:-translate-y-0.5 hover:shadow-lg transition-all"
+                  style={{ backgroundColor: brandLight, borderColor: 'transparent' }}>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
+                    style={{ backgroundColor: brandColor }}>
+                    <Mail size={22} />
                   </div>
-                  <span className="text-base font-medium">+{empresa.whatsapp}</span>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider mb-1"
+                      style={{ color: brandColor }}>
+                      Email
+                    </p>
+                    <p className="text-lg font-black text-[#1e2a3a] break-all">{empresa.email_contacto}</p>
+                  </div>
+                  <span className="text-sm font-semibold flex items-center gap-1.5 mt-auto"
+                    style={{ color: brandColor }}>
+                    Mandanos un mail <ArrowRight size={14} />
+                  </span>
                 </a>
               )}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* CTA al catálogo */}
-        <div className="rounded-2xl p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10"
-          style={{ backgroundColor: brandLight }}>
-          <div className="flex-1">
-            <h2 className="text-xl md:text-2xl font-black text-[#1e2a3a] mb-2">
-              Explorá nuestro catálogo
-            </h2>
-            <p className="text-sm text-[#6b7a90]">
-              Encontrá todos nuestros productos y generá tu presupuesto al instante.
-            </p>
-          </div>
+      {/* ── CTA CATÁLOGO ── */}
+      <div className="relative overflow-hidden px-6 md:px-16 py-16 md:py-24 flex items-center justify-center"
+        style={{ backgroundColor: brandColor }}>
+        {/* Patrón */}
+        <div className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `radial-gradient(circle at 10% 90%, white 2px, transparent 2px),
+              radial-gradient(circle at 90% 10%, white 2px, transparent 2px)`,
+            backgroundSize: '80px 80px'
+          }} />
+        <div className="relative z-10 text-center max-w-[560px]">
+          <ShoppingBag size={36} className="text-white/50 mx-auto mb-5" />
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
+            Explorá todo lo que tenemos para ofrecerte
+          </h2>
+          <p className="text-white/70 mb-8 text-base">
+            Navegá nuestro catálogo completo y generá tu presupuesto al instante.
+          </p>
           <Link to={`/catalogo/${slug}`}
-            className="flex items-center gap-2 px-6 h-12 rounded-xl text-white text-sm font-bold shrink-0 hover:opacity-90 transition-opacity"
-            style={{ background: brandColor }}>
-            Ver catálogo
+            className="inline-flex items-center gap-2 px-8 h-13 py-3.5 rounded-xl bg-white font-bold text-sm hover:opacity-90 transition-opacity"
+            style={{ color: brandColor }}>
+            Ver catálogo completo
             <ArrowRight size={16} />
           </Link>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="text-center py-7 text-[#6b7a90] text-[.8rem] border-t border-[#dde3ed]">
+      <div className="text-center py-6 text-[#9aa5b4] text-[.78rem] border-t border-[#e8ecf2]">
         Catálogo creado con <a href="/" className="font-semibold" style={{ color: brandColor }}>Ordo</a>
       </div>
     </div>
