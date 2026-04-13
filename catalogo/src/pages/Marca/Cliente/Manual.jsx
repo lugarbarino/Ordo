@@ -153,7 +153,7 @@ function SectionHeader({ num, label }) {
 }
 
 // ── Logo card ─────────────────────────────────────────────────
-function LogoCard({ url, label, sub, dark, nombreBase, onZoom }) {
+function LogoCard({ url, label, sub, dark, darkBg, nombreBase, onZoom }) {
   const [dl, setDl] = useState('')
   if (!url) return null
 
@@ -168,8 +168,8 @@ function LogoCard({ url, label, sub, dark, nombreBase, onZoom }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div onClick={() => onZoom?.({ url, dark })} className={`w-full h-[200px] rounded-2xl flex items-center justify-center p-6 border border-[#e0e0e6] cursor-zoom-in
-        ${dark ? 'bg-[#363645]' : 'bg-white border-[#e0e0e6]'}`}>
+      <div onClick={() => onZoom?.({ url, dark, darkBg })} className={`w-full h-[200px] rounded-2xl flex items-center justify-center p-6 border border-[#e0e0e6] cursor-zoom-in`}
+        style={{ backgroundColor: dark ? (darkBg || '#363645') : '#ffffff' }}>
         <img src={url} alt={label} className="max-h-full max-w-full object-contain" />
       </div>
       <div>
@@ -261,6 +261,8 @@ export default function MarcaManual() {
   const colores = manual?.colores || []
   const colorAcento = colores.find(c => c.esAcento) || colores[0]
   const acento = colorAcento?.hex ? (colorAcento.hex.startsWith('#') ? colorAcento.hex : `#${colorAcento.hex}`) : '#c63f3f'
+  const colorDark = colores.find(c => c.esDark)
+  const darkBg = colorDark?.hex ? (colorDark.hex.startsWith('#') ? colorDark.hex : `#${colorDark.hex}`) : '#363645'
   const tipografias = manual?.tipografias || []
   const mockups = manual?.mockups || []
   const usosCorrectos = manual?.usos_correctos || []
@@ -294,7 +296,7 @@ export default function MarcaManual() {
           <div
             onClick={e => e.stopPropagation()}
             className="rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ backgroundColor: lightbox.dark ? '#363645' : '#ffffff', maxWidth: '60vw' }}
+            style={{ backgroundColor: lightbox.dark ? (lightbox.darkBg || '#363645') : '#ffffff', maxWidth: '60vw' }}
           >
             <div className="flex justify-end px-4 pt-4">
               <button onClick={() => setLightbox(null)} className={`cursor-pointer bg-transparent border-none p-1 ${lightbox.dark ? 'text-white/50 hover:text-white' : 'text-black/30 hover:text-black/70'}`}>
@@ -391,8 +393,8 @@ export default function MarcaManual() {
                     {ej && <p className="text-[13px] text-[#aaa]"><span className="font-semibold text-[#888]">Ej:</span> {ej}</p>}
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} nombreBase={`${nombreMarca}-${claro}`} onZoom={v => setLightbox(v)} />}
-                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} nombreBase={`${nombreMarca}-${oscuro}`} onZoom={v => setLightbox(v)} />}
+                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} darkBg={darkBg} nombreBase={`${nombreMarca}-${claro}`} onZoom={v => setLightbox(v)} />}
+                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} darkBg={darkBg} nombreBase={`${nombreMarca}-${oscuro}`} onZoom={v => setLightbox(v)} />}
                   </div>
                 </div>
               )
@@ -403,7 +405,7 @@ export default function MarcaManual() {
 
       {/* COLORES — full width, fondo oscuro */}
       {hayColores && (
-        <div className="bg-[#363645]">
+        <div style={{ backgroundColor: darkBg }}>
           {/* Header dentro del fondo oscuro */}
           <div className="max-w-[1024px] mx-auto px-6 sm:px-12 pt-20 pb-16">
             <div className="flex items-center gap-6 w-full">
@@ -505,7 +507,7 @@ export default function MarcaManual() {
                       <p className="text-[13px] text-[#52586f] mb-1">1234567890</p>
                       <p className="text-[13px] text-[#52586f]">!@#$%&*().,;:'"-+=/</p>
                     </div>
-                    <div className="bg-[#363645] rounded-2xl p-8 sm:p-10" style={{ fontFamily: `'${t.nombre}', sans-serif` }}>
+                    <div className="rounded-2xl p-8 sm:p-10" style={{ backgroundColor: darkBg, fontFamily: `'${t.nombre}', sans-serif` }}>
                       <p className="text-[22px] sm:text-[26px] font-light text-white leading-snug italic">
                         {frase}
                       </p>
