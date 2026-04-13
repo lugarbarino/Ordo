@@ -384,7 +384,7 @@ export default function MarcaManual() {
               const urlOscuro = logos[oscuro]
               if (!urlClaro && !urlOscuro) return null
               return (
-                <div key={key}>
+                <div key={key} className="py-8 border-b border-[#ececf0] last:border-b-0">
                   <p className="text-[18px] font-semibold text-[#363645] mb-2">{label}</p>
                   <div className="flex flex-col gap-0.5 mb-6">
                     {uso && <p className="text-[14px] text-[#52586f]">{uso}</p>}
