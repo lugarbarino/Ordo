@@ -13,7 +13,7 @@ function loadGoogleFont(nombre) {
   document.head.appendChild(link)
 }
 
-const PAD = 80 // px padding on each side when downloading
+const PAD = 160 // px padding on each side when downloading
 
 async function downloadSvg(url, nombre) {
   const res = await fetch(url)
