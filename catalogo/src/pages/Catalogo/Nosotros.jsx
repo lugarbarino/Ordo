@@ -139,25 +139,6 @@ export default function CatalogoNosotros() {
         </div>
       </div>
 
-      {/* ── DESCRIPCIÓN DESTACADA (existente) ── */}
-      {empresa.descripcion && (
-        <div className="px-8 md:px-20 py-16 md:py-24 max-w-[1000px] mx-auto">
-          <div className="flex gap-6 md:gap-10 items-start">
-            <div className="w-1 rounded-full shrink-0 self-stretch mt-1"
-              style={{ backgroundColor: brandColor }} />
-            <div>
-              <p className="text-[.72rem] font-bold uppercase tracking-widest mb-5"
-                style={{ color: brandColor }}>
-                Quiénes somos
-              </p>
-              <p className="text-2xl md:text-3xl font-semibold text-[#1e2a3a] leading-relaxed">
-                {empresa.descripcion}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* ── QUIÉNES SOMOS (tokens.quienes_somos) ── */}
       {tokens.quienes_somos && (
         <div className="bg-white px-8 md:px-20 py-14 md:py-20">
