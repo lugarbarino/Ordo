@@ -438,17 +438,39 @@ export default function CatalogoPublic() {
       '--radius-btn': tokens.radiusBtn || undefined,
     }}>
 
-      {/* Navbar */}
-      <Navbar
-        empresa={empresa}
-        slug={slug}
-        brandColor={brandColor}
-        carritoCount={totalCarrito}
-        onCarrito={() => setCarritoOpen(true)}
-      />
-
-      {/* Hero full-width */}
+      {/* Hero full-width — navbar flota encima */}
       <div className="relative w-full h-[560px] md:h-[640px] flex items-center overflow-hidden">
+
+        {/* Navbar flotante sobre el hero */}
+        <div className="absolute top-0 inset-x-0 z-20 flex items-center px-6 md:px-10 h-[64px]"
+          style={{ background: 'linear-gradient(to bottom, rgba(10,20,40,0.55) 0%, transparent 100%)' }}>
+          <Link to={`/catalogo/${slug}`} className="flex items-center shrink-0 mr-auto">
+            {empresa.logo_url
+              ? <img src={empresa.logo_url} alt={empresa.nombre} className="h-8 w-auto object-contain max-w-[130px] brightness-0 invert" />
+              : <span className="text-base font-black text-white">{empresa.nombre}</span>
+            }
+          </Link>
+          <div className="hidden md:flex items-center gap-1 mx-auto">
+            <Link to={`/catalogo/${slug}`}
+              className="px-4 py-2 rounded-lg text-sm font-semibold text-white/80 hover:text-white hover:bg-white/10 transition-colors">
+              Catálogo
+            </Link>
+            <Link to={`/catalogo/${slug}/nosotros`}
+              className="px-4 py-2 rounded-lg text-sm font-semibold text-white/80 hover:text-white hover:bg-white/10 transition-colors">
+              Sobre nosotros
+            </Link>
+          </div>
+          {(empresa.whatsapp || empresa.email_contacto) && (
+            <button
+              onClick={() => {
+                if (empresa.whatsapp) window.open(`https://wa.me/${empresa.whatsapp}`, '_blank')
+                else window.open(`mailto:${empresa.email_contacto}`, '_blank')
+              }}
+              className="hidden md:block px-5 h-9 rounded-xl text-white text-sm font-bold cursor-pointer border border-white/30 bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm ml-auto">
+              Contactanos
+            </button>
+          )}
+        </div>
         {/* Fondo */}
         {empresa.banner_url && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url) ? (
           <video key={empresa.banner_url} autoPlay muted loop playsInline
@@ -494,14 +516,15 @@ export default function CatalogoPublic() {
         </div>
       </div>
 
-      {/* Barra filtros sticky */}
-      <div ref={catalogoRef} className="bg-white border-b border-[#dde3ed] px-6 md:px-10 h-16 flex items-center gap-3 sticky top-[64px] z-20
-        max-md:h-auto max-md:flex-wrap max-md:gap-2 max-md:py-2.5">
-        <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-1 overflow-x-auto shrink min-w-0 max-md:order-1 max-md:w-full"
+      {/* Barra sticky única: categorías | logo | buscador */}
+      <div ref={catalogoRef} className="bg-white border-b border-[#dde3ed] sticky top-0 z-20 flex items-center gap-3 px-4 md:px-6 h-[60px]">
+
+        {/* Categorías — izquierda */}
+        <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-0.5 overflow-x-auto shrink min-w-0 flex-1"
           style={{ scrollbarWidth: 'none' }}>
           {['', ...categorias].map(cat => (
             <button key={cat} onClick={() => setCatActiva(cat)}
-              className="px-5 py-1.5 rounded-[7px] text-sm font-medium cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
+              className="px-4 py-1.5 rounded-[7px] text-sm font-medium cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
               style={catActiva === cat
                 ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
                 : { background: 'transparent', color: '#666' }}>
@@ -509,15 +532,32 @@ export default function CatalogoPublic() {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[10px] px-3.5 h-[42px] min-w-[200px] shrink-0 ml-auto transition-colors focus-within:border-current max-md:order-2 max-md:min-w-0 max-md:flex-1 max-md:ml-0">
-          <Search size={15} className="text-[#aab] shrink-0" />
-          <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
-            placeholder="Buscar productos…"
-            className="border-none outline-none text-[.88rem] w-full text-[#1e2a3a] placeholder:text-[#aab] bg-transparent" />
+
+        {/* Logo — centro */}
+        <Link to={`/catalogo/${slug}`} className="shrink-0 flex items-center justify-center px-2">
+          {empresa.logo_url
+            ? <img src={empresa.logo_url} alt={empresa.nombre} className="h-7 w-auto object-contain max-w-[100px]" />
+            : <span className="text-sm font-black" style={{ color: brandColor }}>{empresa.nombre}</span>
+          }
+        </Link>
+
+        {/* Buscador + carrito — derecha */}
+        <div className="flex items-center gap-2 shrink-0 flex-1 justify-end">
+          <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[10px] px-3 h-[38px] w-[180px] md:w-[220px] transition-colors focus-within:border-current">
+            <Search size={14} className="text-[#aab] shrink-0" />
+            <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
+              placeholder="Buscar…"
+              className="border-none outline-none text-[.85rem] w-full text-[#1e2a3a] placeholder:text-[#aab] bg-transparent" />
+          </div>
+          {totalCarrito > 0 && (
+            <button onClick={() => setCarritoOpen(true)}
+              className="flex items-center gap-1.5 text-sm font-bold px-3 h-[38px] rounded-xl border border-[#dde3ed] bg-white cursor-pointer shrink-0"
+              style={{ color: brandColor }}>
+              <ShoppingBag size={15} />
+              {totalCarrito}
+            </button>
+          )}
         </div>
-        <span className="text-[.8rem] text-[#6b7a90] whitespace-nowrap shrink-0 max-md:order-3 max-md:ml-auto">
-          {productosFiltrados.length} producto{productosFiltrados.length !== 1 ? 's' : ''}
-        </span>
       </div>
 
       {/* Productos */}
