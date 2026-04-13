@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
-import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image, Check } from 'lucide-react'
+import { useParams, Link } from 'react-router-dom'
+import { Search, X, ShoppingBag, Trash2, Plus, Minus, Send, Image, Check, Menu } from 'lucide-react'
 import { db } from '../../lib/supabase'
 
 function formatPrecio(v) {
@@ -245,6 +245,97 @@ function ProductCard({ producto: p, enCarrito, onFoto, onAgregar }) {
   )
 }
 
+/* ── Navbar compartida ── */
+function Navbar({ empresa, slug, brandColor, carritoCount, onCarrito }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const contactar = () => {
+    if (empresa?.whatsapp) window.open(`https://wa.me/${empresa.whatsapp}`, '_blank')
+    else if (empresa?.email_contacto) window.open(`mailto:${empresa.email_contacto}`, '_blank')
+  }
+
+  return (
+    <nav className="sticky top-0 z-30 bg-white border-b border-[#e8ecf2] flex items-center px-6 md:px-10 h-[64px] gap-4">
+      {/* Logo */}
+      <Link to={`/catalogo/${slug}`} className="flex items-center shrink-0 mr-auto md:mr-0">
+        {empresa?.logo_url
+          ? <img src={empresa.logo_url} alt={empresa?.nombre} className="h-9 w-auto object-contain max-w-[140px]" />
+          : <span className="text-lg font-black" style={{ color: brandColor }}>{empresa?.nombre}</span>
+        }
+      </Link>
+
+      {/* Nav links — desktop */}
+      <div className="hidden md:flex items-center gap-1 mx-auto">
+        <Link to={`/catalogo/${slug}`}
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-[#4a5568] hover:text-[#1e2a3a] hover:bg-[#f5f6f8] transition-colors">
+          Catálogo
+        </Link>
+        <Link to={`/catalogo/${slug}/nosotros`}
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-[#4a5568] hover:text-[#1e2a3a] hover:bg-[#f5f6f8] transition-colors">
+          Sobre nosotros
+        </Link>
+      </div>
+
+      {/* Acciones desktop */}
+      <div className="hidden md:flex items-center gap-3 ml-auto md:ml-0">
+        {carritoCount > 0 && (
+          <button onClick={onCarrito}
+            className="flex items-center gap-2 text-sm font-semibold px-4 h-10 rounded-xl border border-[#dde3ed] text-[#1e2a3a] hover:bg-[#f5f6f8] transition-colors cursor-pointer bg-white">
+            <ShoppingBag size={16} style={{ color: brandColor }} />
+            <span style={{ color: brandColor }}>{carritoCount}</span>
+          </button>
+        )}
+        {(empresa?.whatsapp || empresa?.email_contacto) && (
+          <button onClick={contactar}
+            className="px-5 h-10 rounded-xl text-white text-sm font-bold cursor-pointer border-none hover:opacity-90 transition-opacity"
+            style={{ background: brandColor }}>
+            Contactanos
+          </button>
+        )}
+      </div>
+
+      {/* Mobile: carrito + menu */}
+      <div className="flex md:hidden items-center gap-2 ml-auto">
+        {carritoCount > 0 && (
+          <button onClick={onCarrito}
+            className="flex items-center gap-1.5 text-sm font-bold px-3 h-9 rounded-xl border border-[#dde3ed] bg-white cursor-pointer"
+            style={{ color: brandColor }}>
+            <ShoppingBag size={15} />
+            {carritoCount}
+          </button>
+        )}
+        <button onClick={() => setMenuOpen(o => !o)}
+          className="w-9 h-9 flex items-center justify-center rounded-xl border border-[#dde3ed] bg-white cursor-pointer text-[#4a5568]">
+          {menuOpen ? <X size={18} /> : <Menu size={18} />}
+        </button>
+      </div>
+
+      {/* Mobile dropdown */}
+      {menuOpen && (
+        <div className="absolute top-full left-0 right-0 bg-white border-b border-[#e8ecf2] flex flex-col p-4 gap-2 shadow-lg md:hidden">
+          <Link to={`/catalogo/${slug}`} onClick={() => setMenuOpen(false)}
+            className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[#1e2a3a] hover:bg-[#f5f6f8] transition-colors">
+            Catálogo
+          </Link>
+          <Link to={`/catalogo/${slug}/nosotros`} onClick={() => setMenuOpen(false)}
+            className="px-4 py-2.5 rounded-lg text-sm font-semibold text-[#1e2a3a] hover:bg-[#f5f6f8] transition-colors">
+            Sobre nosotros
+          </Link>
+          {(empresa?.whatsapp || empresa?.email_contacto) && (
+            <button onClick={() => { contactar(); setMenuOpen(false) }}
+              className="px-4 py-2.5 rounded-xl text-white text-sm font-bold cursor-pointer border-none mt-1 hover:opacity-90 transition-opacity"
+              style={{ background: brandColor }}>
+              Contactanos
+            </button>
+          )}
+        </div>
+      )}
+    </nav>
+  )
+}
+
+export { Navbar }
+
 export default function CatalogoPublic() {
   const { slug } = useParams()
   const [empresa, setEmpresa] = useState(null)
@@ -336,7 +427,7 @@ export default function CatalogoPublic() {
   const tokens = empresa?.tokens || {}
 
   return (
-    <div className="min-h-screen bg-white text-[#1e2a3a]" style={{
+    <div className="min-h-screen bg-[#f7f8fa] text-[#1e2a3a]" style={{
       '--brand': brandColor,
       '--brand-light': brandLight,
       '--font-family': tokens.fontFamily || undefined,
@@ -346,19 +437,18 @@ export default function CatalogoPublic() {
       '--radius-btn': tokens.radiusBtn || undefined,
     }}>
 
-      <div className="flex justify-center pt-6 pb-0 bg-white">
-        <div className="w-[180px] h-[80px] flex items-center justify-center overflow-hidden">
-          {empresa.logo_url
-            ? <img src={empresa.logo_url} alt={empresa.nombre} className="w-full h-full object-contain" />
-            : <span className="text-2xl font-black" style={{ color: brandColor }}>{empresa.nombre}</span>
-          }
-        </div>
-      </div>
+      {/* Navbar */}
+      <Navbar
+        empresa={empresa}
+        slug={slug}
+        brandColor={brandColor}
+        carritoCount={totalCarrito}
+        onCarrito={() => setCarritoOpen(true)}
+      />
 
-      <div className="mx-auto my-5 rounded-[14px] overflow-hidden relative flex items-center px-14
-        max-w-[calc(100%-48px)] w-[1000px] h-[450px]
-        max-md:h-[260px] max-md:px-6 max-md:my-3 max-md:max-w-[calc(100%-24px)]
-        max-sm:h-[300px] max-sm:px-[18px] max-sm:my-2.5 max-sm:rounded-[10px]">
+      {/* Hero full-width */}
+      <div className="relative w-full h-[560px] md:h-[640px] flex items-center overflow-hidden">
+        {/* Fondo */}
         {empresa.banner_url && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url) ? (
           <video key={empresa.banner_url} autoPlay muted loop playsInline
             className="absolute inset-0 w-full h-full object-cover">
@@ -367,26 +457,45 @@ export default function CatalogoPublic() {
         ) : (
           <div className="absolute inset-0" style={{
             background: brandColor,
-            ...(empresa.banner_url ? { backgroundImage: `url(${empresa.banner_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {})
+            ...(empresa.banner_url ? {
+              backgroundImage: `url(${empresa.banner_url})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            } : {})
           }} />
         )}
+        {/* Overlay */}
         <div className="absolute inset-0"
-          style={{ background: 'linear-gradient(110deg,rgba(15,38,62,0.88) 0%,rgba(25,60,95,0.65) 55%,rgba(25,60,95,0.35) 100%)' }} />
-        <div className="relative z-10 w-[500px] max-w-full">
-          <h1 className="text-[50px] font-black text-white leading-[1.1] mb-4
-            max-md:text-[2rem] max-sm:text-[2.1rem] max-sm:mb-2">
+          style={{ background: 'linear-gradient(110deg, rgba(10,28,50,0.90) 0%, rgba(15,45,80,0.70) 55%, rgba(15,45,80,0.40) 100%)' }} />
+
+        {/* Contenido */}
+        <div className="relative z-10 px-6 md:px-16 max-w-[700px]">
+          <h1 className="text-4xl sm:text-5xl md:text-[3.5rem] font-black text-white leading-[1.1] mb-5">
             {empresa.titulo || empresa.nombre}
           </h1>
           {empresa.descripcion && (
-            <p className="text-xl text-white/85 leading-relaxed max-md:text-sm max-md:leading-snug max-sm:text-[1.05rem]">
+            <p className="text-base md:text-lg text-white/80 leading-relaxed mb-8 max-w-[520px]">
               {empresa.descripcion}
             </p>
           )}
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setCarritoOpen(true)}
+              className="px-6 h-12 rounded-xl text-white text-sm font-bold cursor-pointer border-none hover:opacity-90 transition-opacity"
+              style={{ background: brandColor }}>
+              Generá tu presupuesto
+            </button>
+            <Link to={`/catalogo/${slug}/nosotros`}
+              className="px-6 h-12 rounded-xl text-white text-sm font-bold flex items-center border border-white/30 bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm">
+              Conocenos
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white border-b border-[#dde3ed] px-10 h-16 flex items-center gap-4 sticky top-0 z-20
-        max-md:px-4 max-md:h-auto max-md:flex-wrap max-md:gap-2 max-md:py-2.5">
+      {/* Barra filtros sticky */}
+      <div className="bg-white border-b border-[#dde3ed] px-6 md:px-10 h-16 flex items-center gap-3 sticky top-[64px] z-20
+        max-md:h-auto max-md:flex-wrap max-md:gap-2 max-md:py-2.5">
         <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-1 overflow-x-auto shrink min-w-0 max-md:order-1 max-md:w-full"
           style={{ scrollbarWidth: 'none' }}>
           {['', ...categorias].map(cat => (
@@ -410,7 +519,8 @@ export default function CatalogoPublic() {
         </span>
       </div>
 
-      <div className="px-10 py-7 max-md:px-4 max-md:py-3.5 max-sm:px-3 max-sm:py-3">
+      {/* Productos */}
+      <div className="px-6 md:px-10 py-8 max-sm:px-3 max-sm:py-4">
         {!productosFiltrados.length ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-[#6b7a90]">
             <div className="text-5xl mb-2">📦</div>
@@ -430,23 +540,12 @@ export default function CatalogoPublic() {
         )}
       </div>
 
+      {/* Footer */}
       <div className="text-center py-7 text-[#6b7a90] text-[.8rem] border-t border-[#dde3ed] mt-4">
         Catálogo creado con <a href="/" className="font-semibold" style={{ color: brandColor }}>Ordo</a>
       </div>
 
-      {totalCarrito > 0 && (
-        <button onClick={() => setCarritoOpen(true)}
-          className="fixed bottom-7 right-7 text-white border-none px-5 h-[60px] text-[.92rem] font-bold cursor-pointer flex items-center gap-2.5 shadow-[0_4px_20px_rgba(0,0,0,.25)] z-50 hover:scale-[1.04] transition-transform max-sm:bottom-4 max-sm:right-4 max-sm:h-[52px] max-sm:px-4 max-sm:text-[.84rem]"
-          style={{ background: brandColor, borderRadius: 'var(--radius-btn, 13px)' }}>
-          <ShoppingBag size={18} style={{ opacity: 0.7 }} />
-          Ver presupuesto
-          <span className="bg-white rounded-full w-[22px] h-[22px] flex items-center justify-center text-[.8rem] font-black"
-            style={{ color: brandColor }}>
-            {totalCarrito}
-          </span>
-        </button>
-      )}
-
+      {/* Modales */}
       {fotoModal && (
         <ModalFoto img={fotoModal.url} nombre={fotoModal.nombre} onClose={() => setFotoModal(null)} />
       )}
