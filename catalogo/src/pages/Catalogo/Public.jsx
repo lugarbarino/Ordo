@@ -632,52 +632,94 @@ export default function CatalogoPublic() {
         </div>
       </div>
 
-      {/* Barra sticky única: categorías | logo | buscador */}
-      <div ref={catalogoRef} className="bg-white border-b border-[#dde3ed] sticky top-0 z-20 flex items-center gap-3 px-4 md:px-6 h-[60px]">
+      {/* Barra sticky única */}
+      <div ref={catalogoRef} className="bg-white border-b border-[#dde3ed] sticky top-0 z-20">
 
-        {/* Categorías — izquierda, se ajusta al contenido */}
-        <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-0.5 overflow-x-auto shrink-0 max-w-[45%]"
-          style={{ scrollbarWidth: 'none' }}>
-          {['', ...categorias].map(cat => (
-            <button key={cat} onClick={() => setCatActiva(cat)}
-              className="px-4 py-1.5 rounded-[7px] text-sm font-medium cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
-              style={catActiva === cat
-                ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
-                : { background: 'transparent', color: '#666' }}>
-              {cat || 'Todas'}
-            </button>
-          ))}
+        {/* ── Desktop: una fila ── */}
+        <div className="hidden md:flex items-center gap-3 px-6 h-[60px]">
+          {/* Categorías */}
+          <div className="inline-flex items-center bg-[#f1f2f4] rounded-[10px] p-1 gap-0.5 overflow-x-auto shrink-0 max-w-[45%]"
+            style={{ scrollbarWidth: 'none' }}>
+            {['', ...categorias].map(cat => (
+              <button key={cat} onClick={() => setCatActiva(cat)}
+                className="px-4 py-1.5 rounded-[7px] text-sm font-medium cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
+                style={catActiva === cat
+                  ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
+                  : { background: 'transparent', color: '#666' }}>
+                {cat || 'Todas'}
+              </button>
+            ))}
+          </div>
+
+          {/* Logo centro */}
+          <Link to={`/catalogo/${slug}`}
+            className="shrink-0 flex items-center justify-center px-2 mx-auto transition-all duration-200"
+            style={{ opacity: logoBarVisible ? 1 : 0, pointerEvents: logoBarVisible ? 'auto' : 'none' }}>
+            {empresa.logo_url
+              ? <img src={empresa.logo_url} alt={empresa.nombre} className="h-7 w-auto object-contain max-w-[100px]" />
+              : <span className="text-sm font-black" style={{ color: brandColor }}>{empresa.nombre}</span>
+            }
+          </Link>
+
+          {/* Buscador + contador + carrito */}
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
+            <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[10px] px-3 h-[38px] w-[200px] transition-colors focus-within:border-current">
+              <Search size={14} className="text-[#aab] shrink-0" />
+              <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
+                placeholder="Buscar…"
+                className="border-none outline-none text-[.85rem] w-full text-[#1e2a3a] placeholder:text-[#aab] bg-transparent" />
+            </div>
+            <span className="text-[.78rem] text-[#9aa5b4] whitespace-nowrap">
+              {productosFiltrados.length} {productosFiltrados.length === 1 ? 'producto' : 'productos'}
+            </span>
+            {totalCarrito > 0 && (
+              <button onClick={() => setCarritoOpen(true)}
+                className="flex items-center gap-1.5 text-sm font-bold px-3 h-[38px] rounded-xl border border-[#dde3ed] bg-white cursor-pointer shrink-0"
+                style={{ color: brandColor }}>
+                <ShoppingBag size={15} />
+                {totalCarrito}
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Logo — centro, aparece cuando el hero sale de vista */}
-        <Link to={`/catalogo/${slug}`}
-          className="shrink-0 flex items-center justify-center px-2 mx-auto transition-all duration-200"
-          style={{ opacity: logoBarVisible ? 1 : 0, pointerEvents: logoBarVisible ? 'auto' : 'none' }}>
-          {empresa.logo_url
-            ? <img src={empresa.logo_url} alt={empresa.nombre} className="h-7 w-auto object-contain max-w-[100px]" />
-            : <span className="text-sm font-black" style={{ color: brandColor }}>{empresa.nombre}</span>
-          }
-        </Link>
-
-        {/* Buscador + contador + carrito — derecha */}
-        <div className="flex items-center gap-2 shrink-0 ml-auto">
-          <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[10px] px-3 h-[38px] w-[160px] md:w-[200px] transition-colors focus-within:border-current">
-            <Search size={14} className="text-[#aab] shrink-0" />
-            <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
-              placeholder="Buscar…"
-              className="border-none outline-none text-[.85rem] w-full text-[#1e2a3a] placeholder:text-[#aab] bg-transparent" />
+        {/* ── Mobile: dos filas ── */}
+        <div className="flex md:hidden flex-col">
+          {/* Fila 1: categorías + carrito */}
+          <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
+            <div className="flex items-center bg-[#f1f2f4] rounded-[9px] p-0.5 gap-0.5 overflow-x-auto flex-1 min-w-0"
+              style={{ scrollbarWidth: 'none' }}>
+              {['', ...categorias].map(cat => (
+                <button key={cat} onClick={() => setCatActiva(cat)}
+                  className="px-3.5 py-1.5 rounded-[6px] text-[.8rem] font-medium cursor-pointer border-none whitespace-nowrap shrink-0 transition-all"
+                  style={catActiva === cat
+                    ? { background: 'white', color: '#111', fontWeight: 600, boxShadow: '0 1px 3px rgba(0,0,0,.1)' }
+                    : { background: 'transparent', color: '#666' }}>
+                  {cat || 'Todas'}
+                </button>
+              ))}
+            </div>
+            {totalCarrito > 0 && (
+              <button onClick={() => setCarritoOpen(true)}
+                className="flex items-center gap-1.5 text-sm font-bold px-3 h-[34px] rounded-xl border border-[#dde3ed] bg-white cursor-pointer shrink-0"
+                style={{ color: brandColor }}>
+                <ShoppingBag size={14} />
+                {totalCarrito}
+              </button>
+            )}
           </div>
-          <span className="text-[.78rem] text-[#9aa5b4] whitespace-nowrap hidden md:block">
-            {productosFiltrados.length} {productosFiltrados.length === 1 ? 'producto' : 'productos'}
-          </span>
-          {totalCarrito > 0 && (
-            <button onClick={() => setCarritoOpen(true)}
-              className="flex items-center gap-1.5 text-sm font-bold px-3 h-[38px] rounded-xl border border-[#dde3ed] bg-white cursor-pointer shrink-0"
-              style={{ color: brandColor }}>
-              <ShoppingBag size={15} />
-              {totalCarrito}
-            </button>
-          )}
+          {/* Fila 2: buscador */}
+          <div className="flex items-center gap-2 px-3 pb-2.5">
+            <div className="flex items-center gap-2 border border-[#dde3ed] rounded-[9px] px-3 h-[36px] flex-1 transition-colors focus-within:border-current">
+              <Search size={13} className="text-[#aab] shrink-0" />
+              <input value={busqueda} onChange={e => setBusqueda(e.target.value)}
+                placeholder="Buscar productos…"
+                className="border-none outline-none text-[.84rem] w-full text-[#1e2a3a] placeholder:text-[#aab] bg-transparent" />
+            </div>
+            <span className="text-[.75rem] text-[#9aa5b4] whitespace-nowrap shrink-0">
+              {productosFiltrados.length}
+            </span>
+          </div>
         </div>
       </div>
 
