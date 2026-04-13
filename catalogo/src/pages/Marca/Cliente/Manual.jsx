@@ -191,10 +191,10 @@ function LogoCard({ url, label, sub, dark, darkBg, lightBg, nombreBase, onZoom }
 }
 
 const LOGO_GRUPOS = [
-  { key: 'iso',   label: 'Isotipo',             uso: 'Para espacios pequeños o cuando la marca ya es reconocible sin texto.',  ej: 'App icon, favicon, avatar.',               claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
-  { key: 'texto', label: 'Logotipo',             uso: 'Cuando es clave que se lea el nombre completo de la marca.',            ej: 'Documentos, presentaciones, piezas institucionales.', claro: 'texto_claro', oscuro: 'texto_oscuro' },
-  { key: 'horiz', label: 'Imagotipo horizontal', uso: 'Uso principal y más versátil.',                                         ej: 'Web, banners, papelería.',                  claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
-  { key: 'vert',  label: 'Imagotipo vertical',   uso: 'Para espacios más altos que anchos.',                                   ej: 'Perfiles verticales, roll ups, señalética.', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
+  { key: 'iso',   label: 'Isotipo',             slug: 'isotipo',             uso: 'Para espacios pequeños o cuando la marca ya es reconocible sin texto.',  ej: 'App icon, favicon, avatar.',               claro: 'iso_claro',   oscuro: 'iso_oscuro'   },
+  { key: 'texto', label: 'Logotipo',             slug: 'logotipo',            uso: 'Cuando es clave que se lea el nombre completo de la marca.',            ej: 'Documentos, presentaciones, piezas institucionales.', claro: 'texto_claro', oscuro: 'texto_oscuro' },
+  { key: 'horiz', label: 'Imagotipo horizontal', slug: 'imagotipo-horizontal', uso: 'Uso principal y más versátil.',                                         ej: 'Web, banners, papelería.',                  claro: 'horiz_claro', oscuro: 'horiz_oscuro' },
+  { key: 'vert',  label: 'Imagotipo vertical',   slug: 'imagotipo-vertical',  uso: 'Para espacios más altos que anchos.',                                   ej: 'Perfiles verticales, roll ups, señalética.', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
 ]
 
 const TEMPLATE_CATS = [
@@ -388,7 +388,7 @@ export default function MarcaManual() {
         <div data-animate className="max-w-[1024px] mx-auto px-6 sm:px-12 py-24">
           <SectionHeader num={nextNum()} label="Logotipo" />
           <div className="flex flex-col gap-16">
-            {LOGO_GRUPOS.map(({ key, label, uso, ej, claro, oscuro }) => {
+            {LOGO_GRUPOS.map(({ key, label, slug, uso, ej, claro, oscuro }) => {
               const urlClaro = logos[claro]
               const urlOscuro = logos[oscuro]
               if (!urlClaro && !urlOscuro) return null
@@ -400,8 +400,8 @@ export default function MarcaManual() {
                     {ej && <p className="text-[13px] text-[#aaa]"><span className="font-semibold text-[#888]">Ej:</span> {ej}</p>}
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} darkBg={darkBg} lightBg={lightBg} nombreBase={`${nombreMarca}-${claro}`} onZoom={v => setLightbox(v)} />}
-                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} darkBg={darkBg} lightBg={lightBg} nombreBase={`${nombreMarca}-${oscuro}`} onZoom={v => setLightbox(v)} />}
+                    {urlClaro && <LogoCard url={urlClaro} label="Fondo claro" dark={false} darkBg={darkBg} lightBg={lightBg} nombreBase={`${nombreMarca}-${slug}-fondo-claro`} onZoom={v => setLightbox(v)} />}
+                    {urlOscuro && <LogoCard url={urlOscuro} label="Fondo oscuro" dark={true} darkBg={darkBg} lightBg={lightBg} nombreBase={`${nombreMarca}-${slug}-fondo-oscuro`} onZoom={v => setLightbox(v)} />}
                   </div>
                 </div>
               )
