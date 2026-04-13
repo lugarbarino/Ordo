@@ -94,9 +94,12 @@ export function ConfigPanel() {
       const { error } = await db.storage.from(bucket).upload(path, file, { upsert: true })
       if (error) { showToast('Error al subir: ' + error.message, 'err'); return }
       const url = `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`
-      const newForm = { ...form, tokens: { ...form.tokens, [tokenKey]: url } }
-      setForm(newForm)
-      await guardarEmpresa(newForm)
+      // Usar setter funcional para leer el form más reciente y evitar closure stale
+      setForm(prev => {
+        const newForm = { ...prev, tokens: { ...(prev.tokens || {}), [tokenKey]: url } }
+        guardarEmpresa(newForm)
+        return newForm
+      })
     } catch (e) {
       showToast('Error al subir: ' + e.message, 'err')
     } finally {
@@ -453,7 +456,11 @@ export function ConfigPanel() {
       <PexelsPicker
         open={pexelsServicioOpen}
         onClose={() => setPexelsServicioOpen(false)}
-        onSelect={({ url }) => setToken('banner_servicio_url', url)}
+        onSelect={async ({ url }) => {
+          const newForm = { ...form, tokens: { ...(form.tokens || {}), banner_servicio_url: url } }
+          setForm(newForm)
+          await guardarEmpresa(newForm)
+        }}
       />
 
       </div>{/* end max-w-xl */}
