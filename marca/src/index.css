@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --brand: #191A23;
+  --brand-light: #191A2322;
+  --color-text: #111111;
+  --color-text-soft: #444444;
+  --color-text-muted: #888888;
+  --color-border: #e3e3e3;
+  --color-border-light: #f1f1f1;
+  --color-bg-soft: #f8f9fa;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --font-scale: 1;
+  --font-family: 'Inter', sans-serif;
+  --font-family-heading: var(--font-family);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { font-size: calc(15px * var(--font-scale)); }
+  body {
+    font-family: var(--font-family);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    color: var(--color-text);
+    background: #fff;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-heading);
+  }
+}
+
+@layer utilities {
+  .rounded-xl  { border-radius: var(--radius-card) !important; }
+  .rounded-2xl { border-radius: var(--radius-card) !important; }
+  .rounded-lg  { border-radius: var(--radius-btn)  !important; }
+  .rounded-md  { border-radius: var(--radius-btn)  !important; }
+}
