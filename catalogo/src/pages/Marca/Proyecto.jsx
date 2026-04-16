@@ -222,24 +222,33 @@ function PanelFinalistas({ proyecto }) {
 // PanelManual is imported from ./PanelManual
 
 // ── Stat card ────────────────────────────────────────────────
-function StatCard({ label, value, icon: Icon }) {
+const STAT_COLORS = [
+  { bg: '#EEF2FF', icon: '#818CF8' }, // lavanda
+  { bg: '#F0FDF4', icon: '#4ADE80' }, // verde suave
+  { bg: '#FFF7ED', icon: '#FB923C' }, // durazno
+]
+
+function StatCard({ label, value, icon: Icon, colorIdx = 0 }) {
+  const { bg, icon: iconColor } = STAT_COLORS[colorIdx % STAT_COLORS.length]
   return (
-    <div className="bg-white rounded-[14px] p-5 border border-[#ebebeb]">
-      <div className="flex items-start justify-between mb-3">
-        <Icon size={15} className="text-[#bbb] mt-0.5" />
+    <div className="rounded-[20px] p-5" style={{ backgroundColor: bg }}>
+      <div className="flex items-start justify-between mb-4">
+        <div className="w-9 h-9 rounded-[10px] bg-white/70 flex items-center justify-center">
+          <Icon size={16} style={{ color: iconColor }} />
+        </div>
       </div>
-      <div className="text-[28px] font-black text-[#1c1c1c] leading-none mb-1.5">{value}</div>
-      <div className="text-xs text-[#999]">{label}</div>
+      <div className="text-[32px] font-black text-[#1c1c1c] leading-none mb-1.5">{value}</div>
+      <div className="text-xs text-[#666] font-medium">{label}</div>
     </div>
   )
 }
 
 // ── Dashboard ────────────────────────────────────────────────
 const PASOS = [
-  { key: 'brief',       label: 'Armá tu brief',            icon: ClipboardList, num: '01' },
-  { key: 'exploracion', label: 'Mostrá tus exploraciones', icon: LayoutGrid,    num: '02' },
-  { key: 'finalista',   label: 'Los finalistas',            icon: Star,          num: '03' },
-  { key: 'manual',      label: 'Manual de marca',           icon: BookOpen,      num: '04' },
+  { key: 'brief',       label: 'Armá tu brief',            icon: ClipboardList, num: '01', bg: '#F5F0FF', iconColor: '#A78BFA' },
+  { key: 'exploracion', label: 'Mostrá tus exploraciones', icon: LayoutGrid,    num: '02', bg: '#F0FDF4', iconColor: '#34D399' },
+  { key: 'finalista',   label: 'Los finalistas',            icon: Star,          num: '03', bg: '#FFF7ED', iconColor: '#FB923C' },
+  { key: 'manual',      label: 'Manual de marca',           icon: BookOpen,      num: '04', bg: '#FDF2F8', iconColor: '#E879F9' },
 ]
 
 function Dashboard({ proyecto, stats, onPanel }) {
@@ -249,49 +258,50 @@ function Dashboard({ proyecto, stats, onPanel }) {
     <div className="p-8 max-w-[860px]">
 
       {/* Hero */}
-      <div className="bg-[#1c1c1c] rounded-[18px] p-7 mb-6 flex items-end justify-between gap-6">
-        <div>
-          <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-2">Compartí tu proceso</p>
-          <h2 className="text-xl font-black text-white mb-1">{proyecto.nombre}</h2>
-          <p className="text-white/50 text-sm mb-5">Compartí tu link con tus clientes y recibí feedback</p>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => onPanel('brief')}
-              className="flex items-center gap-2 bg-white text-[#1c1c1c] px-4 py-2 rounded-[8px] text-sm font-semibold cursor-pointer border-none hover:bg-white/90 transition-colors">
-              <ClipboardList size={13} /> Armá tu brief
-            </button>
-            <a
-              href={`/marca/${slug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 text-white/50 hover:text-white/80 text-sm no-underline transition-colors">
-              <ExternalLink size={13} /> Ver link del cliente
-            </a>
-          </div>
+      <div className="bg-[#1c1c1c] rounded-[24px] p-8 mb-6">
+        <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-3">Compartí tu proceso</p>
+        <h2 className="text-3xl font-black text-white mb-2 leading-tight">{proyecto.nombre}</h2>
+        <p className="text-white/50 text-sm mb-6">Compartí tu link con tus clientes y recibí feedback</p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => onPanel('brief')}
+            className="flex items-center gap-2 bg-white text-[#1c1c1c] px-5 py-2.5 rounded-full text-sm font-bold cursor-pointer border-none hover:bg-white/90 transition-colors">
+            <ClipboardList size={13} /> Armá tu brief
+          </button>
+          <a
+            href={`/marca/${slug}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 text-white/50 hover:text-white/80 text-sm no-underline transition-colors font-medium">
+            <ExternalLink size={13} /> Ver link del cliente
+          </a>
         </div>
       </div>
 
       {/* Stats */}
       <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest mb-3">Datos</p>
       <div className="grid grid-cols-3 gap-3 mb-8">
-        <StatCard label="Vistas"              value={stats.vistas}    icon={Eye} />
-        <StatCard label="Respuestas al brief"  value={stats.respuestas} icon={MessageSquare} />
-        <StatCard label="Brief enviado"       value={stats.briefEnviado ? '✓' : '—'} icon={ShoppingBag} />
+        <StatCard label="Vistas"              value={stats.vistas}     icon={Eye}           colorIdx={0} />
+        <StatCard label="Respuestas al brief"  value={stats.respuestas} icon={MessageSquare} colorIdx={1} />
+        <StatCard label="Brief enviado"        value={stats.briefEnviado ? '✓' : '—'} icon={ShoppingBag} colorIdx={2} />
       </div>
 
       {/* Pasos */}
       <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest mb-3">Primeros pasos</p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {PASOS.map(({ key, label, icon: Icon, num }) => (
+        {PASOS.map(({ key, label, icon: Icon, num, bg, iconColor }) => (
           <button
             key={key}
             onClick={() => onPanel(key)}
-            className="bg-white border border-[#ebebeb] hover:border-[#ccc] rounded-[14px] p-5 text-left cursor-pointer transition-all group flex flex-col justify-between min-h-[130px]">
+            className="rounded-[20px] p-5 text-left cursor-pointer border-none transition-all hover:scale-[1.02] hover:shadow-md flex flex-col justify-between min-h-[140px]"
+            style={{ backgroundColor: bg }}>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-[11px] font-bold text-[#ddd]">{num}</span>
-              <Icon size={15} className="text-[#bbb] group-hover:text-[#1c1c1c] transition-colors" />
+              <span className="text-[11px] font-bold text-black/20">{num}</span>
+              <div className="w-8 h-8 rounded-[10px] bg-white/60 flex items-center justify-center">
+                <Icon size={15} style={{ color: iconColor }} />
+              </div>
             </div>
-            <div className="text-[#1c1c1c] text-sm font-semibold leading-snug">{label}</div>
+            <div className="text-[#1c1c1c] text-sm font-bold leading-snug">{label}</div>
           </button>
         ))}
       </div>
@@ -476,7 +486,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const handlePanel = (key) => { setPanel(key); setSidebarOpen(false) }
 
   return (
-    <div className="flex min-h-screen bg-[#f5f5f3]">
+    <div className="flex min-h-screen bg-[#f7f5f2]">
       {/* Overlay mobile */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
