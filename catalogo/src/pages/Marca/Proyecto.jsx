@@ -445,12 +445,13 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   }
 
   const cargarAccentColor = async (proyectoId) => {
-    const { data } = await db.from('colores_marca')
-      .select('hex')
+    const { data } = await db.from('manual_marca')
+      .select('colores')
       .eq('proyecto_id', proyectoId)
-      .eq('esAcento', true)
       .limit(1)
-    setAccentColor(data?.[0]?.hex || null)
+      .single()
+    const acento = data?.colores?.find(c => c.esAcento)
+    setAccentColor(acento?.hex ? (acento.hex.startsWith('#') ? acento.hex : `#${acento.hex}`) : null)
   }
 
   const handleProyecto = (p) => {
