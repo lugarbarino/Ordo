@@ -311,7 +311,7 @@ const NAV_LINKS = [
 ]
 
 // ── Sidebar ──────────────────────────────────────────────────
-function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onLogout }) {
+function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onLogout, accentColor }) {
   const [selectorOpen, setSelectorOpen] = useState(false)
 
   return (
@@ -326,7 +326,9 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
         <button
           onClick={() => setSelectorOpen(v => !v)}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] hover:bg-[#f5f5f5] transition-colors bg-transparent border-none cursor-pointer text-left">
-          <div className="w-10 h-10 rounded-full bg-[#726d76] text-white flex items-center justify-center text-xs font-bold shrink-0">
+          <div
+            className="w-10 h-10 rounded-full text-white flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
+            style={{ backgroundColor: accentColor || '#726d76' }}>
             {proyecto.nombre?.[0]?.toUpperCase() || 'M'}
           </div>
           <span className="text-sm font-semibold text-[#1c1c1c] truncate flex-1">{proyecto.nombre}</span>
@@ -416,6 +418,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const [nuevoNombre, setNuevoNombre] = useState('')
   const [nuevoError, setNuevoError] = useState('')
   const [nuevoLoading, setNuevoLoading] = useState(false)
+  const [accentColor, setAccentColor] = useState(null)
 
   const handleCrearMarca = async () => {
     if (!nuevoNombre.trim()) { setNuevoError('El nombre es obligatorio'); return }
@@ -430,6 +433,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
 
   useEffect(() => {
     cargarStats(proyecto.id)
+    cargarAccentColor(proyecto.id)
   }, [proyecto.id])
 
   const cargarStats = async (proyectoId) => {
@@ -438,6 +442,15 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
       db.from('proyectos_marca').select('brief_enviado_at').eq('id', proyectoId).limit(1),
     ])
     setStats({ vistas: 0, respuestas: respuestas || 0, briefEnviado: !!(proyData?.[0]?.brief_enviado_at) })
+  }
+
+  const cargarAccentColor = async (proyectoId) => {
+    const { data } = await db.from('colores_marca')
+      .select('hex')
+      .eq('proyecto_id', proyectoId)
+      .eq('rol', 'accent')
+      .limit(1)
+    setAccentColor(data?.[0]?.hex || null)
   }
 
   const handleProyecto = (p) => {
@@ -479,6 +492,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
           onProyecto={handleProyecto}
           onNuevo={() => setNuevoOpen(true)}
           onLogout={handleLogout}
+          accentColor={accentColor}
         />
       </div>
 
