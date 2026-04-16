@@ -448,7 +448,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
     const { data } = await db.from('colores_marca')
       .select('hex')
       .eq('proyecto_id', proyectoId)
-      .eq('rol', 'accent')
+      .eq('esAcento', true)
       .limit(1)
     setAccentColor(data?.[0]?.hex || null)
   }
