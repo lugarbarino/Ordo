@@ -71,8 +71,20 @@ Deploy: Vercel (conectado a GitHub, rama `main`)
 Tablas relevantes de Marca:
 - `proyectos_marca` — proyectos de branding por cliente
 - `cuentas_marca` — cuenta del diseñador
+- `manual_marca` — manual completo (colores, tipografías, logos, etc. como JSON)
 - `brief_preguntas`, `brief_respuestas`, `brief_referencias`
-- `opciones_marca`, `assets_marca`, `colores_marca`, `tipografias_marca`
+
+### ⚠️ Importante — Colores de marca
+Los colores NO tienen tabla propia. Se guardan como array JSON en `manual_marca.colores`:
+```json
+{ "hex": "#0F766E", "nombre": "Principal", "esAcento": true, "esDark": false, "esLight": false }
+```
+Para obtener el color acento:
+```js
+const { data } = await db.from('manual_marca').select('colores').eq('proyecto_id', id).single()
+const acento = data?.colores?.find(c => c.esAcento)
+```
+No buscar en `colores_marca` — esa tabla es de la versión antigua en `/marca/`.
 
 ---
 
