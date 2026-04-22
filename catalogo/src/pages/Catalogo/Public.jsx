@@ -400,8 +400,8 @@ function Navbar({ empresa, slug, brandColor, carritoCount, onCarrito }) {
       <div className="flex md:hidden items-center gap-2 ml-auto">
         {carritoCount > 0 && (
           <button onClick={onCarrito}
-            className="flex items-center gap-1.5 text-sm font-bold px-3 h-9 rounded-xl border border-[#dde3ed] bg-white cursor-pointer"
-            style={{ color: brandColor }}>
+            className="flex items-center gap-1.5 text-sm font-bold px-3 h-9 rounded-xl cursor-pointer"
+            style={{ backgroundColor: brandColor, color: '#fff' }}>
             <ShoppingBag size={15} />
             {carritoCount}
           </button>
@@ -675,8 +675,8 @@ export default function CatalogoPublic() {
             </span>
             {totalCarrito > 0 && (
               <button onClick={() => setCarritoOpen(true)}
-                className="flex items-center gap-1.5 text-sm font-bold px-3 h-[38px] rounded-xl border border-[#dde3ed] bg-white cursor-pointer shrink-0"
-                style={{ color: brandColor }}>
+                className="flex items-center gap-1.5 text-sm font-bold px-3 h-[38px] rounded-xl cursor-pointer shrink-0"
+                style={{ backgroundColor: brandColor, color: '#fff' }}>
                 <ShoppingBag size={15} />
                 {totalCarrito}
               </button>
