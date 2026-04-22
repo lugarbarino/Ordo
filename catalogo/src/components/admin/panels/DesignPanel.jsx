@@ -78,7 +78,7 @@ export function DesignPanel() {
   const guardar = async () => {
     setSaving(true)
     const preset = RADIUS_PRESETS.find(r => r.card === radius) || RADIUS_PRESETS[1]
-    const tokens = { fontPreset, fontFamily, fontFamilyHeading, fontScale, radiusCard: radius, radiusBtn: preset.btn }
+    const tokens = { ...(empresa?.tokens || {}), fontPreset, fontFamily, fontFamilyHeading, fontScale, radiusCard: radius, radiusBtn: preset.btn }
     await guardarEmpresa({ color, tokens })
     setSaving(false)
   }
