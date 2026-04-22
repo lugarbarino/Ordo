@@ -319,31 +319,6 @@ export function ConfigPanel() {
           )}
         </div>
 
-        {/* Preview */}
-        <div className="rounded-xl overflow-hidden border border-[#e8ecf2]" style={{ height: 120 }}>
-          <div className="flex h-full">
-            <div className="flex-1 flex flex-col justify-center px-4 py-3"
-              style={{ backgroundColor: form.color || '#3872fa' }}>
-              {form.logo_url
-                ? <img src={form.logo_url} alt="logo" className="h-6 w-auto object-contain mb-2 brightness-0 invert max-w-[80px]" />
-                : <div className="h-5 w-16 rounded bg-white/30 mb-2" />
-              }
-              <p className="text-white text-xs font-black leading-snug line-clamp-2">
-                {form.nombre || 'Tu empresa'}
-              </p>
-              {form.descripcion && (
-                <p className="text-white/60 text-[10px] mt-0.5 line-clamp-1">{form.descripcion}</p>
-              )}
-            </div>
-            <div className="w-1/3 relative overflow-hidden">
-              {(form.tokens?.banner_nosotros_url || form.banner_url)
-                ? <img src={form.tokens?.banner_nosotros_url || form.banner_url} alt="banner" className="absolute inset-0 w-full h-full object-cover" />
-                : <div className="absolute inset-0" style={{ backgroundColor: form.color ? form.color + '44' : '#3872fa22' }} />
-              }
-            </div>
-          </div>
-        </div>
-
         {/* Título y párrafo del hero */}
         <Input
           label="Título de Quiénes somos"
