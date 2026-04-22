@@ -173,14 +173,20 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
 
       const nombre = pedido.nombre_cliente?.replace(/\s+/g, '_') || 'cliente'
       doc.save(`presupuesto_${nombre}.pdf`)
-
-      // Marcar pedido como respondido y guardar precios
-      await responder(pedido.id, JSON.stringify({ precios, nota }), empresa?.id)
-      onClose()
     } catch (e) {
-      console.error(e)
+      console.error('Error generando PDF:', e)
+      setGenerando(false)
+      return
+    }
+
+    // Marcar pedido como respondido — fuera del try del PDF para que siempre se ejecute
+    try {
+      await responder(pedido.id, JSON.stringify({ precios, nota }), empresa?.id)
+    } catch (e) {
+      console.error('Error al marcar como respondido:', e)
     }
     setGenerando(false)
+    onClose()
   }
 
   if (!pedido) return null
