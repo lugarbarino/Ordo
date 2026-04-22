@@ -336,8 +336,8 @@ export function ConfigPanel() {
               )}
             </div>
             <div className="w-1/3 relative overflow-hidden">
-              {form.banner_url
-                ? <img src={form.banner_url} alt="banner" className="absolute inset-0 w-full h-full object-cover" />
+              {(form.tokens?.banner_nosotros_url || form.banner_url)
+                ? <img src={form.tokens?.banner_nosotros_url || form.banner_url} alt="banner" className="absolute inset-0 w-full h-full object-cover" />
                 : <div className="absolute inset-0" style={{ backgroundColor: form.color ? form.color + '44' : '#3872fa22' }} />
               }
             </div>
