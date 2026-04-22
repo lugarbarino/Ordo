@@ -23,7 +23,12 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
 
   useEffect(() => {
     if (!open || !pedido) return
-    const saved = presupCache[pedido.id] || {}
+    // Primero intentar cargar desde Supabase (respuesta guardada), luego desde cache local
+    let saved = {}
+    if (pedido.respuesta) {
+      try { saved = JSON.parse(pedido.respuesta) } catch {}
+    }
+    if (!saved.precios) saved = presupCache[pedido.id] || {}
     const items = pedido.productos || []
     setPrecios(items.map((_, i) => saved.precios?.[i] ?? ''))
     setNota(saved.nota || '')
@@ -169,8 +174,8 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       const nombre = pedido.nombre_cliente?.replace(/\s+/g, '_') || 'cliente'
       doc.save(`presupuesto_${nombre}.pdf`)
 
-      // Marcar pedido como respondido
-      await responder(pedido.id, null, empresa?.id)
+      // Marcar pedido como respondido y guardar precios
+      await responder(pedido.id, JSON.stringify({ precios, nota }), empresa?.id)
       onClose()
     } catch (e) {
       console.error(e)
