@@ -344,6 +344,24 @@ export function ConfigPanel() {
           </div>
         </div>
 
+        {/* Título y párrafo del hero */}
+        <Input
+          label="Título de Quiénes somos"
+          value={form.tokens?.titulo_nosotros || ''}
+          onChange={e => setToken('titulo_nosotros', e.target.value)}
+          placeholder={form.titulo || form.nombre || 'Título del hero'}
+        />
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-semibold text-[#666] uppercase tracking-wide">Párrafo de Quiénes somos</label>
+          <textarea
+            value={form.tokens?.descripcion_nosotros || ''}
+            onChange={e => setToken('descripcion_nosotros', e.target.value)}
+            placeholder={form.descripcion || 'Párrafo del hero'}
+            rows={3}
+            className="w-full px-4 py-2.5 text-sm border border-[#e3e3e3] focus:outline-none focus:border-[var(--brand)] resize-none bg-white text-[#111] placeholder-[#aaa] transition-colors rounded-xl"
+          />
+        </div>
+
         {/* Banner de Quiénes somos */}
         <div className="flex flex-col gap-2">
           <label className="text-xs font-semibold text-[#666] uppercase tracking-wide">Banner de Quiénes somos</label>

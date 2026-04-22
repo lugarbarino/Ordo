@@ -114,11 +114,11 @@ export default function CatalogoNosotros() {
               Sobre nosotros
             </p>
             <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-6">
-              {empresa.titulo || empresa.nombre}
+              {tokens.titulo_nosotros || empresa.titulo || empresa.nombre}
             </h1>
-            {empresa.descripcion && (
+            {(tokens.descripcion_nosotros || empresa.descripcion) && (
               <p className="text-white/75 text-base md:text-lg leading-relaxed max-w-[420px]">
-                {empresa.descripcion}
+                {tokens.descripcion_nosotros || empresa.descripcion}
               </p>
             )}
           </div>
