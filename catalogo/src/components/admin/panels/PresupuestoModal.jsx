@@ -16,7 +16,7 @@ function imgToB64(url) {
 
 export function PresupuestoModal({ open, onClose, pedido, productos }) {
   const { empresa } = useAppStore()
-  const { presupCache, guardarPresupCache } = usePedidosStore()
+  const { presupCache, guardarPresupCache, responder } = usePedidosStore()
   const [precios, setPrecios] = useState([])
   const [nota, setNota] = useState('')
   const [generando, setGenerando] = useState(false)
@@ -168,6 +168,10 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
 
       const nombre = pedido.nombre_cliente?.replace(/\s+/g, '_') || 'cliente'
       doc.save(`presupuesto_${nombre}.pdf`)
+
+      // Marcar pedido como respondido
+      await responder(pedido.id, null, empresa?.id)
+      onClose()
     } catch (e) {
       console.error(e)
     }
