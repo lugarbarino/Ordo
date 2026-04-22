@@ -75,8 +75,9 @@ export default function CatalogoNosotros() {
   )
 
   const tokens = empresa.tokens || {}
-  const hasBanner = !!empresa.banner_url
-  const isVideo = hasBanner && /\.(mp4|webm|ogg)(\?|#|$)/i.test(empresa.banner_url)
+  const bannerNosotros = tokens.banner_nosotros_url || empresa.banner_url
+  const hasBanner = !!bannerNosotros
+  const isVideo = hasBanner && /\.(mp4|webm|ogg)(\?|#|$)/i.test(bannerNosotros)
 
   const servicios = (tokens.servicios && tokens.servicios.length > 0)
     ? tokens.servicios
@@ -126,12 +127,12 @@ export default function CatalogoNosotros() {
         {/* Derecha: imagen / video o bloque decorativo */}
         <div className="md:w-1/2 min-h-[280px] md:min-h-0 relative overflow-hidden">
           {isVideo ? (
-            <video key={empresa.banner_url} autoPlay muted loop playsInline
+            <video key={bannerNosotros} autoPlay muted loop playsInline
               className="absolute inset-0 w-full h-full object-cover">
-              <source src={empresa.banner_url} />
+              <source src={bannerNosotros} />
             </video>
           ) : hasBanner ? (
-            <img src={empresa.banner_url} alt={empresa.nombre}
+            <img src={bannerNosotros} alt={empresa.nombre}
               className="absolute inset-0 w-full h-full object-cover" />
           ) : (
             <div className="absolute inset-0" style={{ backgroundColor: brandLight }} />

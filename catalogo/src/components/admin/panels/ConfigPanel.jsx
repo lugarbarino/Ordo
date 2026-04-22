@@ -25,11 +25,14 @@ export function ConfigPanel() {
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [uploadingBanner, setUploadingBanner] = useState(false)
   const [uploadingBannerServicio, setUploadingBannerServicio] = useState(false)
+  const [uploadingBannerNosotros, setUploadingBannerNosotros] = useState(false)
   const [pexelsOpen, setPexelsOpen] = useState(false)
   const [pexelsServicioOpen, setPexelsServicioOpen] = useState(false)
+  const [pexelsNosotrosOpen, setPexelsNosotrosOpen] = useState(false)
   const logoRef = useRef()
   const bannerRef = useRef()
   const bannerServicioRef = useRef()
+  const bannerNosotrosRef = useRef()
 
   useEffect(() => {
     if (empresa) {
@@ -341,6 +344,31 @@ export function ConfigPanel() {
           </div>
         </div>
 
+        {/* Banner de Quiénes somos */}
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-semibold text-[#666] uppercase tracking-wide">Banner de Quiénes somos</label>
+          <p className="text-xs text-[#999]">Imagen o video exclusivo para la página Quiénes somos. Si no subís uno se usa el banner del catálogo.</p>
+          {form.tokens?.banner_nosotros_url && (
+            <div className="rounded-xl overflow-hidden border border-[#e8ecf2]" style={{ height: 100 }}>
+              {isVideo(form.tokens.banner_nosotros_url)
+                ? <video key={form.tokens.banner_nosotros_url} autoPlay muted loop playsInline className="w-full h-full object-cover"><source src={form.tokens.banner_nosotros_url} /></video>
+                : <img src={form.tokens.banner_nosotros_url} alt="Banner nosotros" className="w-full h-full object-cover" />
+              }
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setPexelsNosotrosOpen(true)}>
+              <Search size={13} /> Buscar en Pexels
+            </Button>
+            <Button size="sm" variant="secondary" loading={uploadingBannerNosotros}
+              onClick={() => bannerNosotrosRef.current?.click()}>
+              <Upload size={13} /> {uploadingBannerNosotros ? 'Subiendo…' : 'Subir archivo'}
+            </Button>
+          </div>
+          <input type="file" ref={bannerNosotrosRef} accept="image/*,video/mp4,video/webm" className="hidden"
+            onChange={e => subirToken(e.target.files[0], 'banners', setUploadingBannerNosotros, 'banner_nosotros_url')} />
+        </div>
+
         <Input
           label="WhatsApp"
           value={form.whatsapp || ''}
@@ -469,6 +497,17 @@ export function ConfigPanel() {
         onClose={() => setPexelsServicioOpen(false)}
         onSelect={async ({ url }) => {
           const newForm = { ...form, tokens: { ...(form.tokens || {}), banner_servicio_url: url } }
+          setForm(newForm)
+          await guardarEmpresa(buildCampos(newForm))
+        }}
+      />
+
+      {/* Pexels picker — banner de Quiénes somos */}
+      <PexelsPicker
+        open={pexelsNosotrosOpen}
+        onClose={() => setPexelsNosotrosOpen(false)}
+        onSelect={async ({ url }) => {
+          const newForm = { ...form, tokens: { ...(form.tokens || {}), banner_nosotros_url: url } }
           setForm(newForm)
           await guardarEmpresa(buildCampos(newForm))
         }}
