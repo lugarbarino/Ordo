@@ -14,14 +14,19 @@ function applyTokens(tokens) {
   if (tokens.colorBgSoft)    root.style.setProperty('--color-bg-soft', tokens.colorBgSoft)
 }
 
+const PANEL_KEY = 'ordo-panel-activo'
+
 export const useAppStore = create((set, get) => ({
   user: null,
   empresa: null,
-  panel: 'dashboard',
+  panel: localStorage.getItem(PANEL_KEY) || 'dashboard',
   toast: null,
 
   setUser: (user) => set({ user }),
-  setPanel: (panel) => set({ panel }),
+  setPanel: (panel) => {
+    localStorage.setItem(PANEL_KEY, panel)
+    set({ panel })
+  },
 
   showToast: (message, type = 'ok') => {
     set({ toast: { message, type } })

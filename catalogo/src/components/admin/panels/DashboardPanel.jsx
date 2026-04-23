@@ -53,15 +53,15 @@ export function DashboardPanel() {
 
     db.from('pedidos').select('*', { count: 'exact', head: true })
       .eq('empresa_id', empresa.id).eq('estado', 'Pendiente')
-      .then(({ count }) => setPedidosPendientes(count || 0))
+      .then(({ count, error }) => setPedidosPendientes(error ? 0 : (count ?? 0)))
 
     db.from('pedidos').select('*', { count: 'exact', head: true })
       .eq('empresa_id', empresa.id).gte('created_at', iso)
-      .then(({ count }) => setPedidosEsteMes(count || 0))
+      .then(({ count, error }) => setPedidosEsteMes(error ? 0 : (count ?? 0)))
 
     db.from('visitas').select('*', { count: 'exact', head: true })
       .eq('empresa_id', empresa.id).is('producto_id', null).gte('created_at', iso)
-      .then(({ count }) => setVisitasEsteMes(count || 0))
+      .then(({ count, error }) => setVisitasEsteMes(error ? 0 : (count ?? 0)))
 
     // Productos más presupuestados
     db.from('pedidos').select('productos')
