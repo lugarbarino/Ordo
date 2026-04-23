@@ -138,8 +138,14 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
             const img = new Image()
             await new Promise(r => { img.onload = img.onerror = r; img.src = b64 })
             const canvas = document.createElement('canvas')
-            canvas.width = 120; canvas.height = 120
-            canvas.getContext('2d').drawImage(img, 0, 0, 120, 120)
+            const size = 120
+            canvas.width = size; canvas.height = size
+            const ctx = canvas.getContext('2d')
+            const iw = img.naturalWidth, ih = img.naturalHeight
+            const scale = Math.max(size / iw, size / ih)
+            const sw = size / scale, sh = size / scale
+            const sx = (iw - sw) / 2, sy = (ih - sh) / 2
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size)
             prodImgs[item.id] = canvas.toDataURL('image/png')
           } catch (e) {}
         }
