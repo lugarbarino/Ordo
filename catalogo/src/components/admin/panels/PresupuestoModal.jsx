@@ -34,9 +34,10 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
     setNota(saved.nota || '')
   }, [open, pedido])
 
-  const total = precios.reduce((sum, v) => {
+  const total = precios.reduce((sum, v, i) => {
     const n = parseFloat(v)
-    return isNaN(n) ? sum : sum + n
+    const cantidad = pedido?.productos?.[i]?.cantidad || 1
+    return isNaN(n) ? sum : sum + n * cantidad
   }, 0)
   const hayTotal = precios.some(v => !isNaN(parseFloat(v)))
 
