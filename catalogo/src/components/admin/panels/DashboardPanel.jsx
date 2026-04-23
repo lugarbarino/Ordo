@@ -37,7 +37,7 @@ function StatCard({ label, shortLabel, value, icon: Icon, onClick }) {
 }
 
 export function DashboardPanel() {
-  const { empresa, setPanel, showToast } = useAppStore()
+  const { empresa, setPanel, showToast, panel } = useAppStore()
   const productos = useProductosStore(s => s.productos)
   const [pedidosPendientes, setPedidosPendientes] = useState(null)
   const [pedidosEsteMes, setPedidosEsteMes] = useState(null)
@@ -46,7 +46,7 @@ export function DashboardPanel() {
   const [ultimosPedidos, setUltimosPedidos] = useState([])
 
   useEffect(() => {
-    if (!empresa) return
+    if (!empresa || panel !== 'dashboard') return
     const inicioMes = new Date()
     inicioMes.setDate(1); inicioMes.setHours(0, 0, 0, 0)
     const iso = inicioMes.toISOString()
@@ -90,7 +90,7 @@ export function DashboardPanel() {
         })
         setUltimosPedidos(sorted.slice(0, 5))
       })
-  }, [empresa, productos])
+  }, [empresa, productos, panel])
 
   const categorias = new Set(productos.map(p => p.categoria).filter(Boolean)).size
   const catalogoUrl = empresa?.slug ? `${window.location.origin}/catalogo/${empresa.slug}` : null
