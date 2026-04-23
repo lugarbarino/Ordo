@@ -25,8 +25,13 @@ export const usePedidosStore = create(persist((set, get) => ({
   },
 
   responder: async (pedidoId, respuesta, empresaId) => {
-    const { error } = await db.from('pedidos').update({ estado: 'Respondido', respuesta }).eq('id', pedidoId)
+    // Primero solo actualizamos el estado (columna que siempre existe)
+    const { error } = await db.from('pedidos').update({ estado: 'Respondido' }).eq('id', pedidoId)
     if (error) return error
+    // Intentamos guardar la respuesta por separado (columna opcional)
+    if (respuesta) {
+      await db.from('pedidos').update({ respuesta }).eq('id', pedidoId)
+    }
     await get().cargar(empresaId)
     return null
   },
