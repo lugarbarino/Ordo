@@ -126,19 +126,43 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       doc.text('PRECIO', colX.precio, y + 20, { align: 'right' })
       y += 32
 
-      // Rows
+      // Precargar imágenes de productos
       const items = pedido.productos || []
+      const prodImgs = {}
+      await Promise.all(items.map(async (item) => {
+        const prod = productos.find(p => String(p.id) === String(item.id))
+        if (prod?.imagen_url) {
+          try {
+            const b64 = await imgToB64(prod.imagen_url)
+            const img = new Image()
+            await new Promise(r => { img.onload = img.onerror = r; img.src = b64 })
+            const canvas = document.createElement('canvas')
+            canvas.width = 120; canvas.height = 120
+            canvas.getContext('2d').drawImage(img, 0, 0, 120, 120)
+            prodImgs[item.id] = canvas.toDataURL('image/png')
+          } catch (e) {}
+        }
+      }))
+
+      // Rows
+      const ROW_H = 52
+      const IMG_SIZE = 38
       items.forEach((item, i) => {
         const precio = parseFloat(precios[i])
         const bgRow = i % 2 === 0 ? [255, 255, 255] : [249, 250, 252]
-        doc.setFillColor(...bgRow).rect(40, y, W - 80, 28, 'F')
-        doc.setFontSize(10).setTextColor(20).setFont(undefined, 'normal')
-        doc.text(item.nombre, colX.prod + 8, y + 18)
-        doc.text(String(item.cantidad), colX.cant, y + 18, { align: 'right' })
-        if (!isNaN(precio)) {
-          doc.text(precio.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.precio, y + 18, { align: 'right' })
+        doc.setFillColor(...bgRow).rect(40, y, W - 80, ROW_H, 'F')
+        const imgX = colX.prod + 8
+        const textX = prodImgs[item.id] ? imgX + IMG_SIZE + 8 : imgX
+        if (prodImgs[item.id]) {
+          doc.addImage(prodImgs[item.id], 'PNG', imgX, y + (ROW_H - IMG_SIZE) / 2, IMG_SIZE, IMG_SIZE, '', 'FAST')
         }
-        y += 28
+        doc.setFontSize(10).setTextColor(20).setFont(undefined, 'normal')
+        doc.text(item.nombre, textX, y + ROW_H / 2 + 4)
+        doc.text(String(item.cantidad), colX.cant, y + ROW_H / 2 + 4, { align: 'right' })
+        if (!isNaN(precio)) {
+          doc.text(precio.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.precio, y + ROW_H / 2 + 4, { align: 'right' })
+        }
+        y += ROW_H
       })
 
       // Total row
