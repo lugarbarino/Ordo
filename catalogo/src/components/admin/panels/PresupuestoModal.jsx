@@ -119,12 +119,13 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       y += 22
 
       // Table header
-      const colX = { prod: 40, cant: W - 170, precio: W - 52 }
+      const colX = { prod: 40, cant: W - 250, unit: W - 175, sub: W - 52 }
       doc.setFillColor(br, bg, bb).rect(40, y, W - 80, 32, 'F')
       doc.setFontSize(9.5).setTextColor(255).setFont(undefined, 'bold')
       doc.text('PRODUCTO', colX.prod + 8, y + 20)
       doc.text('CANT.', colX.cant, y + 20, { align: 'right' })
-      doc.text('PRECIO', colX.precio, y + 20, { align: 'right' })
+      doc.text('P. UNIT.', colX.unit, y + 20, { align: 'right' })
+      doc.text('SUBTOTAL', colX.sub, y + 20, { align: 'right' })
       y += 32
 
       // Precargar imágenes de productos
@@ -155,7 +156,9 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       const ROW_H = 52
       const IMG_SIZE = 38
       items.forEach((item, i) => {
-        const precio = parseFloat(precios[i])
+        const precioUnit = parseFloat(precios[i])
+        const cantidad = item.cantidad || 1
+        const subtotal = !isNaN(precioUnit) ? precioUnit * cantidad : null
         const bgRow = i % 2 === 0 ? [255, 255, 255] : [249, 250, 252]
         doc.setFillColor(...bgRow).rect(40, y, W - 80, ROW_H, 'F')
         const imgX = colX.prod + 8
@@ -165,9 +168,12 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
         }
         doc.setFontSize(10).setTextColor(20).setFont(undefined, 'normal')
         doc.text(item.nombre, textX, y + ROW_H / 2 + 4)
-        doc.text(String(item.cantidad), colX.cant, y + ROW_H / 2 + 4, { align: 'right' })
-        if (!isNaN(precio)) {
-          doc.text(precio.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.precio, y + ROW_H / 2 + 4, { align: 'right' })
+        doc.text(String(cantidad), colX.cant, y + ROW_H / 2 + 4, { align: 'right' })
+        if (!isNaN(precioUnit)) {
+          doc.text(precioUnit.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.unit, y + ROW_H / 2 + 4, { align: 'right' })
+          doc.setFont(undefined, 'bold')
+          doc.text(subtotal.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.sub, y + ROW_H / 2 + 4, { align: 'right' })
+          doc.setFont(undefined, 'normal')
         }
         y += ROW_H
       })
