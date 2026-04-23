@@ -186,7 +186,7 @@ export function PresupuestoModal({ open, onClose, pedido, productos }) {
       doc.text('Total estimado', 40, y)
       if (hayTotal) {
         doc.setFontSize(22).setFont(undefined, 'bold').setTextColor(20)
-        doc.text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.precio, y, { align: 'right' })
+        doc.text(total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' }), colX.sub, y, { align: 'right' })
       }
 
       // Consideraciones (nota de empresa)
