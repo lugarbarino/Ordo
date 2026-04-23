@@ -317,7 +317,7 @@ function ProductCard({ producto: p, enCarrito, onDetalle, onAgregar }) {
       {/* Imagen */}
       <div className="w-full h-[180px] bg-white flex items-center justify-center overflow-hidden relative max-sm:h-[140px]">
         {p.imagen_url
-          ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-contain p-5 transition-transform group-hover:scale-[1.03]" />
+          ? <img src={p.imagen_url} alt={p.nombre} className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-[1.03]" />
           : <Image size={28} className="text-[#d0d5de]" />
         }
       </div>
