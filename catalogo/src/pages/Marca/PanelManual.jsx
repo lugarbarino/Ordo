@@ -351,7 +351,27 @@ function MockupGrid({ mockups, onMockups, proyectoId }) {
   )
 }
 
-// ── TemplateItem — una imagen + link Canva ────────────────────
+// ── normalizeTemplates — migra formato viejo (array) al nuevo (objeto) ──
+function normalizeTemplates(raw) {
+  const keys = ['foto', 'portada', 'posts', 'brochure', 'otro']
+  const result = {}
+  for (const key of keys) {
+    const val = raw?.[key]
+    if (Array.isArray(val)) {
+      result[key] = {
+        canva_url: val.find(i => i?.canva_url)?.canva_url || '',
+        items: val.map(i => ({ preview_url: i?.preview_url || '', titulo: i?.titulo || '' }))
+      }
+    } else if (val && typeof val === 'object') {
+      result[key] = { canva_url: val.canva_url || '', items: val.items || [] }
+    } else {
+      result[key] = { canva_url: '', items: [] }
+    }
+  }
+  return result
+}
+
+// ── TemplateItem — una imagen + título ───────────────────────
 function TemplateItem({ item, onChange, onDelete, proyectoId }) {
   const ref = useRef()
   const [loading, setLoading] = useState(false)
@@ -379,8 +399,8 @@ function TemplateItem({ item, onChange, onDelete, proyectoId }) {
           <span className="text-[10px] text-[#ccc]">Preview</span>
         </Button>
       )}
-      <Input value={item.canva_url || ''} onChange={e => onChange({ ...item, canva_url: e.target.value })}
-        className="text-xs text-[#888]" placeholder="Link de Canva (opcional)" />
+      <Input value={item.titulo || ''} onChange={e => onChange({ ...item, titulo: e.target.value })}
+        className="text-xs text-[#888]" placeholder="Título (ej: Para Instagram, 2022-ahora)" />
       <Button variant="ghost" size="sm" onClick={onDelete} className="text-[#ccc] hover:text-red-500 self-end -mt-1">
         <Trash2 size={12} /> Eliminar
       </Button>
@@ -390,14 +410,19 @@ function TemplateItem({ item, onChange, onDelete, proyectoId }) {
 }
 
 // ── TemplateCategoria ─────────────────────────────────────────
-function TemplateCategoria({ label, items, onChange, proyectoId }) {
-  const addItem = () => onChange([...items, { preview_url: '', canva_url: '' }])
-  const updateItem = (i, v) => onChange(items.map((x, idx) => idx === i ? v : x))
-  const removeItem = (i) => onChange(items.filter((_, idx) => idx !== i))
+function TemplateCategoria({ label, catData, onChange, proyectoId }) {
+  const items = catData.items || []
+  const canvaUrl = catData.canva_url || ''
+
+  const addItem = () => onChange({ ...catData, items: [...items, { preview_url: '', titulo: '' }] })
+  const updateItem = (i, v) => onChange({ ...catData, items: items.map((x, idx) => idx === i ? v : x) })
+  const removeItem = (i) => onChange({ ...catData, items: items.filter((_, idx) => idx !== i) })
 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-xs font-semibold text-[#666] uppercase tracking-wide">{label}</p>
+      <Input value={canvaUrl} onChange={e => onChange({ ...catData, canva_url: e.target.value })}
+        className="text-xs text-[#888]" placeholder="Link de Canva para esta sección (opcional)" />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {items.map((item, i) => (
           <TemplateItem key={i} item={item} onChange={v => updateItem(i, v)} onDelete={() => removeItem(i)} proyectoId={proyectoId} />
@@ -483,7 +508,7 @@ export function PanelManual({ proyecto }) {
     setMockups(row.mockups || [])
     setUsosCorrectos(row.usos_correctos || [])
     setUsosIncorrectos(row.usos_incorrectos || [])
-    setTemplates({ foto: [], portada: [], posts: [], brochure: [], otro: [], ...(row.templates || {}) })
+    setTemplates(normalizeTemplates(row.templates))
   }
 
   const guardar = async () => {
@@ -500,7 +525,7 @@ export function PanelManual({ proyecto }) {
   }
 
   const setLogo = (key, url) => setLogos(l => ({ ...l, [key]: url }))
-  const updateTemplatesCat = (key, items) => setTemplates(t => ({ ...t, [key]: items }))
+  const updateTemplatesCat = (key, catData) => setTemplates(t => ({ ...t, [key]: catData }))
 
   const move = (setter, i, dir) => setter(arr => {
     const next = [...arr]
@@ -692,8 +717,8 @@ export function PanelManual({ proyecto }) {
             <TemplateCategoria
               key={key}
               label={label}
-              items={templates[key] || []}
-              onChange={items => updateTemplatesCat(key, items)}
+              catData={templates[key] || { canva_url: '', items: [] }}
+              onChange={catData => updateTemplatesCat(key, catData)}
               proyectoId={proyecto.id}
             />
           ))}

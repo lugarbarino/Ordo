@@ -285,7 +285,15 @@ export default function MarcaManual() {
   const hayTipos = tipografias.length > 0
   const hayMockups = mockups.length > 0
   const hayUsos = usosCorrectos.length > 0 || usosIncorrectos.length > 0
-  const hayTemplates = TEMPLATE_CATS.some(({ key }) => (templates[key] || []).some(t => t?.preview_url || t?.canva_url))
+  const getTemplateItems = (key) => {
+    const val = templates[key]
+    if (Array.isArray(val)) return { canva_url: '', items: val }
+    return { canva_url: val?.canva_url || '', items: val?.items || [] }
+  }
+  const hayTemplates = TEMPLATE_CATS.some(({ key }) => {
+    const { canva_url, items } = getTemplateItems(key)
+    return canva_url || items.some(t => t?.preview_url)
+  })
 
   let sectionNum = 0
   const nextNum = () => String(++sectionNum).padStart(2, '0')
@@ -605,58 +613,45 @@ export default function MarcaManual() {
             <SectionHeader num={nextNum()} label="Difusión" />
             <div className="flex flex-col gap-12">
               {TEMPLATE_CATS.map(({ key, label, aspect }) => {
-                const items = (templates[key] || []).filter(t => t?.preview_url || t?.canva_url)
-                if (!items.length) return null
+                const { canva_url, items } = getTemplateItems(key)
+                const itemsFiltrados = items.filter(t => t?.preview_url)
+                if (!canva_url && !itemsFiltrados.length) return null
                 const isPortada = key === 'portada'
                 return (
                   <div key={key}>
-                    <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px] mb-6">{label}</p>
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px]">{label}</p>
+                      {canva_url && (
+                        <a href={canva_url} target="_blank" rel="noreferrer"
+                          className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
+                          <ExternalLink size={11} /> Editar en Canva
+                        </a>
+                      )}
+                    </div>
                     <div className={`grid gap-4 ${isPortada ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
-                      {items.map((tmpl, i) => (
-                        <div key={i} className="flex flex-col gap-3">
-                          {tmpl.preview_url ? (
-                            <div className="rounded-2xl overflow-hidden flex items-end justify-center pt-8 px-6 min-h-[280px]" style={{ backgroundColor: lightBg }}>
-                              <img src={tmpl.preview_url} alt={label} className="w-full max-h-[260px] object-contain object-bottom drop-shadow-lg" />
-                            </div>
-                          ) : getCanvaEmbedUrl(tmpl.canva_url) ? (
-                            <div className={`rounded-2xl overflow-hidden ${aspect} w-full bg-[#f5f5f5] border border-[#e8e8ee]`}>
-                              <iframe
-                                src={getCanvaEmbedUrl(tmpl.canva_url)}
-                                className="w-full h-full border-0 pointer-events-none"
-                                allow="fullscreen"
-                                loading="lazy"
-                                title={label}
-                              />
-                            </div>
-                          ) : (
-                            <div className={`rounded-2xl ${aspect} w-full flex items-center justify-center`} style={{ backgroundColor: lightBg }}>
-                              <p className="text-[12px] text-[#aaa]">Sin preview</p>
-                            </div>
-                          )}
-                          <div className="flex gap-2">
-                            {tmpl.preview_url && (
-                              <button
-                                onClick={async () => {
-                                  const res = await fetch(tmpl.preview_url)
-                                  const blob = await res.blob()
-                                  const ext = tmpl.preview_url.split('?')[0].split('.').pop() || 'jpg'
-                                  const a = document.createElement('a')
-                                  a.href = URL.createObjectURL(blob)
-                                  a.download = `template.${ext}`
-                                  a.click()
-                                  URL.revokeObjectURL(a.href)
-                                }}
-                                className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors cursor-pointer">
-                                <Download size={11} /> Descargar
-                              </button>
-                            )}
-                            {tmpl.canva_url && (
-                              <a href={tmpl.canva_url} target="_blank" rel="noreferrer"
-                                className="flex-1 flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
-                                <ExternalLink size={11} /> Editar en Canva
-                              </a>
-                            )}
+                      {itemsFiltrados.map((tmpl, i) => (
+                        <div key={i} className="flex flex-col gap-2">
+                          <div className="rounded-2xl overflow-hidden flex items-end justify-center pt-8 px-6 min-h-[280px]" style={{ backgroundColor: lightBg }}>
+                            <img src={tmpl.preview_url} alt={tmpl.titulo || label} className="w-full max-h-[260px] object-contain object-bottom drop-shadow-lg" />
                           </div>
+                          {tmpl.titulo && (
+                            <p className="text-[13px] text-[#52586f]">{tmpl.titulo}</p>
+                          )}
+                          <button
+                            onClick={async () => {
+                              const res = await fetch(tmpl.preview_url)
+                              const blob = await res.blob()
+                              const ext = tmpl.preview_url.split('?')[0].split('.').pop() || 'jpg'
+                              const nombre = tmpl.titulo ? tmpl.titulo.toLowerCase().replace(/\s+/g, '-') : 'template'
+                              const a = document.createElement('a')
+                              a.href = URL.createObjectURL(blob)
+                              a.download = `${nombre}.${ext}`
+                              a.click()
+                              URL.revokeObjectURL(a.href)
+                            }}
+                            className="flex items-center justify-center gap-1.5 text-[12px] font-medium py-2 rounded-xl border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors cursor-pointer w-full">
+                            <Download size={11} /> Descargar
+                          </button>
                         </div>
                       ))}
                     </div>
