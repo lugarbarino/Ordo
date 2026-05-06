@@ -223,63 +223,74 @@ function ProyectoCard({ proyecto, onAbrir, onArchivar }) {
 
 // ── Empty state dashboard ────────────────────────────────────
 const PASOS_EMPTY = [
-  { label: 'Armá tu brief',            icon: Briefcase, bg: 'bg-[#35425f]', textColor: 'text-white' },
-  { label: 'Mostrá tus exploraciones', icon: Package,   bg: 'bg-[#495a82]', textColor: 'text-white' },
-  { label: 'Los finalistas',           icon: Package,   bg: 'bg-[#495a82]', textColor: 'text-white' },
-  { label: 'Manual de marca',          icon: Link,      bg: 'bg-[#aab8d8]', textColor: 'text-[#171717]' },
+  { label: 'Brief',       icon: FileText },
+  { label: 'Exploración', icon: Palette  },
+  { label: 'Finalistas',  icon: Star     },
+  { label: 'Manual',      icon: BookOpen },
 ]
 
 function EmptyDashboard({ onNuevo }) {
   return (
-    <div className="flex-1 overflow-y-auto p-8">
-      <div className="max-w-[960px]">
+    <div className="space-y-6">
 
-        {/* Hero — mismo estilo que Dashboard de proyecto */}
-        <div className="bg-[#1c1c1c] rounded-[20px] p-8 mb-8">
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-3">Compartí tu proceso</p>
-          <h2 className="text-2xl font-black text-white mb-2">Crea tu primera marca</h2>
-          <p className="text-white/60 text-sm mb-6">Compartí tu link con tus clientes y recibí feedback</p>
-          <button
-            onClick={onNuevo}
-            className="flex items-center gap-2 bg-transparent text-white border border-white/30 hover:border-white/60 px-4 py-2.5 rounded-[10px] text-sm font-semibold cursor-pointer transition-colors">
-            <Plus size={14} /> Nuevo proyecto
-          </button>
+        {/* Hero */}
+        <div
+          className="rounded-xl p-8 pt-[100px] md:pt-8 text-white flex items-end min-h-[400px] md:min-h-[240px] relative overflow-hidden"
+          style={{ background: 'linear-gradient(110deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,.3) 60%, transparent 100%), url(/banner-dash.png) center/cover no-repeat' }}
+        >
+          <div>
+            <div className="text-xs text-white/70 uppercase tracking-wide mb-2">Compartí tu proceso</div>
+            <h2 className="text-2xl font-bold mb-1">Creá tu primera marca</h2>
+            <p className="text-white/80 text-sm mb-4">Compartí tu link con tus clientes y recibí feedback</p>
+            <button
+              onClick={onNuevo}
+              className="flex items-center gap-1.5 px-4 py-2.5 md:px-3 md:py-1.5 rounded-lg md:rounded-md text-sm md:text-xs font-semibold bg-white text-[#111] hover:bg-white/90 transition-colors cursor-pointer border-none">
+              <Plus size={14} /> Nuevo proyecto
+            </button>
+          </div>
         </div>
 
         {/* Stats en 0 */}
-        <p className="text-[10px] font-bold text-[#aaa] uppercase tracking-widest mb-3">Datos</p>
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="text-xs font-bold text-[#666] uppercase tracking-wide mb-3">Este proyecto</div>
+        <div className="grid grid-cols-3 gap-3 mb-8">
           {[
             { label: 'Vistas', icon: Eye },
-            { label: 'Respuestas', icon: MessageSquare },
-            { label: 'Pedidos nuevos', icon: ShoppingBag },
+            { label: 'Respuestas al brief', icon: MessageSquare },
+            { label: 'Brief enviado', icon: ShoppingBag },
           ].map(({ label, icon: Icon }) => (
-            <button key={label} onClick={onNuevo} className="bg-white rounded-[16px] p-5 border border-[#e8e8e8] flex items-center justify-between cursor-pointer hover:border-[#ccc] transition-colors text-left">
-              <div>
-                <div className="text-3xl font-black text-[#ccc] mb-1">—</div>
-                <div className="text-xs text-[#aaa]">{label}</div>
-              </div>
-              <div className="w-10 h-10 rounded-[10px] bg-[#f0f0f0] flex items-center justify-center shrink-0">
-                <Icon size={18} className="text-[#ccc]" />
+            <button key={label} onClick={onNuevo}
+              className="bg-white border border-[#e3e3e3] rounded-xl p-5 relative cursor-pointer hover:border-[#ccc] transition-colors text-left">
+              <div className="text-2xl font-bold text-[#111] pr-12">—</div>
+              <div className="text-sm text-[#666] mt-0.5">{label}</div>
+              <div className="absolute right-4 top-4 w-10 h-10 bg-[#f0f0f0] rounded-lg flex items-center justify-center text-[#888]">
+                <Icon size={22} />
               </div>
             </button>
           ))}
         </div>
 
         {/* Primeros pasos */}
-        <p className="text-sm font-bold text-[#1c1c1c] mb-4">Primeros pasos</p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {PASOS_EMPTY.map(({ label, icon: Icon, bg, textColor }) => (
-            <button key={label} onClick={onNuevo} className={`${bg} rounded-[16px] p-5 flex flex-col justify-between min-h-[140px] border-none cursor-pointer text-left hover:opacity-90 transition-opacity`}>
-              <div className="w-9 h-9 rounded-[8px] bg-white/15 flex items-center justify-center shrink-0">
-                <Icon size={18} className="text-white" />
-              </div>
-              <p className={`text-sm font-bold ${textColor} leading-snug`}>{label}</p>
-            </button>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="bg-white border border-[#e3e3e3] rounded-xl p-6">
+            <h3 className="text-base font-bold mb-4">Secciones del proyecto</h3>
+            <div className="space-y-1">
+              {PASOS_EMPTY.map(({ label, icon: Icon }) => (
+                <button key={label} onClick={onNuevo}
+                  className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-[#f8f9fa] transition-colors cursor-pointer border-none bg-transparent text-left">
+                  <div className="w-8 h-8 bg-[#f0f0f0] rounded-lg flex items-center justify-center text-[#888] flex-shrink-0">
+                    <Icon size={15} />
+                  </div>
+                  <span className="text-sm font-semibold text-[#111]">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white border border-[#e3e3e3] rounded-xl p-6">
+            <h3 className="text-base font-bold mb-4">Link del cliente</h3>
+            <p className="text-sm text-[#888]">Creá tu primer proyecto para obtener el link del cliente.</p>
+          </div>
         </div>
 
-      </div>
     </div>
   )
 }
@@ -393,9 +404,13 @@ function AdminContent({ cuenta, user }) {
 
   // ── Empty state ──────────────────────────────────────────
   return (
-    <div className="flex min-h-screen bg-[#f8f9fa]">
+    <div className="flex h-screen overflow-hidden bg-white">
       <AdminSidebar cuenta={cuenta} onLogout={handleLogout} onNuevo={() => setModalOpen(true)} />
-      <EmptyDashboard onNuevo={() => setModalOpen(true)} />
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-4 md:p-7 max-w-5xl mx-auto pb-7">
+          <EmptyDashboard onNuevo={() => setModalOpen(true)} />
+        </div>
+      </main>
       {modalOpen && (
         <ModalNuevoProyecto
           cuentaId={cuenta.id}
@@ -405,6 +420,7 @@ function AdminContent({ cuenta, user }) {
       )}
     </div>
   )
+
 }
 
 // ── Auth wrapper ─────────────────────────────────────────────

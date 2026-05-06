@@ -222,88 +222,113 @@ function PanelFinalistas({ proyecto }) {
 // PanelManual is imported from ./PanelManual
 
 // ── Stat card ────────────────────────────────────────────────
-const STAT_COLORS = [
-  { bg: '#EEF2FF', icon: '#818CF8' }, // lavanda
-  { bg: '#F0FDF4', icon: '#4ADE80' }, // verde suave
-  { bg: '#FFF7ED', icon: '#FB923C' }, // durazno
-]
-
-function StatCard({ label, value, icon: Icon, colorIdx = 0 }) {
-  const { bg, icon: iconColor } = STAT_COLORS[colorIdx % STAT_COLORS.length]
+function StatCard({ label, value, icon: Icon, onClick }) {
   return (
-    <div className="rounded-[20px] p-5" style={{ backgroundColor: bg }}>
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-9 h-9 rounded-[10px] bg-white/70 flex items-center justify-center">
-          <Icon size={16} style={{ color: iconColor }} />
+    <div
+      className={`bg-white border border-[#e3e3e3] rounded-xl transition-colors ${onClick ? 'cursor-pointer hover:border-[#ccc]' : ''}
+        flex flex-col p-3 gap-2 min-h-[90px]
+        md:relative md:p-5 md:min-h-0 md:block md:gap-0`}
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-between md:hidden">
+        <div className="text-3xl font-bold text-[#111]">{value ?? '—'}</div>
+        <div className="w-8 h-8 bg-[#f0f0f0] rounded-lg flex items-center justify-center text-[#888]">
+          <Icon size={17} />
         </div>
       </div>
-      <div className="text-[32px] font-black text-[#1c1c1c] leading-none mb-1.5">{value}</div>
-      <div className="text-xs text-[#666] font-medium">{label}</div>
+      <div className="text-xs text-[#666] text-center md:hidden">{label}</div>
+      <div className="hidden md:block pr-12">
+        <div className="text-2xl font-bold text-[#111]">{value ?? '—'}</div>
+        <div className="text-sm text-[#666] mt-0.5">{label}</div>
+      </div>
+      <div className="hidden md:flex absolute right-4 top-4 w-10 h-10 bg-[#f0f0f0] rounded-lg items-center justify-center text-[#888]">
+        <Icon size={22} />
+      </div>
     </div>
   )
 }
 
 // ── Dashboard ────────────────────────────────────────────────
 const PASOS = [
-  { key: 'brief',       label: 'Armá tu brief',            icon: ClipboardList, num: '01', bg: '#F5F0FF', iconColor: '#A78BFA' },
-  { key: 'exploracion', label: 'Mostrá tus exploraciones', icon: LayoutGrid,    num: '02', bg: '#F0FDF4', iconColor: '#34D399' },
-  { key: 'finalista',   label: 'Los finalistas',            icon: Star,          num: '03', bg: '#FFF7ED', iconColor: '#FB923C' },
-  { key: 'manual',      label: 'Manual de marca',           icon: BookOpen,      num: '04', bg: '#FDF2F8', iconColor: '#E879F9' },
+  { key: 'brief',       label: 'Brief',        icon: ClipboardList },
+  { key: 'exploracion', label: 'Exploración',  icon: LayoutGrid    },
+  { key: 'finalista',   label: 'Finalistas',   icon: Star          },
+  { key: 'manual',      label: 'Manual',       icon: BookOpen      },
 ]
 
 function Dashboard({ proyecto, stats, onPanel }) {
   const slug = proyecto.slug || proyecto.id
 
   return (
-    <div className="p-8 max-w-[860px]">
+    <div className="space-y-6">
 
       {/* Hero */}
-      <div className="bg-[#1c1c1c] rounded-[24px] p-8 mb-6">
-        <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-3">Compartí tu proceso</p>
-        <h2 className="text-3xl font-black text-white mb-2 leading-tight">{proyecto.nombre}</h2>
-        <p className="text-white/50 text-sm mb-6">Compartí tu link con tus clientes y recibí feedback</p>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => onPanel('brief')}
-            className="flex items-center gap-2 bg-white text-[#1c1c1c] px-5 py-2.5 rounded-full text-sm font-bold cursor-pointer border-none hover:bg-white/90 transition-colors">
-            <ClipboardList size={13} /> Armá tu brief
-          </button>
-          <a
-            href={`/marca/${slug}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1.5 text-white/50 hover:text-white/80 text-sm no-underline transition-colors font-medium">
-            <ExternalLink size={13} /> Ver link del cliente
-          </a>
+      <div
+        className="rounded-xl p-8 pt-[100px] md:pt-8 text-white flex items-end justify-between min-h-[400px] md:min-h-[240px] relative overflow-hidden"
+        style={{ background: 'linear-gradient(110deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,.3) 60%, transparent 100%), url(/banner-dash.png) center/cover no-repeat' }}
+      >
+        <div>
+          <div className="text-xs text-white/70 uppercase tracking-wide mb-2">Compartí tu proceso</div>
+          <h2 className="text-2xl font-bold mb-1">{proyecto.nombre}</h2>
+          <p className="text-white/80 text-sm mb-4">Compartí tu link con tus clientes y recibí feedback</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onPanel('brief')}
+              className="flex items-center gap-1.5 px-4 py-2.5 md:px-3 md:py-1.5 rounded-lg md:rounded-md text-sm md:text-xs font-semibold bg-white text-[#111] hover:bg-white/90 transition-colors cursor-pointer border-none">
+              <ClipboardList size={15} className="md:hidden" /><ClipboardList size={13} className="hidden md:block" /> Armá tu brief
+            </button>
+            <a
+              href={`/marca/${slug}`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2.5 md:px-3 md:py-1.5 rounded-lg md:rounded-md text-sm md:text-xs font-semibold border border-white/40 text-white hover:bg-white/10 transition-colors no-underline">
+              <ExternalLink size={15} className="md:hidden" /><ExternalLink size={13} className="hidden md:block" /> Ver link del cliente
+            </a>
+          </div>
         </div>
       </div>
 
       {/* Stats */}
-      <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest mb-3">Datos</p>
-      <div className="grid grid-cols-3 gap-3 mb-8">
-        <StatCard label="Vistas"              value={stats.vistas}     icon={Eye}           colorIdx={0} />
-        <StatCard label="Respuestas al brief"  value={stats.respuestas} icon={MessageSquare} colorIdx={1} />
-        <StatCard label="Brief enviado"        value={stats.briefEnviado ? '✓' : '—'} icon={ShoppingBag} colorIdx={2} />
+      <div>
+        <div className="text-xs font-bold text-[#666] uppercase tracking-wide mb-3">Este proyecto</div>
+        <div className="grid grid-cols-3 gap-3">
+          <StatCard label="Vistas"             value={stats.vistas}     icon={Eye}           />
+          <StatCard label="Respuestas al brief" value={stats.respuestas} icon={MessageSquare} onClick={() => onPanel('brief')} />
+          <StatCard label="Brief enviado"       value={stats.briefEnviado ? '✓' : '—'} icon={ClipboardList} onClick={() => onPanel('brief')} />
+        </div>
       </div>
 
       {/* Pasos */}
-      <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest mb-3">Primeros pasos</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {PASOS.map(({ key, label, icon: Icon, num, bg, iconColor }) => (
-          <button
-            key={key}
-            onClick={() => onPanel(key)}
-            className="rounded-[20px] p-5 text-left cursor-pointer border-none transition-all hover:scale-[1.02] hover:shadow-md flex flex-col justify-between min-h-[140px]"
-            style={{ backgroundColor: bg }}>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[11px] font-bold text-black/20">{num}</span>
-              <div className="w-8 h-8 rounded-[10px] bg-white/60 flex items-center justify-center">
-                <Icon size={15} style={{ color: iconColor }} />
-              </div>
-            </div>
-            <div className="text-[#1c1c1c] text-sm font-bold leading-snug">{label}</div>
-          </button>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="bg-white border border-[#e3e3e3] rounded-xl p-6">
+          <h3 className="text-base font-bold mb-4">Secciones del proyecto</h3>
+          <div className="space-y-1">
+            {PASOS.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => onPanel(key)}
+                className="w-full flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-[#f8f9fa] transition-colors cursor-pointer border-none bg-transparent text-left group">
+                <div className="w-8 h-8 bg-[#f0f0f0] rounded-lg flex items-center justify-center text-[#888] flex-shrink-0">
+                  <Icon size={15} />
+                </div>
+                <span className="text-sm font-semibold text-[#111]">{label}</span>
+                <ExternalLink size={13} className="ml-auto text-[#ccc] group-hover:text-[#888] transition-colors" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white border border-[#e3e3e3] rounded-xl p-6">
+          <h3 className="text-base font-bold mb-4">Link del cliente</h3>
+          <p className="text-sm text-[#888] mb-4">Compartí este link con tu cliente para que complete el brief y vea el avance.</p>
+          <a
+            href={`/marca/${slug}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 text-sm font-semibold text-[#1c1c1c] border border-[#e3e3e3] rounded-lg px-4 py-2.5 hover:border-[#ccc] transition-colors no-underline w-fit">
+            <ExternalLink size={14} /> Abrir link del cliente
+          </a>
+        </div>
       </div>
     </div>
   )
@@ -488,7 +513,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const handlePanel = (key) => { setPanel(key); setSidebarOpen(false) }
 
   return (
-    <div className="flex min-h-screen bg-[#f7f5f2]">
+    <div className="flex h-screen overflow-hidden bg-white">
       {/* Overlay mobile */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
@@ -510,17 +535,20 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
       </div>
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto md:ml-0">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile topbar */}
-        <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-[#f1f1f1] md:hidden sticky top-0 z-20">
-          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-[8px] hover:bg-[#f5f5f5] bg-transparent border-none cursor-pointer">
-            <Menu size={20} className="text-[#1c1c1c]" />
+        <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-[#e3e3e3] flex items-center gap-3 px-4 flex-shrink-0" style={{ height: 52 }}>
+          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded-lg hover:bg-[#f0f0f0] transition-colors cursor-pointer bg-transparent border-none">
+            <Menu size={20} className="text-[#111]" />
           </button>
-          <img src="/logo-ordo.svg" alt="ORDO" className="h-5 w-auto" />
-          <span className="text-sm font-semibold text-[#1c1c1c] truncate">{proyecto.nombre}</span>
-        </div>
-        {renderPanel()}
-      </main>
+          <span className="text-base font-bold text-[#111] truncate">{proyecto.nombre}</span>
+        </header>
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-7 max-w-5xl mx-auto pb-24 lg:pb-7">
+            {renderPanel()}
+          </div>
+        </main>
+      </div>
 
       {/* Modal nueva marca */}
       {nuevoOpen && (
