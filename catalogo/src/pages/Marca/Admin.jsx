@@ -294,49 +294,51 @@ const NAV_EMPTY = [
 // ── Sidebar (admin) ──────────────────────────────────────────
 function AdminSidebar({ cuenta, onLogout, onNuevo }) {
   return (
-    <aside className="w-[288px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
+    <aside className="w-[220px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
       {/* Logo */}
-      <div className="px-8 h-[72px] flex items-center border-b border-[#f1f1f1]">
-        <img src="/logo-ordo.svg" alt="ORDO" className="h-[26px] w-auto" />
+      <div className="px-5 h-[52px] flex items-center border-b border-[#f1f1f1]">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-[18px] w-auto" />
       </div>
 
       {/* Proyecto selector placeholder */}
-      <div className="px-4 py-3 border-b border-[#f1f1f1]">
+      <div className="px-3 py-3 border-b border-[#f1f1f1]">
         <button
           onClick={onNuevo}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] hover:bg-[#f5f5f5] transition-colors bg-transparent border-none cursor-pointer text-left">
-          <div className="w-10 h-10 rounded-full bg-[#726d76] text-white flex items-center justify-center text-xs font-bold shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#726d76] text-white flex items-center justify-center text-xs font-bold shrink-0">
             M
           </div>
-          <span className="text-sm font-semibold text-[#aaa] truncate flex-1">Nueva marca</span>
+          <span className="text-[0.88rem] font-semibold text-[#aaa] truncate flex-1">Nueva marca</span>
           <Plus size={14} className="text-[#aaa] shrink-0" />
         </button>
       </div>
 
       {/* Nav links (placeholder, todos abren modal) */}
-      <nav className="flex-1 px-4 py-4">
-        <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-2.5 mb-2">Links</p>
+      <nav className="flex-1 py-3 overflow-y-auto">
+        <p className="px-5 pt-3.5 pb-1 text-[0.7rem] font-bold text-[#666] tracking-[1.2px] uppercase">Links</p>
         {NAV_EMPTY.map(({ label, icon: Icon }) => (
           <button
             key={label}
             onClick={onNuevo}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[10px] text-sm font-medium mb-0.5 cursor-pointer border-none transition-colors text-left bg-transparent text-[#bbb] hover:bg-[#f5f5f5] hover:text-[#999]">
-            <Icon size={15} className="shrink-0" />
+            className="w-full flex items-center gap-2.5 px-5 py-2 text-[0.88rem] font-medium cursor-pointer border-none transition-colors text-left bg-transparent text-[#bbb] hover:bg-[#f8f9fa] hover:text-[#999]">
+            <Icon size={16} className="shrink-0" />
             {label}
           </button>
         ))}
       </nav>
 
       {/* User + logout */}
-      <div className="px-6 py-6 border-t border-[#e3e3e3]">
-        <div className="flex items-center gap-3 pt-3">
-          <div className="w-10 h-10 rounded-full bg-[#726d76] shrink-0" />
-          <div>
-            <p className="text-[11.2px] text-[#484848]">{cuenta.nombre}</p>
+      <div className="px-4 pb-4 pt-3 border-t border-[#e3e3e3]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-[#726d76] shrink-0 flex items-center justify-center text-xs font-bold text-white">
+            {cuenta.nombre?.[0]?.toUpperCase() || 'D'}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-[#111] truncate">{cuenta.nombre}</p>
             <button
               onClick={onLogout}
-              className="text-[11.5px] text-[#111] underline bg-transparent border-none cursor-pointer p-0 hover:opacity-70">
-              cerrar sesión
+              className="text-[0.7rem] text-[#888] hover:text-red-500 bg-transparent border-none cursor-pointer p-0 transition-colors">
+              Cerrar sesión
             </button>
           </div>
         </div>

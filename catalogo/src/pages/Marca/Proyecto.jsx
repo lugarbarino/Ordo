@@ -325,23 +325,23 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
   const [selectorOpen, setSelectorOpen] = useState(false)
 
   return (
-    <aside className="w-[288px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
+    <aside className="w-[220px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
       {/* Logo */}
-      <div className="px-8 h-[72px] flex items-center border-b border-[#f1f1f1]">
-        <img src="/logo-ordo.svg" alt="ORDO" className="h-[26px] w-auto" />
+      <div className="px-5 h-[52px] flex items-center border-b border-[#f1f1f1]">
+        <img src="/logo-ordo.svg" alt="ORDO" className="h-[18px] w-auto" />
       </div>
 
       {/* Proyecto selector */}
-      <div className="px-4 py-3 border-b border-[#f1f1f1] relative">
+      <div className="px-3 py-3 border-b border-[#f1f1f1] relative">
         <button
           onClick={() => setSelectorOpen(v => !v)}
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-[10px] hover:bg-[#f5f5f5] transition-colors bg-transparent border-none cursor-pointer text-left">
           <div
-            className="w-10 h-10 rounded-full text-white flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
+            className="w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
             style={{ backgroundColor: accentColor || '#726d76' }}>
             {proyecto.nombre?.[0]?.toUpperCase() || 'M'}
           </div>
-          <span className="text-sm font-semibold text-[#1c1c1c] truncate flex-1">{proyecto.nombre}</span>
+          <span className="text-[0.88rem] font-semibold text-[#1c1c1c] truncate flex-1">{proyecto.nombre}</span>
           <ChevronDown size={14} className={`text-[#aaa] shrink-0 transition-transform ${selectorOpen ? 'rotate-180' : ''}`} />
         </button>
 
@@ -369,30 +369,30 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 flex flex-col gap-4">
+      <nav className="flex-1 py-3 overflow-y-auto">
         <div>
           {NAV_TOP.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => onPanel(key)}
-              className={`relative w-full flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium cursor-pointer border-none transition-colors text-left bg-transparent
-                ${panel === key ? 'text-[#111] font-semibold' : 'text-[#666] hover:text-[#111]'}`}>
+              className={`relative w-full flex items-center gap-2.5 px-5 py-2 text-[0.88rem] font-medium cursor-pointer border-none transition-colors text-left bg-transparent
+                ${panel === key ? 'text-[#111] font-semibold' : 'text-[#333] hover:bg-[#f8f9fa] hover:text-[#111]'}`}>
               {panel === key && <span className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-[#111] rounded-r-[4px]" />}
-              <Icon size={15} className="shrink-0" />
+              <Icon size={16} className="shrink-0" />
               {label}
             </button>
           ))}
         </div>
         <div>
-          <p className="text-[10px] font-bold text-[#bbb] uppercase tracking-widest px-5 mb-2">Links</p>
+          <p className="px-5 pt-3.5 pb-1 text-[0.7rem] font-bold text-[#666] tracking-[1.2px] uppercase">Links</p>
           {NAV_LINKS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => onPanel(key)}
-              className={`relative w-full flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium cursor-pointer border-none transition-colors text-left bg-transparent
-                ${panel === key ? 'text-[#111] font-semibold' : 'text-[#666] hover:text-[#111]'}`}>
+              className={`relative w-full flex items-center gap-2.5 px-5 py-2 text-[0.88rem] font-medium cursor-pointer border-none transition-colors text-left bg-transparent
+                ${panel === key ? 'text-[#111] font-semibold' : 'text-[#333] hover:bg-[#f8f9fa] hover:text-[#111]'}`}>
               {panel === key && <span className="absolute left-0 top-[15%] bottom-[15%] w-1 bg-[#111] rounded-r-[4px]" />}
-              <Icon size={15} className="shrink-0" />
+              <Icon size={16} className="shrink-0" />
               {label}
             </button>
           ))}
@@ -400,15 +400,17 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
       </nav>
 
       {/* User + logout */}
-      <div className="px-6 py-6 border-t border-[#e3e3e3]">
-        <div className="flex items-center gap-3 pt-3">
-          <div className="w-10 h-10 rounded-full bg-[#726d76] shrink-0" />
-          <div className="min-w-0">
-            <p className="text-[11.2px] text-[#484848] truncate">{cuenta.nombre}</p>
+      <div className="px-4 pb-4 pt-3 border-t border-[#e3e3e3]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-[#726d76] shrink-0 flex items-center justify-center text-xs font-bold text-white">
+            {cuenta.nombre?.[0]?.toUpperCase() || 'D'}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-[#111] truncate">{cuenta.nombre}</p>
             <button
               onClick={onLogout}
-              className="text-[11.5px] text-[#111] underline bg-transparent border-none cursor-pointer p-0 hover:opacity-70">
-              cerrar sesión
+              className="text-[0.7rem] text-[#888] hover:text-red-500 bg-transparent border-none cursor-pointer p-0 transition-colors flex items-center gap-1">
+              Cerrar sesión
             </button>
           </div>
         </div>
