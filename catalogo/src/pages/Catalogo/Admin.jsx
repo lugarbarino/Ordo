@@ -26,8 +26,17 @@ function PanelContent({ panel }) {
   }
 }
 
+const PANEL_TITLES_CAT = {
+  dashboard: 'Dashboard', productos: 'Productos', pedidos: 'Pedidos',
+  config: 'Mi empresa', pdf: 'Cargar productos', cuenta: 'Mi cuenta', design: 'Apariencia',
+}
+
 function AdminApp() {
   const { user, empresa, panel, setUser, cargarEmpresa } = useAppStore()
+
+  useEffect(() => {
+    document.title = `Catálogo — ${PANEL_TITLES_CAT[panel] || 'Dashboard'}`
+  }, [panel])
   const cargarProductos = useProductosStore(s => s.cargar)
   const cargarPedidos = usePedidosStore(s => s.cargar)
   const [cargando, setCargando] = useState(true)

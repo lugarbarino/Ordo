@@ -468,6 +468,14 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
     navigate(`/marca/admin/${data.id}`)
   }
 
+  const PANEL_TITLES = {
+    dashboard: 'Dashboard', brief: 'Brief', exploracion: 'Exploración',
+    finalista: 'Finalistas', manual: 'Manual',
+  }
+  useEffect(() => {
+    document.title = `Marca — ${PANEL_TITLES[panel] || 'Dashboard'}`
+  }, [panel])
+
   useEffect(() => {
     cargarStats(proyecto.id)
     cargarAccentColor(proyecto.id)
@@ -593,7 +601,6 @@ export default function MarcaProyecto() {
   const navigate = useNavigate()
   const [state, setState] = useState({ checked: false, cuenta: null, proyecto: null, proyectos: [] })
 
-  useEffect(() => { document.title = 'Marca — Ordo' }, [])
   useEffect(() => { load() }, [proyectoId])
 
   const load = async () => {
