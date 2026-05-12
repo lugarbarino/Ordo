@@ -450,46 +450,55 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
   const email = firma.email || ''
   const web = (firma.web || '').replace(/^https?:\/\//, '')
   const webHref = web ? `https://${web}` : ''
+  const nombre = firma.nombre || ''
+  const cargo = firma.cargo || ''
+  const telefono = firma.telefono || ''
 
-  // Iconos como tablas con fondo de color — compatible Gmail + Outlook
+  const logoHtml = logoUrl
+    ? `<tr><td style="padding-bottom:12px;"><img src="${logoUrl}" alt="logo" width="100" style="display:block;max-width:100px;height:auto;" /></td></tr>`
+    : ''
+
+  const nombreHtml = nombre
+    ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>`
+    : ''
+
+  const cargoHtml = cargo
+    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:6px;">${cargo}</td></tr>`
+    : ''
+
+  const telefonoHtml = telefono
+    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:8px;">${telefono}</td></tr>`
+    : ''
+
   const iconEmail = email ? `
     <td>
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
-            <a href="mailto:${email}" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">@</a>
-          </td>
-        </tr>
-      </table>
+      <table cellpadding="0" cellspacing="0" border="0"><tr>
+        <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
+          <a href="mailto:${email}" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">@</a>
+        </td>
+      </tr></table>
     </td>
     <td style="width:8px;"></td>` : ''
 
   const iconWeb = webHref ? `
     <td>
-      <table cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
-            <a href="${webHref}" target="_blank" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">&#8599;</a>
-          </td>
-        </tr>
-      </table>
+      <table cellpadding="0" cellspacing="0" border="0"><tr>
+        <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
+          <a href="${webHref}" target="_blank" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">&#8599;</a>
+        </td>
+      </tr></table>
     </td>` : ''
 
   const iconsRow = (iconEmail || iconWeb) ? `
-    <tr>
-      <td style="padding-top:10px;">
-        <table cellpadding="0" cellspacing="0" border="0">
-          <tr>${iconEmail}${iconWeb}</tr>
-        </table>
-      </td>
-    </tr>` : ''
-
-  const logoHtml = logoUrl
-    ? `<tr><td style="padding-bottom:10px;"><img src="${logoUrl}" alt="logo" width="100" style="display:block;max-width:100px;height:auto;" /></td></tr>`
-    : ''
+    <tr><td>
+      <table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}</tr></table>
+    </td></tr>` : ''
 
   return `<table cellpadding="0" cellspacing="0" border="0">
   ${logoHtml}
+  ${nombreHtml}
+  ${cargoHtml}
+  ${telefonoHtml}
   ${iconsRow}
 </table>`
 }
@@ -509,6 +518,21 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">Nombre</label>
+          <Input value={firma.nombre || ''} onChange={e => onChange({ ...firma, nombre: e.target.value })}
+            placeholder="Juan Pérez" className="text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">Cargo</label>
+          <Input value={firma.cargo || ''} onChange={e => onChange({ ...firma, cargo: e.target.value })}
+            placeholder="Diseñador / Estudio" className="text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">Teléfono</label>
+          <Input value={firma.telefono || ''} onChange={e => onChange({ ...firma, telefono: e.target.value })}
+            placeholder="+54 11 1234-5678" className="text-sm" />
+        </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-[#999]">Email</label>
           <Input value={firma.email || ''} onChange={e => onChange({ ...firma, email: e.target.value })}
