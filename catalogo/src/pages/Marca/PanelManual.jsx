@@ -507,8 +507,17 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
   const logoUrl = logos?.vert_claro || null
   const html = generarHtmlFirma({ firma, logoUrl, acento })
 
-  const copiar = () => {
-    navigator.clipboard.writeText(html)
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([''], { type: 'text/plain' }),
+        })
+      ])
+    } catch {
+      navigator.clipboard.writeText(html)
+    }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -559,7 +568,7 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
         </div>
         <button onClick={copiar}
           className="self-start flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-lg border border-[#e8e8e8] hover:border-[#1c1c1c] transition-colors">
-          {copied ? <><Check size={13} /> HTML copiado</> : 'Copiar HTML'}
+          {copied ? <><Check size={13} /> Copiado</> : 'Copiar firma'}
         </button>
       </div>
     </div>
