@@ -351,24 +351,25 @@ function MockupGrid({ mockups, onMockups, proyectoId }) {
   )
 }
 
-// ── normalizeTemplates — migra formato viejo (array) al nuevo (objeto) ──
+// ── normalizeTemplates — convierte formato viejo (objeto con keys fijas) al nuevo (array) ──
 function normalizeTemplates(raw) {
-  const keys = ['foto', 'portada', 'posts', 'brochure', 'otro']
-  const result = {}
-  for (const key of keys) {
+  if (Array.isArray(raw)) return raw
+  const LEGACY = [
+    { key: 'foto',     label: 'Foto de perfil' },
+    { key: 'portada',  label: 'Portada'        },
+    { key: 'posts',    label: 'Posts'          },
+    { key: 'brochure', label: 'Brochure'       },
+    { key: 'otro',     label: 'Otro'           },
+  ]
+  return LEGACY.map(({ key, label }) => {
     const val = raw?.[key]
     if (Array.isArray(val)) {
-      result[key] = {
-        canva_url: val.find(i => i?.canva_url)?.canva_url || '',
-        items: val.map(i => ({ preview_url: i?.preview_url || '', titulo: i?.titulo || '' }))
-      }
+      return { id: key, titulo: label, canva_url: val.find(i => i?.canva_url)?.canva_url || '', items: val.map(i => ({ preview_url: i?.preview_url || '', titulo: i?.titulo || '' })) }
     } else if (val && typeof val === 'object') {
-      result[key] = { canva_url: val.canva_url || '', items: val.items || [] }
-    } else {
-      result[key] = { canva_url: '', items: [] }
+      return { id: key, titulo: label, canva_url: val.canva_url || '', items: val.items || [] }
     }
-  }
-  return result
+    return { id: key, titulo: label, canva_url: '', items: [] }
+  }).filter(cat => cat.canva_url || cat.items.length > 0 || raw?.[cat.id])
 }
 
 // ── TemplateItem — una imagen + título ───────────────────────
@@ -410,17 +411,24 @@ function TemplateItem({ item, onChange, onDelete, proyectoId }) {
 }
 
 // ── TemplateCategoria ─────────────────────────────────────────
-function TemplateCategoria({ label, catData, onChange, proyectoId }) {
+function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
   const items = catData.items || []
   const canvaUrl = catData.canva_url || ''
+  const titulo = catData.titulo || ''
 
   const addItem = () => onChange({ ...catData, items: [...items, { preview_url: '', titulo: '' }] })
   const updateItem = (i, v) => onChange({ ...catData, items: items.map((x, idx) => idx === i ? v : x) })
   const removeItem = (i) => onChange({ ...catData, items: items.filter((_, idx) => idx !== i) })
 
   return (
-    <div className="flex flex-col gap-3">
-      <h4 className="text-sm font-bold text-[#1c1c1c]">{label}</h4>
+    <div className="flex flex-col gap-3 pb-6 border-b border-[#f0f0f0] last:border-0 last:pb-0">
+      <div className="flex items-center gap-2">
+        <Input value={titulo} onChange={e => onChange({ ...catData, titulo: e.target.value })}
+          className="text-sm font-semibold text-[#1c1c1c] flex-1" placeholder="Título de la sección" />
+        <button onClick={onDelete} className="text-[#ccc] hover:text-red-400 transition-colors flex-shrink-0">
+          <Trash2 size={15} />
+        </button>
+      </div>
       <Input value={canvaUrl} onChange={e => onChange({ ...catData, canva_url: e.target.value })}
         className="text-xs text-[#888]" placeholder="Link de Canva para esta sección (opcional)" />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -487,7 +495,7 @@ export function PanelManual({ proyecto }) {
   const [mockups, setMockups] = useState([])
   const [usosCorrectos, setUsosCorrectos] = useState([])
   const [usosIncorrectos, setUsosIncorrectos] = useState([])
-  const [templates, setTemplates] = useState({})
+  const [templates, setTemplates] = useState([])
 
   useEffect(() => { cargar() }, [proyecto.id])
 
@@ -525,7 +533,9 @@ export function PanelManual({ proyecto }) {
   }
 
   const setLogo = (key, url) => setLogos(l => ({ ...l, [key]: url }))
-  const updateTemplatesCat = (key, catData) => setTemplates(t => ({ ...t, [key]: catData }))
+  const updateTemplatesCat = (id, catData) => setTemplates(t => t.map(c => c.id === id ? catData : c))
+  const removeTemplatesCat = (id) => setTemplates(t => t.filter(c => c.id !== id))
+  const addTemplatesCat = () => setTemplates(t => [...t, { id: Date.now().toString(), titulo: '', canva_url: '', items: [] }])
 
   const move = (setter, i, dir) => setter(arr => {
     const next = [...arr]
@@ -712,16 +722,20 @@ export function PanelManual({ proyecto }) {
 
       {/* DIFUSIÓN */}
       <Section title="Difusión" hint="Redes sociales, brochures, impreso y cualquier pieza de comunicación. Preview + link de Canva.">
-        <div className="flex flex-col gap-8">
-          {TEMPLATE_CATS.map(({ key, label }) => (
+        <div className="flex flex-col gap-6">
+          {templates.map(cat => (
             <TemplateCategoria
-              key={key}
-              label={label}
-              catData={templates[key] || { canva_url: '', items: [] }}
-              onChange={catData => updateTemplatesCat(key, catData)}
+              key={cat.id}
+              catData={cat}
+              onChange={catData => updateTemplatesCat(cat.id, catData)}
+              onDelete={() => removeTemplatesCat(cat.id)}
               proyectoId={proyecto.id}
             />
           ))}
+          <Button variant="secondary" onClick={addTemplatesCat} className="self-start gap-2 text-xs">
+            <Plus size={14} />
+            Agregar sección
+          </Button>
         </div>
       </Section>
 
