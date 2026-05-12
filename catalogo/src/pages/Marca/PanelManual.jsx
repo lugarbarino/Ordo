@@ -455,57 +455,49 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
   const telefono = firma.telefono || ''
   const direccion = firma.direccion || ''
 
-  const logoHtml = logoUrl
-    ? `<tr><td style="padding-bottom:12px;"><img src="${logoUrl}" alt="logo" width="100" style="display:block;max-width:100px;height:auto;" /></td></tr>`
-    : ''
-
-  const nombreHtml = nombre
-    ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>`
-    : ''
-
-  const cargoHtml = cargo
-    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:6px;">${cargo}</td></tr>`
-    : ''
-
-  const telefonoHtml = telefono
-    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:4px;">${telefono}</td></tr>`
-    : ''
-
-  const direccionHtml = direccion
-    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#888888;padding-bottom:8px;">${direccion}</td></tr>`
-    : ''
+  const infoHtml = [
+    nombre    ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
+    cargo     ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:6px;">${cargo}</td></tr>` : '',
+    telefono  ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:4px;">${telefono}</td></tr>` : '',
+    direccion ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#888888;padding-bottom:8px;">${direccion}</td></tr>` : '',
+  ].join('')
 
   const iconEmail = email ? `
-    <td>
-      <table cellpadding="0" cellspacing="0" border="0"><tr>
-        <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
-          <a href="mailto:${email}" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">@</a>
-        </td>
-      </tr></table>
-    </td>
+    <td><table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
+        <a href="mailto:${email}" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">@</a>
+      </td>
+    </tr></table></td>
     <td style="width:8px;"></td>` : ''
 
   const iconWeb = webHref ? `
-    <td>
-      <table cellpadding="0" cellspacing="0" border="0"><tr>
-        <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
-          <a href="${webHref}" target="_blank" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">&#8599;</a>
-        </td>
-      </tr></table>
-    </td>` : ''
+    <td><table cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
+        <a href="${webHref}" target="_blank" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">&#8599;</a>
+      </td>
+    </tr></table></td>` : ''
 
-  const iconsRow = (iconEmail || iconWeb) ? `
-    <tr><td>
-      <table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}</tr></table>
-    </td></tr>` : ''
+  const iconsHtml = (iconEmail || iconWeb)
+    ? `<tr><td style="padding-top:8px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}</tr></table></td></tr>`
+    : ''
+
+  const logoTd = logoUrl
+    ? `<td style="padding-right:16px;border-right:2px solid ${acento};vertical-align:middle;">
+        <img src="${logoUrl}" alt="logo" width="90" style="display:block;max-width:90px;height:auto;" />
+      </td>
+      <td style="width:16px;"></td>`
+    : ''
 
   return `<table cellpadding="0" cellspacing="0" border="0">
-  ${logoHtml}
-  ${nombreHtml}
-  ${cargoHtml}
-  ${telefonoHtml}
-  ${direccionHtml}
-  ${iconsRow}
+  <tr>
+    ${logoTd}
+    <td style="vertical-align:middle;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        ${infoHtml}
+        ${iconsHtml}
+      </table>
+    </td>
+  </tr>
 </table>`
 }
 
