@@ -496,7 +496,7 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
 
 function FirmaMailSection({ firma, onChange, logos, colores }) {
   const [copied, setCopied] = useState(false)
-  const acento = firma.color_acento || colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
+  const acento = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
   const logoUrl = logos?.vert_claro || null
   const html = generarHtmlFirma({ firma, logoUrl, acento })
 
@@ -518,21 +518,6 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
           <label className="text-xs text-[#999]">Web</label>
           <Input value={firma.web || ''} onChange={e => onChange({ ...firma, web: e.target.value })}
             placeholder="www.estudio.com" className="text-sm" />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="text-xs text-[#999]">Color de iconos</label>
-        <div className="flex items-center gap-2 flex-wrap">
-          {colores?.length > 0
-            ? colores.map(c => (
-                <button key={c.hex} onClick={() => onChange({ ...firma, color_acento: c.hex })}
-                  className={`w-7 h-7 rounded-full border-2 transition-all ${firma.color_acento === c.hex ? 'border-[#1c1c1c] scale-110' : 'border-transparent'}`}
-                  style={{ backgroundColor: c.hex }} title={c.nombre} />
-              ))
-            : <input type="color" value={acento} onChange={e => onChange({ ...firma, color_acento: e.target.value })}
-                className="w-8 h-8 rounded cursor-pointer border-0" />
-          }
         </div>
       </div>
 
