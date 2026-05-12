@@ -453,6 +453,7 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
   const nombre = firma.nombre || ''
   const cargo = firma.cargo || ''
   const telefono = firma.telefono || ''
+  const direccion = firma.direccion || ''
 
   const logoHtml = logoUrl
     ? `<tr><td style="padding-bottom:12px;"><img src="${logoUrl}" alt="logo" width="100" style="display:block;max-width:100px;height:auto;" /></td></tr>`
@@ -467,7 +468,11 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
     : ''
 
   const telefonoHtml = telefono
-    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:8px;">${telefono}</td></tr>`
+    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:4px;">${telefono}</td></tr>`
+    : ''
+
+  const direccionHtml = direccion
+    ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#888888;padding-bottom:8px;">${direccion}</td></tr>`
     : ''
 
   const iconEmail = email ? `
@@ -499,6 +504,7 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
   ${nombreHtml}
   ${cargoHtml}
   ${telefonoHtml}
+  ${direccionHtml}
   ${iconsRow}
 </table>`
 }
@@ -542,6 +548,11 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
           <label className="text-xs text-[#999]">Web</label>
           <Input value={firma.web || ''} onChange={e => onChange({ ...firma, web: e.target.value })}
             placeholder="www.estudio.com" className="text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">Dirección</label>
+          <Input value={firma.direccion || ''} onChange={e => onChange({ ...firma, direccion: e.target.value })}
+            placeholder="Av. Corrientes 1234, CABA" className="text-sm" />
         </div>
       </div>
 
