@@ -197,14 +197,6 @@ const LOGO_GRUPOS = [
   { key: 'vert',  label: 'Imagotipo vertical',   slug: 'imagotipo-vertical',  uso: 'Para espacios más altos que anchos.',                                   ej: 'Perfiles verticales, roll ups, señalética.', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
 ]
 
-const TEMPLATE_CATS = [
-  { key: 'foto',     label: 'Foto de perfil',    aspect: 'aspect-square'  },
-  { key: 'portada',  label: 'Portada',            aspect: 'aspect-[16/9]' },
-  { key: 'posts',    label: 'Posts',              aspect: 'aspect-square'  },
-  { key: 'brochure', label: 'Brochure', aspect: 'aspect-[3/4]'  },
-  { key: 'otro',     label: 'Otro',               aspect: 'aspect-square'  },
-]
-
 // ── Main ──────────────────────────────────────────────────────
 export default function MarcaManual() {
   const { nombre } = useParams()
@@ -277,7 +269,23 @@ export default function MarcaManual() {
   const mockups = manual?.mockups || []
   const usosCorrectos = manual?.usos_correctos || []
   const usosIncorrectos = manual?.usos_incorrectos || []
-  const templates = manual?.templates || {}
+  const rawTemplates = manual?.templates
+  const templateCats = (() => {
+    if (Array.isArray(rawTemplates)) return rawTemplates
+    // migración formato viejo
+    const LEGACY = [
+      { key: 'foto',     label: 'Foto de perfil' },
+      { key: 'portada',  label: 'Portada'        },
+      { key: 'posts',    label: 'Posts'          },
+      { key: 'brochure', label: 'Brochure'       },
+      { key: 'otro',     label: 'Otro'           },
+    ]
+    return LEGACY.map(({ key, label }) => {
+      const val = rawTemplates?.[key]
+      if (Array.isArray(val)) return { id: key, titulo: label, canva_url: '', items: val }
+      return { id: key, titulo: label, canva_url: val?.canva_url || '', items: val?.items || [] }
+    }).filter(c => c.canva_url || c.items.some(i => i?.preview_url))
+  })()
   const nombreMarca = proyecto.nombre?.toLowerCase().replace(/\s+/g, '-') || 'logo'
 
   const hayLogos = LOGO_GRUPOS.some(g => logos[g.claro] || logos[g.oscuro])
@@ -285,15 +293,7 @@ export default function MarcaManual() {
   const hayTipos = tipografias.length > 0
   const hayMockups = mockups.length > 0
   const hayUsos = usosCorrectos.length > 0 || usosIncorrectos.length > 0
-  const getTemplateItems = (key) => {
-    const val = templates[key]
-    if (Array.isArray(val)) return { canva_url: '', items: val }
-    return { canva_url: val?.canva_url || '', items: val?.items || [] }
-  }
-  const hayTemplates = TEMPLATE_CATS.some(({ key }) => {
-    const { canva_url, items } = getTemplateItems(key)
-    return canva_url || items.some(t => t?.preview_url)
-  })
+  const hayTemplates = templateCats.some(c => c.canva_url || c.items.some(t => t?.preview_url))
 
   let sectionNum = 0
   const nextNum = () => String(++sectionNum).padStart(2, '0')
@@ -612,27 +612,25 @@ export default function MarcaManual() {
           <div data-animate>
             <SectionHeader num={nextNum()} label="Difusión" />
             <div className="flex flex-col gap-12">
-              {TEMPLATE_CATS.map(({ key, label, aspect }) => {
-                const { canva_url, items } = getTemplateItems(key)
-                const itemsFiltrados = items.filter(t => t?.preview_url)
-                if (!canva_url && !itemsFiltrados.length) return null
-                const isPortada = key === 'portada'
+              {templateCats.map((cat) => {
+                const itemsFiltrados = (cat.items || []).filter(t => t?.preview_url)
+                if (!cat.canva_url && !itemsFiltrados.length) return null
                 return (
-                  <div key={key}>
+                  <div key={cat.id}>
                     <div className="flex items-center justify-between mb-6">
-                      <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px]">{label}</p>
-                      {canva_url && (
-                        <a href={canva_url} target="_blank" rel="noreferrer"
+                      <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px]">{cat.titulo}</p>
+                      {cat.canva_url && (
+                        <a href={cat.canva_url} target="_blank" rel="noreferrer"
                           className="flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors no-underline">
                           <ExternalLink size={11} /> Editar en Canva
                         </a>
                       )}
                     </div>
-                    <div className={`grid gap-4 ${isPortada ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                       {itemsFiltrados.map((tmpl, i) => (
                         <div key={i} className="flex flex-col gap-2">
                           <div className="rounded-2xl overflow-hidden flex items-end justify-center pt-8 px-6 min-h-[280px]" style={{ backgroundColor: lightBg }}>
-                            <img src={tmpl.preview_url} alt={tmpl.titulo || label} className="w-full max-h-[260px] object-contain object-bottom drop-shadow-lg" />
+                            <img src={tmpl.preview_url} alt={tmpl.titulo || cat.titulo} className="w-full max-h-[260px] object-contain object-bottom drop-shadow-lg" />
                           </div>
                           {tmpl.titulo && (
                             <p className="text-[13px] text-[#52586f]">{tmpl.titulo}</p>
