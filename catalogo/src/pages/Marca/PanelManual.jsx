@@ -420,7 +420,7 @@ function TemplateCategoria({ label, catData, onChange, proyectoId }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs font-semibold text-[#666] uppercase tracking-wide">{label}</p>
+      <h4 className="text-sm font-bold text-[#1c1c1c]">{label}</h4>
       <Input value={canvaUrl} onChange={e => onChange({ ...catData, canva_url: e.target.value })}
         className="text-xs text-[#888]" placeholder="Link de Canva para esta sección (opcional)" />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
