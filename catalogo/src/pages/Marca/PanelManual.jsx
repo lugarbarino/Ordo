@@ -445,6 +445,133 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
   )
 }
 
+// ── FirmaMailSection ──────────────────────────────────────────
+const FIRMA_CAMPOS = [
+  { key: 'nombre',    label: 'Nombre'    },
+  { key: 'cargo',     label: 'Cargo'     },
+  { key: 'telefono',  label: 'Teléfono'  },
+  { key: 'email',     label: 'Email'     },
+  { key: 'web',       label: 'Web'       },
+  { key: 'direccion', label: 'Dirección' },
+]
+
+function generarHtmlFirma({ firma, logos, colores }) {
+  const acento = firma.color_acento || colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
+  const logoUrl = firma.logo_key ? logos[firma.logo_key] : null
+  const visibles = firma.campos_visibles || ['nombre', 'cargo', 'telefono', 'email', 'web']
+  const val = (k) => firma[k] || ''
+
+  const textoHtml = FIRMA_CAMPOS
+    .filter(c => visibles.includes(c.key) && val(c.key))
+    .map((c, i) => {
+      if (c.key === 'nombre') return `<tr><td style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${val('nombre')}</td></tr>`
+      if (c.key === 'cargo')  return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:6px;">${val('cargo')}</td></tr>`
+      if (c.key === 'telefono') return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:2px;">${val('telefono')}</td></tr>`
+      if (c.key === 'email')    return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:2px;"><a href="mailto:${val('email')}" style="color:${acento};text-decoration:none;">${val('email')}</a></td></tr>`
+      if (c.key === 'web')      return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:2px;"><a href="https://${val('web').replace(/^https?:\/\//, '')}" style="color:${acento};text-decoration:none;">${val('web')}</a></td></tr>`
+      if (c.key === 'direccion') return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#888888;padding-top:4px;">${val('direccion')}</td></tr>`
+      return ''
+    }).join('')
+
+  const logoHtml = logoUrl
+    ? `<td style="padding-right:16px;vertical-align:middle;border-right:2px solid ${acento};">
+        <img src="${logoUrl}" alt="logo" width="80" style="display:block;max-width:80px;" />
+      </td>
+      <td style="width:16px;"></td>`
+    : ''
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,sans-serif;">
+  <tr>
+    ${logoHtml}
+    <td style="vertical-align:middle;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        ${textoHtml}
+      </table>
+    </td>
+  </tr>
+</table>`
+}
+
+function FirmaMailSection({ firma, onChange, logos, colores }) {
+  const [copied, setCopied] = useState(false)
+  const visibles = firma.campos_visibles || ['nombre', 'cargo', 'telefono', 'email', 'web']
+  const logoOptions = Object.entries(logos).filter(([, url]) => url)
+  const acento = firma.color_acento || colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
+  const html = generarHtmlFirma({ firma, logos, colores })
+
+  const toggleCampo = (key) => {
+    const next = visibles.includes(key) ? visibles.filter(k => k !== key) : [...visibles, key]
+    onChange({ ...firma, campos_visibles: next })
+  }
+
+  const copiar = () => {
+    navigator.clipboard.writeText(html)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {FIRMA_CAMPOS.map(({ key, label }) => (
+          <div key={key} className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-[#999]">{label}</label>
+              <button
+                onClick={() => toggleCampo(key)}
+                className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${visibles.includes(key) ? 'border-[#1c1c1c] text-[#1c1c1c] bg-[#f5f5f3]' : 'border-[#e8e8e8] text-[#bbb]'}`}>
+                {visibles.includes(key) ? 'visible' : 'oculto'}
+              </button>
+            </div>
+            <Input value={firma[key] || ''} onChange={e => onChange({ ...firma, [key]: e.target.value })}
+              placeholder={label} className="text-sm" />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {logoOptions.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-[#999]">Logo</label>
+            <select value={firma.logo_key || ''} onChange={e => onChange({ ...firma, logo_key: e.target.value })}
+              className="border border-[#e8e8e8] rounded-lg px-3 py-2 text-sm text-[#1c1c1c] bg-white">
+              <option value="">Sin logo</option>
+              {logoOptions.map(([key]) => (
+                <option key={key} value={key}>{key.replace('_', ' ')}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">Color de acento</label>
+          <div className="flex items-center gap-2">
+            {colores?.length > 0
+              ? colores.map(c => (
+                  <button key={c.hex} onClick={() => onChange({ ...firma, color_acento: c.hex })}
+                    className={`w-7 h-7 rounded-full border-2 transition-all ${firma.color_acento === c.hex ? 'border-[#1c1c1c] scale-110' : 'border-transparent'}`}
+                    style={{ backgroundColor: c.hex }} title={c.nombre} />
+                ))
+              : <input type="color" value={acento} onChange={e => onChange({ ...firma, color_acento: e.target.value })}
+                  className="w-8 h-8 rounded cursor-pointer border-0" />
+            }
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <p className="text-xs text-[#999]">Preview</p>
+        <div className="border border-[#e8e8e8] rounded-xl p-5 bg-white">
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </div>
+        <button onClick={copiar}
+          className="self-start flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-lg border border-[#e8e8e8] hover:border-[#1c1c1c] transition-colors">
+          {copied ? <><Check size={13} /> HTML copiado</> : 'Copiar HTML'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Section ───────────────────────────────────────────────────
 function Section({ title, hint, children }) {
   return (
@@ -496,6 +623,7 @@ export function PanelManual({ proyecto }) {
   const [usosCorrectos, setUsosCorrectos] = useState([])
   const [usosIncorrectos, setUsosIncorrectos] = useState([])
   const [templates, setTemplates] = useState([])
+  const [firma, setFirma] = useState({})
 
   useEffect(() => { cargar() }, [proyecto.id])
 
@@ -517,11 +645,12 @@ export function PanelManual({ proyecto }) {
     setUsosCorrectos(row.usos_correctos || [])
     setUsosIncorrectos(row.usos_incorrectos || [])
     setTemplates(normalizeTemplates(row.templates))
+    setFirma(row.firma_mail || {})
   }
 
   const guardar = async () => {
     setSaving(true)
-    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, descripcion, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates }
+    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, descripcion, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates, firma_mail: firma }
     if (data?.id) {
       await db.from('manual_marca').update(payload).eq('id', data.id)
     } else {
@@ -737,6 +866,11 @@ export function PanelManual({ proyecto }) {
             Agregar sección
           </Button>
         </div>
+      </Section>
+
+      {/* FIRMA DE MAIL */}
+      <Section title="Firma de mail" hint="Generá el HTML listo para usar en Gmail, Outlook o cualquier cliente de correo.">
+        <FirmaMailSection firma={firma} onChange={setFirma} logos={logos} colores={colores} />
       </Section>
 
       <PexelsPicker
