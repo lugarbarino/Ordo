@@ -446,63 +446,59 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
 }
 
 // ── FirmaMailSection ──────────────────────────────────────────
-const FIRMA_CAMPOS = [
-  { key: 'nombre',    label: 'Nombre'    },
-  { key: 'cargo',     label: 'Cargo'     },
-  { key: 'telefono',  label: 'Teléfono'  },
-  { key: 'email',     label: 'Email'     },
-  { key: 'web',       label: 'Web'       },
-  { key: 'direccion', label: 'Dirección' },
-]
+function generarHtmlFirma({ firma, logoUrl, acento }) {
+  const email = firma.email || ''
+  const web = (firma.web || '').replace(/^https?:\/\//, '')
+  const webHref = web ? `https://${web}` : ''
 
-function generarHtmlFirma({ firma, logos, colores }) {
-  const acento = firma.color_acento || colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
-  const logoUrl = firma.logo_key ? logos[firma.logo_key] : null
-  const visibles = firma.campos_visibles || ['nombre', 'cargo', 'telefono', 'email', 'web']
-  const val = (k) => firma[k] || ''
-
-  const textoHtml = FIRMA_CAMPOS
-    .filter(c => visibles.includes(c.key) && val(c.key))
-    .map((c, i) => {
-      if (c.key === 'nombre') return `<tr><td style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${val('nombre')}</td></tr>`
-      if (c.key === 'cargo')  return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:6px;">${val('cargo')}</td></tr>`
-      if (c.key === 'telefono') return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:2px;">${val('telefono')}</td></tr>`
-      if (c.key === 'email')    return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:2px;"><a href="mailto:${val('email')}" style="color:${acento};text-decoration:none;">${val('email')}</a></td></tr>`
-      if (c.key === 'web')      return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:2px;"><a href="https://${val('web').replace(/^https?:\/\//, '')}" style="color:${acento};text-decoration:none;">${val('web')}</a></td></tr>`
-      if (c.key === 'direccion') return `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#888888;padding-top:4px;">${val('direccion')}</td></tr>`
-      return ''
-    }).join('')
-
-  const logoHtml = logoUrl
-    ? `<td style="padding-right:16px;vertical-align:middle;border-right:2px solid ${acento};">
-        <img src="${logoUrl}" alt="logo" width="80" style="display:block;max-width:80px;" />
-      </td>
-      <td style="width:16px;"></td>`
-    : ''
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,sans-serif;">
-  <tr>
-    ${logoHtml}
-    <td style="vertical-align:middle;">
+  // Iconos como tablas con fondo de color — compatible Gmail + Outlook
+  const iconEmail = email ? `
+    <td>
       <table cellpadding="0" cellspacing="0" border="0">
-        ${textoHtml}
+        <tr>
+          <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
+            <a href="mailto:${email}" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">@</a>
+          </td>
+        </tr>
       </table>
     </td>
-  </tr>
+    <td style="width:8px;"></td>` : ''
+
+  const iconWeb = webHref ? `
+    <td>
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
+            <a href="${webHref}" target="_blank" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">&#8599;</a>
+          </td>
+        </tr>
+      </table>
+    </td>` : ''
+
+  const iconsRow = (iconEmail || iconWeb) ? `
+    <tr>
+      <td style="padding-top:10px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>${iconEmail}${iconWeb}</tr>
+        </table>
+      </td>
+    </tr>` : ''
+
+  const logoHtml = logoUrl
+    ? `<tr><td style="padding-bottom:10px;"><img src="${logoUrl}" alt="logo" width="100" style="display:block;max-width:100px;height:auto;" /></td></tr>`
+    : ''
+
+  return `<table cellpadding="0" cellspacing="0" border="0">
+  ${logoHtml}
+  ${iconsRow}
 </table>`
 }
 
 function FirmaMailSection({ firma, onChange, logos, colores }) {
   const [copied, setCopied] = useState(false)
-  const visibles = firma.campos_visibles || ['nombre', 'cargo', 'telefono', 'email', 'web']
-  const logoOptions = Object.entries(logos).filter(([, url]) => url)
   const acento = firma.color_acento || colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
-  const html = generarHtmlFirma({ firma, logos, colores })
-
-  const toggleCampo = (key) => {
-    const next = visibles.includes(key) ? visibles.filter(k => k !== key) : [...visibles, key]
-    onChange({ ...firma, campos_visibles: next })
-  }
+  const logoUrl = logos?.vert_claro || null
+  const html = generarHtmlFirma({ firma, logoUrl, acento })
 
   const copiar = () => {
     navigator.clipboard.writeText(html)
@@ -513,50 +509,36 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {FIRMA_CAMPOS.map(({ key, label }) => (
-          <div key={key} className="flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-[#999]">{label}</label>
-              <button
-                onClick={() => toggleCampo(key)}
-                className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${visibles.includes(key) ? 'border-[#1c1c1c] text-[#1c1c1c] bg-[#f5f5f3]' : 'border-[#e8e8e8] text-[#bbb]'}`}>
-                {visibles.includes(key) ? 'visible' : 'oculto'}
-              </button>
-            </div>
-            <Input value={firma[key] || ''} onChange={e => onChange({ ...firma, [key]: e.target.value })}
-              placeholder={label} className="text-sm" />
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {logoOptions.length > 0 && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-[#999]">Logo</label>
-            <select value={firma.logo_key || ''} onChange={e => onChange({ ...firma, logo_key: e.target.value })}
-              className="border border-[#e8e8e8] rounded-lg px-3 py-2 text-sm text-[#1c1c1c] bg-white">
-              <option value="">Sin logo</option>
-              {logoOptions.map(([key]) => (
-                <option key={key} value={key}>{key.replace('_', ' ')}</option>
-              ))}
-            </select>
-          </div>
-        )}
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Color de acento</label>
-          <div className="flex items-center gap-2">
-            {colores?.length > 0
-              ? colores.map(c => (
-                  <button key={c.hex} onClick={() => onChange({ ...firma, color_acento: c.hex })}
-                    className={`w-7 h-7 rounded-full border-2 transition-all ${firma.color_acento === c.hex ? 'border-[#1c1c1c] scale-110' : 'border-transparent'}`}
-                    style={{ backgroundColor: c.hex }} title={c.nombre} />
-                ))
-              : <input type="color" value={acento} onChange={e => onChange({ ...firma, color_acento: e.target.value })}
-                  className="w-8 h-8 rounded cursor-pointer border-0" />
-            }
-          </div>
+          <label className="text-xs text-[#999]">Email</label>
+          <Input value={firma.email || ''} onChange={e => onChange({ ...firma, email: e.target.value })}
+            placeholder="hola@estudio.com" className="text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">Web</label>
+          <Input value={firma.web || ''} onChange={e => onChange({ ...firma, web: e.target.value })}
+            placeholder="www.estudio.com" className="text-sm" />
         </div>
       </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-[#999]">Color de iconos</label>
+        <div className="flex items-center gap-2 flex-wrap">
+          {colores?.length > 0
+            ? colores.map(c => (
+                <button key={c.hex} onClick={() => onChange({ ...firma, color_acento: c.hex })}
+                  className={`w-7 h-7 rounded-full border-2 transition-all ${firma.color_acento === c.hex ? 'border-[#1c1c1c] scale-110' : 'border-transparent'}`}
+                  style={{ backgroundColor: c.hex }} title={c.nombre} />
+              ))
+            : <input type="color" value={acento} onChange={e => onChange({ ...firma, color_acento: e.target.value })}
+                className="w-8 h-8 rounded cursor-pointer border-0" />
+          }
+        </div>
+      </div>
+
+      {!logoUrl && (
+        <p className="text-xs text-[#f59e0b]">No hay logo vertical cargado. Subí el logo "Vertical / Fondo claro" en la sección Logos.</p>
+      )}
 
       <div className="flex flex-col gap-3">
         <p className="text-xs text-[#999]">Preview</p>
