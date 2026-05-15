@@ -724,9 +724,8 @@ export default function MarcaManual() {
                   webHref        ? fila('🔗', web, webHref) : '',
                 ].join('')
 
-                const logoSrc = logoUrl ? logoUrl.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=240&quality=100' : null
                 const logoTd = logoUrl
-                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoSrc}" alt="logo" width="120" style="display:block;max-width:120px;height:auto;" /></td><td style="width:20px;"></td>`
+                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="120" style="display:block;max-width:120px;height:auto;" /></td><td style="width:20px;"></td>`
                   : ''
 
                 const html = `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${infoHtml}</table></td></tr></table>`

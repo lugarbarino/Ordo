@@ -446,14 +446,9 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
 }
 
 // ── FirmaMailSection ──────────────────────────────────────────
-function logo2x(url) {
-  if (!url) return url
-  return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + '?width=240&quality=100'
-}
-
 function generarHtmlFirma({ firma, logoUrl, acento, light }) {
   const bgIcono = light || '#f5f5f3'
-  const logoSrc = logo2x(logoUrl)
+  const logoSrc = logoUrl
   const email    = firma.email    || ''
   const web      = (firma.web || '').replace(/^https?:\/\//, '')
   const webHref  = web ? `https://${web}` : ''
