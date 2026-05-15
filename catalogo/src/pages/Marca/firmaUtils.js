@@ -80,18 +80,14 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       email     ? link(`mailto:${email}`, `${ini('M')} ${email}`, '_self') : '',
       direccion ? `${ini('D')} ${txt(direccion)}` : '',
       webHref   ? link(webHref, `${ini('W')} ${web}`) : '',
-    ].filter(Boolean).join(`<span style="padding:0 4px;"> </span>`)
-    const logoTd = logoUrl ? `<td style="padding-right:0;vertical-align:middle;">${logoImg(Math.round(logoSize * 0.7))}</td>` : ''
-    return `<table cellpadding="0" cellspacing="0" border="0" >
-      <tr>
-        ${logoTd}
-        <td style="vertical-align:middle;">
-          ${nombre ? `<div style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;">${nombre}</div>` : ''}
-          ${cargo  ? `<div style="font-family:Arial,sans-serif;font-size:12px;font-weight:600;color:${acento};">${cargo}</div>` : ''}
-        </td>
-      </tr>
-      ${datos ? `<tr><td colspan="3" style="padding-top:8px;border-top:1px solid #e8e8e8;">${datos}</td></tr>` : ''}
+    ].filter(Boolean).join(`<span style="color:#ccc;padding:0 8px;">|</span>`)
+    const contenido = `<table cellpadding="0" cellspacing="0" border="0">
+      ${nombre ? `<tr><td style="font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : ''}
+      ${cargo  ? `<tr><td style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:10px;">${cargo}</td></tr>` : ''}
+      ${datos  ? `<tr><td style="border-top:2px solid ${acento};padding-top:8px;">${datos}</td></tr>` : ''}
     </table>`
+    const logoTd = logoUrl ? `<td style="padding-right:16px;vertical-align:middle;">${logoImg()}</td>` : ''
+    return `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;">${contenido}</td></tr></table>`
   }
 
   return ''
