@@ -451,8 +451,8 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
   const email    = firma.email    || ''
   const web      = (firma.web || '').replace(/^https?:\/\//, '')
   const webHref  = web ? `https://${web}` : ''
-  const whatsapp = (firma.whatsapp || '').replace(/\D/g, '')
-  const wpHref   = whatsapp ? `https://wa.me/${whatsapp}` : ''
+  const wpNum  = (firma.telefono || '').replace(/\D/g, '')
+  const wpHref = wpNum ? `https://wa.me/${wpNum}` : ''
   const nombre   = firma.nombre   || ''
   const cargo    = firma.cargo    || ''
   const telefono = firma.telefono || ''
@@ -476,12 +476,6 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
     webHref   ? fila('🔗', web, webHref) : '',
   ].join('')
 
-  const btnEmail = email  ? `<td><a href="mailto:${email}" style="font-size:22px;text-decoration:none;line-height:1;">✉️</a></td><td style="width:12px;"></td>` : ''
-  const btnWp    = wpHref ? `<td><a href="${wpHref}" target="_blank" style="font-size:22px;text-decoration:none;line-height:1;">📞</a></td><td style="width:12px;"></td>` : ''
-
-  const iconsHtml = (btnEmail || btnWp)
-    ? `<tr><td colspan="2" style="padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${btnEmail}${btnWp}</tr></table></td></tr>`
-    : ''
 
   const logoTd = logoUrl
     ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;">
@@ -496,7 +490,6 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
     <td style="vertical-align:middle;">
       <table cellpadding="0" cellspacing="0" border="0">
         ${infoHtml}
-        ${iconsHtml}
       </table>
     </td>
   </tr>
@@ -557,11 +550,6 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
           <label className="text-xs text-[#999]">Dirección</label>
           <Input value={firma.direccion || ''} onChange={e => onChange({ ...firma, direccion: e.target.value })}
             placeholder="Av. Corrientes 1234, CABA" className="text-sm" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">WhatsApp</label>
-          <Input value={firma.whatsapp || ''} onChange={e => onChange({ ...firma, whatsapp: e.target.value })}
-            placeholder="+54 11 1234-5678" className="text-sm" />
         </div>
       </div>
 
