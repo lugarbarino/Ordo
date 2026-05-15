@@ -521,50 +521,77 @@ function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
     const file = e.target.files[0]
     if (!file) return
     setUploading(true)
-    try {
-      const url = await subirArchivo(proyectoId, file)
-      setLogoPng(url)
-    } finally { setUploading(false) }
+    try { setLogoPng(await subirArchivo(proyectoId, file)) }
+    finally { setUploading(false) }
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <label className="text-xs text-[#999]">Diseño</label>
-        <div className="flex gap-2 flex-wrap">
+
+      {/* Logo */}
+      <div className="flex flex-col gap-3">
+        <p className="text-xs font-semibold text-[#555]">Logo de la firma</p>
+        <div className="flex items-start gap-4">
+          <label className="cursor-pointer group shrink-0">
+            <div className="w-36 h-24 rounded-xl border-2 border-dashed border-[#e0e0e0] bg-[#fafafa] flex items-center justify-center overflow-hidden hover:border-[#aaa] transition-colors relative">
+              {uploading ? (
+                <div className="w-5 h-5 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
+              ) : logoPng ? (
+                <>
+                  <img src={logoPng} alt="logo firma" className="max-h-full max-w-full object-contain p-3" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+                    <Upload size={14} className="text-white" />
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5">
+                  <Upload size={16} className="text-[#ccc]" />
+                  <span className="text-[10px] text-[#ccc]">PNG / JPG</span>
+                </div>
+              )}
+            </div>
+            <input type="file" accept="image/png,image/jpeg" className="hidden" onChange={subirLogo} />
+          </label>
+
+          <div className="flex flex-col gap-3 flex-1 pt-1">
+            {logoPng ? (
+              <>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-[#999]">Tamaño del logo</label>
+                    <span className="text-xs font-medium text-[#555]">{logoSize}px</span>
+                  </div>
+                  <input type="range" min="40" max="200" step="10" value={logoSize}
+                    onChange={e => setLogoSize(Number(e.target.value))}
+                    className="w-full accent-[#1c1c1c]" />
+                </div>
+                <button onClick={() => setLogoPng('')}
+                  className="self-start text-xs text-[#ccc] hover:text-red-400 transition-colors flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer">
+                  <Trash2 size={11} /> Eliminar logo
+                </button>
+              </>
+            ) : (
+              <p className="text-xs text-[#aaa] leading-relaxed">Subí el logo en PNG o JPG. Va a aparecer en todas las firmas de este proyecto.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Tipo de firma */}
+      <div className="flex flex-col gap-2.5">
+        <p className="text-xs font-semibold text-[#555]">Tipo de firma</p>
+        <div className="grid grid-cols-4 gap-2">
           {FIRMA_TEMPLATES.map(t => (
             <button key={t.key} onClick={() => setTemplate(t.key)}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${template === t.key ? 'border-[#1c1c1c] bg-[#1c1c1c] text-white' : 'border-[#e8e8e8] text-[#666] hover:border-[#1c1c1c]'}`}>
+              className={`text-xs px-3 py-2 rounded-xl border transition-colors cursor-pointer ${template === t.key ? 'border-[#1c1c1c] bg-[#1c1c1c] text-white' : 'border-[#e8e8e8] text-[#666] hover:border-[#1c1c1c] bg-transparent'}`}>
               {t.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label className="text-xs text-[#999]">Logo PNG para firma</label>
-        <div className="flex items-center gap-3">
-          {logoPng
-            ? <img src={logoPng} alt="logo firma" className="h-10 object-contain" />
-            : <div className="w-16 h-10 border border-dashed border-[#e8e8e8] rounded flex items-center justify-center text-[#ccc] text-xs">PNG</div>
-          }
-          <label className="cursor-pointer text-xs font-medium px-3 py-2 rounded-lg border border-[#e8e8e8] hover:border-[#1c1c1c] transition-colors">
-            {uploading ? 'Subiendo...' : logoPng ? 'Cambiar' : 'Subir PNG'}
-            <input type="file" accept="image/png,image/jpeg" className="hidden" onChange={subirLogo} />
-          </label>
-          {logoPng && <button onClick={() => setLogoPng('')} className="text-[#ccc] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>}
-        </div>
-        {logoPng && (
-          <div className="flex items-center gap-3 mt-1">
-            <label className="text-xs text-[#999]">Tamaño</label>
-            <input type="range" min="40" max="200" step="10" value={logoSize}
-              onChange={e => setLogoSize(Number(e.target.value))}
-              className="w-32 accent-[#1c1c1c]" />
-            <span className="text-xs text-[#999]">{logoSize}px</span>
-          </div>
-        )}
-      </div>
-
+      {/* Firmas */}
+      {firmas.length > 0 && <div className="border-t border-[#f0f0f0]" />}
       {firmas.map(f => (
         <FirmaItem key={f.id} firma={f} onChange={d => update(f.id, d)} onDelete={() => remove(f.id)}
           logoUrl={logoPng} logoSize={logoSize} acento={acento} template={template} />
