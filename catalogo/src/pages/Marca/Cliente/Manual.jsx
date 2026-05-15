@@ -323,7 +323,9 @@ export default function MarcaManual() {
   const hayMockups = mockups.length > 0
   const hayUsos = usosCorrectos.length > 0 || usosIncorrectos.length > 0
   const hayTemplates = templateCats.some(c => c.canva_url || c.items.some(t => t?.preview_url))
-  const firmas = Array.isArray(manual?.firma_mail) ? manual.firma_mail : manual?.firma_mail ? [manual.firma_mail] : []
+  const firmaData = manual?.firma_mail || {}
+  const firmas = Array.isArray(firmaData) ? firmaData : (firmaData.firmas || [])
+  const firmaLogoPng = firmaData.logo_png || null
   const hayFirmas = firmas.length > 0
 
   let sectionNum = 0
@@ -699,33 +701,34 @@ export default function MarcaManual() {
               {firmas.map((firma, i) => {
                 const acento = colores.find(c => c.esAcento)?.hex || '#1c1c1c'
                 const light  = colores.find(c => c.esLight)?.hex  || '#f5f5f3'
-                const logoUrl = logos?.vert_claro || logos?.horiz_claro || null
+                const logoUrl = firmaLogoPng || null
                 const wpNum  = (firma.telefono || '').replace(/\D/g, '')
                 const wpHref = wpNum ? `https://wa.me/${wpNum}` : ''
                 const web    = (firma.web || '').replace(/^https?:\/\//, '')
                 const webHref = web ? `https://${web}` : ''
 
-                const fila = (icono, texto, href = '') => {
+                const inicial = (l) => `<span style="font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:${acento};">${l}.</span>`
+                const fila = (letra, texto, href = '') => {
                   const contenido = href
-                    ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:14px;color:#666666;text-decoration:none;">${texto}</a>`
-                    : `<span style="font-family:Arial,sans-serif;font-size:14px;color:#666666;">${texto}</span>`
+                    ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${texto}</a>`
+                    : `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${texto}</span>`
                   return `<tr>
-                    <td style="font-size:14px;padding-right:6px;padding-bottom:4px;vertical-align:middle;">${icono}</td>
+                    <td style="padding-right:8px;padding-bottom:4px;vertical-align:middle;">${inicial(letra)}</td>
                     <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
                   </tr>`
                 }
 
                 const infoHtml = [
-                  firma.nombre   ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${firma.nombre}</td></tr>` : '',
-                  firma.cargo    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:14px;font-weight:600;color:${acento};padding-bottom:8px;">${firma.cargo}</td></tr>` : '',
-                  firma.telefono ? fila('📞', firma.telefono, wpHref) : '',
-                  firma.email    ? fila('✉️', firma.email, `mailto:${firma.email}`) : '',
-                  firma.direccion? fila('📍', firma.direccion) : '',
-                  webHref        ? fila('🔗', web, webHref) : '',
+                  firma.nombre   ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${firma.nombre}</td></tr>` : '',
+                  firma.cargo    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:8px;">${firma.cargo}</td></tr>` : '',
+                  firma.telefono ? fila('T', firma.telefono, wpHref) : '',
+                  firma.email    ? fila('M', firma.email, `mailto:${firma.email}`) : '',
+                  firma.direccion? fila('D', firma.direccion) : '',
+                  webHref        ? fila('W', web, webHref) : '',
                 ].join('')
 
                 const logoTd = logoUrl
-                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="120" style="display:block;max-width:120px;height:auto;" /></td><td style="width:20px;"></td>`
+                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="80" style="display:block;max-width:80px;height:auto;" /></td><td style="width:20px;"></td>`
                   : ''
 
                 const html = `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${infoHtml}</table></td></tr></table>`

@@ -446,42 +446,42 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
 }
 
 // ── FirmaMailSection ──────────────────────────────────────────
-function generarHtmlFirma({ firma, logoUrl, acento, light }) {
-  const bgIcono = light || '#f5f5f3'
-  const logoSrc = logoUrl
+function generarHtmlFirma({ firma, logoUrl, acento }) {
   const email    = firma.email    || ''
   const web      = (firma.web || '').replace(/^https?:\/\//, '')
   const webHref  = web ? `https://${web}` : ''
-  const wpNum  = (firma.telefono || '').replace(/\D/g, '')
-  const wpHref = wpNum ? `https://wa.me/${wpNum}` : ''
+  const wpNum    = (firma.telefono || '').replace(/\D/g, '')
+  const wpHref   = wpNum ? `https://wa.me/${wpNum}` : ''
   const nombre   = firma.nombre   || ''
   const cargo    = firma.cargo    || ''
   const telefono = firma.telefono || ''
   const direccion= firma.direccion|| ''
 
-  const fila = (icono, texto, href = '') => {
+  const inicial = (letra) =>
+    `<span style="font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:${acento};">${letra}.</span>`
+
+  const fila = (letra, texto, href = '') => {
     const contenido = href
-      ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:14px;color:#666666;text-decoration:none;">${texto}</a>`
-      : `<span style="font-family:Arial,sans-serif;font-size:14px;color:#666666;">${texto}</span>`
+      ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${texto}</a>`
+      : `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${texto}</span>`
     return `<tr>
-      <td style="font-size:14px;padding-right:6px;padding-bottom:4px;vertical-align:middle;">${icono}</td>
+      <td style="padding-right:8px;padding-bottom:4px;vertical-align:middle;">${inicial(letra)}</td>
       <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
     </tr>`
   }
 
   const infoHtml = [
-    nombre    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
-    cargo     ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:14px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : '',
-    telefono  ? fila('📞', telefono, wpHref || '') : '',
-    email     ? fila('✉️', email, `mailto:${email}`) : '',
-    direccion ? fila('📍', direccion) : '',
-    webHref   ? fila('🔗', web, webHref) : '',
+    nombre    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
+    cargo     ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : '',
+    telefono  ? fila('T', telefono, wpHref) : '',
+    email     ? fila('M', email, `mailto:${email}`) : '',
+    direccion ? fila('D', direccion) : '',
+    webHref   ? fila('W', web, webHref) : '',
   ].join('')
-
 
   const logoTd = logoUrl
     ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;">
-        <img src="${logoSrc}" alt="logo" width="120" style="display:block;max-width:120px;height:auto;" />
+        <img src="${logoUrl}" alt="logo" width="80" style="display:block;max-width:80px;height:auto;" />
       </td>
       <td style="width:20px;"></td>`
     : ''
@@ -499,9 +499,9 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
 }
 
 // ── FirmaItem — una firma individual ──────────────────────────
-function FirmaItem({ firma, onChange, onDelete, logoUrl, acento, light }) {
+function FirmaItem({ firma, onChange, onDelete, logoUrl, acento }) {
   const [copied, setCopied] = useState(false)
-  const html = generarHtmlFirma({ firma, logoUrl, acento, light })
+  const html = generarHtmlFirma({ firma, logoUrl, acento })
 
   const campo = (key, label, placeholder) => (
     <div className="flex flex-col gap-1">
@@ -554,23 +554,47 @@ function FirmaItem({ firma, onChange, onDelete, logoUrl, acento, light }) {
 }
 
 // ── FirmaMailSection — lista de firmas ────────────────────────
-function FirmaMailSection({ firmas, onChange, logos, colores }) {
+function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
+  const [uploading, setUploading] = useState(false)
   const acento  = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
-  const light   = colores?.find(c => c.esLight)?.hex  || '#f5f5f3'
-  const logoUrl = logos?.vert_claro || null
+  const logoPng = firmaData.logo_png || null
+  const firmas  = firmaData.firmas || []
 
-  const update = (id, data) => onChange(firmas.map(f => f.id === id ? data : f))
-  const remove = (id)       => onChange(firmas.filter(f => f.id !== id))
-  const add    = ()         => onChange([...firmas, { id: Date.now().toString(), nombre_firma: '' }])
+  const setLogoPng = (url) => onChange({ ...firmaData, logo_png: url })
+  const update = (id, data) => onChange({ ...firmaData, firmas: firmas.map(f => f.id === id ? data : f) })
+  const remove = (id)       => onChange({ ...firmaData, firmas: firmas.filter(f => f.id !== id) })
+  const add    = ()         => onChange({ ...firmaData, firmas: [...firmas, { id: Date.now().toString(), nombre_firma: '' }] })
+
+  const subirLogo = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const url = await subirArchivo(proyectoId, file)
+      setLogoPng(url)
+    } finally { setUploading(false) }
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      {!logoUrl && (
-        <p className="text-xs text-[#f59e0b]">No hay logo vertical cargado. Subí el logo "Vertical / Fondo claro" en la sección Logos.</p>
-      )}
+      <div className="flex flex-col gap-2">
+        <label className="text-xs text-[#999]">Logo PNG para firma</label>
+        <div className="flex items-center gap-3">
+          {logoPng
+            ? <img src={logoPng} alt="logo firma" className="h-10 object-contain" />
+            : <div className="w-16 h-10 border border-dashed border-[#e8e8e8] rounded flex items-center justify-center text-[#ccc] text-xs">PNG</div>
+          }
+          <label className="cursor-pointer text-xs font-medium px-3 py-2 rounded-lg border border-[#e8e8e8] hover:border-[#1c1c1c] transition-colors">
+            {uploading ? 'Subiendo...' : logoPng ? 'Cambiar' : 'Subir PNG'}
+            <input type="file" accept="image/png,image/jpeg" className="hidden" onChange={subirLogo} />
+          </label>
+          {logoPng && <button onClick={() => setLogoPng('')} className="text-[#ccc] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>}
+        </div>
+      </div>
+
       {firmas.map(f => (
         <FirmaItem key={f.id} firma={f} onChange={d => update(f.id, d)} onDelete={() => remove(f.id)}
-          logoUrl={logoUrl} acento={acento} light={light} />
+          logoUrl={logoPng} acento={acento} />
       ))}
       <Button variant="secondary" onClick={add} className="self-start gap-2 text-xs">
         <Plus size={14} /> Agregar firma
@@ -630,7 +654,7 @@ export function PanelManual({ proyecto }) {
   const [usosCorrectos, setUsosCorrectos] = useState([])
   const [usosIncorrectos, setUsosIncorrectos] = useState([])
   const [templates, setTemplates] = useState([])
-  const [firmas, setFirmas] = useState([])
+  const [firmaData, setFirmaData] = useState({ logo_png: '', firmas: [] })
 
   useEffect(() => { cargar() }, [proyecto.id])
 
@@ -652,12 +676,16 @@ export function PanelManual({ proyecto }) {
     setUsosCorrectos(row.usos_correctos || [])
     setUsosIncorrectos(row.usos_incorrectos || [])
     setTemplates(normalizeTemplates(row.templates))
-    setFirmas(Array.isArray(row.firma_mail) ? row.firma_mail : row.firma_mail ? [{ id: '1', nombre_firma: '', ...row.firma_mail }] : [])
+    const fm = row.firma_mail
+    if (!fm) setFirmaData({ logo_png: '', firmas: [] })
+    else if (Array.isArray(fm)) setFirmaData({ logo_png: '', firmas: fm })
+    else if (fm.firmas) setFirmaData(fm)
+    else setFirmaData({ logo_png: '', firmas: [{ id: '1', nombre_firma: '', ...fm }] })
   }
 
   const guardar = async () => {
     setSaving(true)
-    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, descripcion, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates, firma_mail: firmas }
+    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, descripcion, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates, firma_mail: firmaData }
     if (data?.id) {
       await db.from('manual_marca').update(payload).eq('id', data.id)
     } else {
@@ -877,7 +905,7 @@ export function PanelManual({ proyecto }) {
 
       {/* FIRMA DE MAIL */}
       <Section title="Firma de mail" hint="Generá el HTML listo para usar en Gmail, Outlook o cualquier cliente de correo.">
-        <FirmaMailSection firmas={firmas} onChange={setFirmas} logos={logos} colores={colores} />
+        <FirmaMailSection firmaData={firmaData} onChange={setFirmaData} proyectoId={proyecto.id} colores={colores} />
       </Section>
 
       <PexelsPicker
