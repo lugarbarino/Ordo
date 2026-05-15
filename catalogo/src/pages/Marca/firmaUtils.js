@@ -80,8 +80,8 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       email     ? link(`mailto:${email}`, `${ini('M')} ${email}`, '_self') : '',
       direccion ? `${ini('D')} ${txt(direccion)}` : '',
       webHref   ? link(webHref, `${ini('W')} ${web}`) : '',
-    ].filter(Boolean).join(`<span style="color:#ccc;padding:0 8px;">·</span>`)
-    const logoTd = logoUrl ? `<td style="padding-right:8px;vertical-align:middle;">${logoImg(Math.round(logoSize * 0.7))}</td>` : ''
+    ].filter(Boolean).join(`<span style="padding:0 4px;"> </span>`)
+    const logoTd = logoUrl ? `<td style="padding-right:4px;vertical-align:middle;">${logoImg(Math.round(logoSize * 0.7))}</td>` : ''
     return `<table cellpadding="0" cellspacing="0" border="0">
       <tr>
         ${logoTd}
