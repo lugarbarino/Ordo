@@ -446,7 +446,7 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
 }
 
 // ── FirmaMailSection ──────────────────────────────────────────
-function generarHtmlFirma({ firma, logoUrl, acento }) {
+function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento }) {
   const email    = firma.email    || ''
   const web      = (firma.web || '').replace(/^https?:\/\//, '')
   const webHref  = web ? `https://${web}` : ''
@@ -481,7 +481,7 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
 
   const logoTd = logoUrl
     ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;">
-        <img src="${logoUrl}" alt="logo" width="80" style="display:block;max-width:80px;height:auto;" />
+        <img src="${logoUrl}" alt="logo" width="${logoSize}" style="display:block;max-width:${logoSize}px;height:auto;" />
       </td>
       <td style="width:20px;"></td>`
     : ''
@@ -499,9 +499,9 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
 }
 
 // ── FirmaItem — una firma individual ──────────────────────────
-function FirmaItem({ firma, onChange, onDelete, logoUrl, acento }) {
+function FirmaItem({ firma, onChange, onDelete, logoUrl, logoSize, acento }) {
   const [copied, setCopied] = useState(false)
-  const html = generarHtmlFirma({ firma, logoUrl, acento })
+  const html = generarHtmlFirma({ firma, logoUrl, logoSize, acento })
 
   const campo = (key, label, placeholder) => (
     <div className="flex flex-col gap-1">
@@ -557,10 +557,12 @@ function FirmaItem({ firma, onChange, onDelete, logoUrl, acento }) {
 function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
   const [uploading, setUploading] = useState(false)
   const acento  = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
-  const logoPng = firmaData.logo_png || null
-  const firmas  = firmaData.firmas || []
+  const logoPng   = firmaData.logo_png || null
+  const logoSize  = firmaData.logo_size || 80
+  const firmas    = firmaData.firmas || []
 
-  const setLogoPng = (url) => onChange({ ...firmaData, logo_png: url })
+  const setLogoPng  = (url)  => onChange({ ...firmaData, logo_png: url })
+  const setLogoSize = (size) => onChange({ ...firmaData, logo_size: size })
   const update = (id, data) => onChange({ ...firmaData, firmas: firmas.map(f => f.id === id ? data : f) })
   const remove = (id)       => onChange({ ...firmaData, firmas: firmas.filter(f => f.id !== id) })
   const add    = ()         => onChange({ ...firmaData, firmas: [...firmas, { id: Date.now().toString(), nombre_firma: '' }] })
@@ -590,11 +592,20 @@ function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
           </label>
           {logoPng && <button onClick={() => setLogoPng('')} className="text-[#ccc] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>}
         </div>
+        {logoPng && (
+          <div className="flex items-center gap-3 mt-1">
+            <label className="text-xs text-[#999]">Tamaño</label>
+            <input type="range" min="40" max="200" step="10" value={logoSize}
+              onChange={e => setLogoSize(Number(e.target.value))}
+              className="w-32 accent-[#1c1c1c]" />
+            <span className="text-xs text-[#999]">{logoSize}px</span>
+          </div>
+        )}
       </div>
 
       {firmas.map(f => (
         <FirmaItem key={f.id} firma={f} onChange={d => update(f.id, d)} onDelete={() => remove(f.id)}
-          logoUrl={logoPng} acento={acento} />
+          logoUrl={logoPng} logoSize={logoSize} acento={acento} />
       ))}
       <Button variant="secondary" onClick={add} className="self-start gap-2 text-xs">
         <Plus size={14} /> Agregar firma

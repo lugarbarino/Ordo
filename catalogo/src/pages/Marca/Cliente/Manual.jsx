@@ -325,7 +325,8 @@ export default function MarcaManual() {
   const hayTemplates = templateCats.some(c => c.canva_url || c.items.some(t => t?.preview_url))
   const firmaData = manual?.firma_mail || {}
   const firmas = Array.isArray(firmaData) ? firmaData : (firmaData.firmas || [])
-  const firmaLogoPng = firmaData.logo_png || null
+  const firmaLogoPng  = firmaData.logo_png  || null
+  const firmaLogoSize = firmaData.logo_size || 80
   const hayFirmas = firmas.length > 0
 
   let sectionNum = 0
@@ -728,7 +729,7 @@ export default function MarcaManual() {
                 ].join('')
 
                 const logoTd = logoUrl
-                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="80" style="display:block;max-width:80px;height:auto;" /></td><td style="width:20px;"></td>`
+                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="${firmaLogoSize}" style="display:block;max-width:${firmaLogoSize}px;height:auto;" /></td><td style="width:20px;"></td>`
                   : ''
 
                 const html = `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${infoHtml}</table></td></tr></table>`
