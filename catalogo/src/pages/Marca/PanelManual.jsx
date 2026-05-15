@@ -471,7 +471,7 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
   const infoHtml = [
     nombre    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
     cargo     ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:14px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : '',
-    telefono  ? fila('📞', telefono) : '',
+    telefono  ? fila('📞', telefono, wpHref || '') : '',
     direccion ? fila('📍', direccion) : '',
     webHref   ? fila('🔗', web, webHref) : '',
   ].join('')
