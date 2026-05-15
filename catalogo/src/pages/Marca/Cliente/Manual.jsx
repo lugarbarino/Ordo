@@ -699,7 +699,7 @@ export default function MarcaManual() {
               {firmas.map((firma, i) => {
                 const acento = colores.find(c => c.esAcento)?.hex || '#1c1c1c'
                 const light  = colores.find(c => c.esLight)?.hex  || '#f5f5f3'
-                const logoUrl = manual?.logos?.vert_claro || null
+                const logoUrl = logos?.vert_claro || logos?.horiz_claro || null
                 const wpNum  = (firma.telefono || '').replace(/\D/g, '')
                 const wpHref = wpNum ? `https://wa.me/${wpNum}` : ''
                 const web    = (firma.web || '').replace(/^https?:\/\//, '')
