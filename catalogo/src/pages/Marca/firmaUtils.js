@@ -20,7 +20,7 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
   const link = (href, txt, target='_blank') => `<a href="${href}" target="${target}" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${txt}</a>`
   const txt  = (t) => `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${t}</span>`
   const logoImg = (size = logoSize) => logoUrl
-    ? `<div style="display:inline-block;background-color:#ffffff;border-radius:8px;padding:4px;"><img src="${logoUrl}" alt="logo" width="${size}" style="display:block;max-width:100%;height:auto;" /></div>`
+    ? `<table cellpadding="0" cellspacing="0" border="0" style="display:inline-table;"><tr><td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:8px;padding:4px;"><img src="${logoUrl}" alt="logo" width="${size}" style="display:block;max-width:100%;height:auto;" /></td></tr></table>`
     : ''
 
   if (template === 'clasica') {
