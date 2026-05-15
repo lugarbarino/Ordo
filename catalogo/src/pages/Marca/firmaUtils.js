@@ -81,11 +81,11 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       direccion ? `${ini('D')} ${txt(direccion)}` : '',
       webHref   ? link(webHref, `${ini('W')} ${web}`) : '',
     ].filter(Boolean).join(`<span style="color:#ccc;padding:0 8px;">·</span>`)
-    const logoTd = logoUrl ? `<td style="padding-right:12px;vertical-align:middle;">${logoImg(Math.round(logoSize * 0.7))}</td>` : ''
+    const logoTd = logoUrl ? `<td style="padding-right:8px;vertical-align:middle;">${logoImg(Math.round(logoSize * 0.7))}</td>` : ''
     return `<table cellpadding="0" cellspacing="0" border="0">
       <tr>
         ${logoTd}
-        <td style="vertical-align:middle;${logoUrl ? `border-left:2px solid ${acento};padding-left:12px;` : ''}">
+        <td style="vertical-align:middle;">
           ${nombre ? `<div style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;">${nombre}</div>` : ''}
           ${cargo  ? `<div style="font-family:Arial,sans-serif;font-size:12px;font-weight:600;color:${acento};">${cargo}</div>` : ''}
         </td>
