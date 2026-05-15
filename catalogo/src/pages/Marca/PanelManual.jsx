@@ -447,45 +447,44 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
 
 // ── FirmaMailSection ──────────────────────────────────────────
 function generarHtmlFirma({ firma, logoUrl, acento }) {
-  const email = firma.email || ''
-  const web = (firma.web || '').replace(/^https?:\/\//, '')
-  const webHref = web ? `https://${web}` : ''
-  const nombre = firma.nombre || ''
-  const cargo = firma.cargo || ''
+  const email    = firma.email    || ''
+  const web      = (firma.web || '').replace(/^https?:\/\//, '')
+  const webHref  = web ? `https://${web}` : ''
+  const whatsapp = (firma.whatsapp || '').replace(/\D/g, '')
+  const wpHref   = whatsapp ? `https://wa.me/${whatsapp}` : ''
+  const nombre   = firma.nombre   || ''
+  const cargo    = firma.cargo    || ''
   const telefono = firma.telefono || ''
-  const direccion = firma.direccion || ''
+  const direccion= firma.direccion|| ''
 
   const infoHtml = [
     nombre    ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
-    cargo     ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:6px;">${cargo}</td></tr>` : '',
-    telefono  ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#444444;padding-bottom:4px;">${telefono}</td></tr>` : '',
-    direccion ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#888888;padding-bottom:8px;">${direccion}</td></tr>` : '',
+    cargo     ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;font-weight:600;color:${acento};padding-bottom:6px;">${cargo}</td></tr>` : '',
+    telefono  ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:3px;">${telefono}</td></tr>` : '',
+    direccion ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#666666;padding-bottom:8px;">${direccion}</td></tr>` : '',
   ].join('')
 
-  const iconEmail = email ? `
+  const btn = (href, char, bg, target = '') => `
     <td><table cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
-        <a href="mailto:${email}" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">@</a>
+      <td style="background-color:${bg};border-radius:4px;mso-padding-alt:7px 10px;">
+        <a href="${href}" ${target} style="display:inline-block;padding:7px 10px;font-family:Arial,sans-serif;font-size:14px;color:#ffffff;text-decoration:none;line-height:1;">${char}</a>
       </td>
     </tr></table></td>
-    <td style="width:8px;"></td>` : ''
+    <td style="width:8px;"></td>`
 
-  const iconWeb = webHref ? `
-    <td><table cellpadding="0" cellspacing="0" border="0"><tr>
-      <td style="background-color:${acento};border-radius:4px;mso-padding-alt:7px 9px;">
-        <a href="${webHref}" target="_blank" style="display:inline-block;padding:7px 9px;font-family:Arial,sans-serif;font-size:13px;color:#ffffff;text-decoration:none;font-weight:bold;line-height:1;">&#8599;</a>
-      </td>
-    </tr></table></td>` : ''
+  const iconEmail = email   ? btn(`mailto:${email}`, '&#9993;', acento) : ''
+  const iconWeb   = webHref ? btn(webHref, '&#128279;', acento, 'target="_blank"') : ''
+  const iconWp    = wpHref  ? btn(wpHref,  '&#9990;',  '#25D366', 'target="_blank"') : ''
 
-  const iconsHtml = (iconEmail || iconWeb)
-    ? `<tr><td style="padding-top:8px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}</tr></table></td></tr>`
+  const iconsHtml = (iconEmail || iconWeb || iconWp)
+    ? `<tr><td style="padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}${iconWp}</tr></table></td></tr>`
     : ''
 
   const logoTd = logoUrl
-    ? `<td style="padding-right:16px;border-right:2px solid ${acento};vertical-align:middle;">
-        <img src="${logoUrl}" alt="logo" width="90" style="display:block;max-width:90px;height:auto;" />
+    ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;">
+        <img src="${logoUrl}" alt="logo" width="120" style="display:block;max-width:120px;height:auto;" />
       </td>
-      <td style="width:16px;"></td>`
+      <td style="width:20px;"></td>`
     : ''
 
   return `<table cellpadding="0" cellspacing="0" border="0">
@@ -554,6 +553,11 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
           <label className="text-xs text-[#999]">Dirección</label>
           <Input value={firma.direccion || ''} onChange={e => onChange({ ...firma, direccion: e.target.value })}
             placeholder="Av. Corrientes 1234, CABA" className="text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#999]">WhatsApp</label>
+          <Input value={firma.whatsapp || ''} onChange={e => onChange({ ...firma, whatsapp: e.target.value })}
+            placeholder="+54 11 1234-5678" className="text-sm" />
         </div>
       </div>
 
