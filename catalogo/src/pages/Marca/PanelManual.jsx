@@ -474,7 +474,7 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
 
   const iconEmail = email   ? btn(`mailto:${email}`, '&#9993;', acento) : ''
   const iconWeb   = webHref ? btn(webHref, '&#128279;', acento, 'target="_blank"') : ''
-  const iconWp    = wpHref  ? btn(wpHref,  '&#9990;',  '#25D366', 'target="_blank"') : ''
+  const iconWp    = wpHref  ? btn(wpHref,  '&#9990;',  acento, 'target="_blank"') : ''
 
   const iconsHtml = (iconEmail || iconWeb || iconWp)
     ? `<tr><td style="padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}${iconWp}</tr></table></td></tr>`
