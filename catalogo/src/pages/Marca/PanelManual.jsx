@@ -497,70 +497,50 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
 </table>`
 }
 
-function FirmaMailSection({ firma, onChange, logos, colores }) {
+// ── FirmaItem — una firma individual ──────────────────────────
+function FirmaItem({ firma, onChange, onDelete, logoUrl, acento, light }) {
   const [copied, setCopied] = useState(false)
-  const acento = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
-  const light  = colores?.find(c => c.esLight)?.hex  || '#f5f5f3'
-  const logoUrl = logos?.vert_claro || null
   const html = generarHtmlFirma({ firma, logoUrl, acento, light })
+
+  const campo = (key, label, placeholder) => (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs text-[#999]">{label}</label>
+      <Input value={firma[key] || ''} onChange={e => onChange({ ...firma, [key]: e.target.value })}
+        placeholder={placeholder} className="text-sm" />
+    </div>
+  )
 
   const copiar = async () => {
     try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/html': new Blob([html], { type: 'text/html' }),
-          'text/plain': new Blob([''], { type: 'text/plain' }),
-        })
-      ])
-    } catch {
-      navigator.clipboard.writeText(html)
-    }
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([''], { type: 'text/plain' }),
+      })])
+    } catch { navigator.clipboard.writeText(html) }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Nombre</label>
-          <Input value={firma.nombre || ''} onChange={e => onChange({ ...firma, nombre: e.target.value })}
-            placeholder="Juan Pérez" className="text-sm" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Cargo</label>
-          <Input value={firma.cargo || ''} onChange={e => onChange({ ...firma, cargo: e.target.value })}
-            placeholder="Diseñador / Estudio" className="text-sm" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Teléfono</label>
-          <Input value={firma.telefono || ''} onChange={e => onChange({ ...firma, telefono: e.target.value })}
-            placeholder="+54 11 1234-5678" className="text-sm" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Email</label>
-          <Input value={firma.email || ''} onChange={e => onChange({ ...firma, email: e.target.value })}
-            placeholder="hola@estudio.com" className="text-sm" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Web</label>
-          <Input value={firma.web || ''} onChange={e => onChange({ ...firma, web: e.target.value })}
-            placeholder="www.estudio.com" className="text-sm" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-[#999]">Dirección</label>
-          <Input value={firma.direccion || ''} onChange={e => onChange({ ...firma, direccion: e.target.value })}
-            placeholder="Av. Corrientes 1234, CABA" className="text-sm" />
-        </div>
+    <div className="flex flex-col gap-4 pb-6 border-b border-[#f0f0f0] last:border-0 last:pb-0">
+      <div className="flex items-center gap-2">
+        <Input value={firma.nombre_firma || ''} onChange={e => onChange({ ...firma, nombre_firma: e.target.value })}
+          placeholder="Nombre de la firma (ej: Juan - Comercial)" className="text-sm font-semibold flex-1" />
+        <button onClick={onDelete} className="text-[#ccc] hover:text-red-400 transition-colors flex-shrink-0">
+          <Trash2 size={15} />
+        </button>
       </div>
-
-      {!logoUrl && (
-        <p className="text-xs text-[#f59e0b]">No hay logo vertical cargado. Subí el logo "Vertical / Fondo claro" en la sección Logos.</p>
-      )}
-
-      <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {campo('nombre',   'Nombre',    'Juan Pérez')}
+        {campo('cargo',    'Cargo',     'Diseñador / Estudio')}
+        {campo('telefono', 'Teléfono',  '+54 11 1234-5678')}
+        {campo('email',    'Email',     'hola@estudio.com')}
+        {campo('web',      'Web',       'www.estudio.com')}
+        {campo('direccion','Dirección', 'Av. Corrientes 1234, CABA')}
+      </div>
+      <div className="flex flex-col gap-2">
         <p className="text-xs text-[#999]">Preview</p>
-        <div className="border border-[#e8e8e8] rounded-xl p-5 bg-white">
+        <div className="border border-[#e8e8e8] rounded-xl p-4 bg-white">
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </div>
         <button onClick={copiar}
@@ -568,6 +548,32 @@ function FirmaMailSection({ firma, onChange, logos, colores }) {
           {copied ? <><Check size={13} /> Copiado</> : 'Copiar firma'}
         </button>
       </div>
+    </div>
+  )
+}
+
+// ── FirmaMailSection — lista de firmas ────────────────────────
+function FirmaMailSection({ firmas, onChange, logos, colores }) {
+  const acento  = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
+  const light   = colores?.find(c => c.esLight)?.hex  || '#f5f5f3'
+  const logoUrl = logos?.vert_claro || null
+
+  const update = (id, data) => onChange(firmas.map(f => f.id === id ? data : f))
+  const remove = (id)       => onChange(firmas.filter(f => f.id !== id))
+  const add    = ()         => onChange([...firmas, { id: Date.now().toString(), nombre_firma: '' }])
+
+  return (
+    <div className="flex flex-col gap-6">
+      {!logoUrl && (
+        <p className="text-xs text-[#f59e0b]">No hay logo vertical cargado. Subí el logo "Vertical / Fondo claro" en la sección Logos.</p>
+      )}
+      {firmas.map(f => (
+        <FirmaItem key={f.id} firma={f} onChange={d => update(f.id, d)} onDelete={() => remove(f.id)}
+          logoUrl={logoUrl} acento={acento} light={light} />
+      ))}
+      <Button variant="secondary" onClick={add} className="self-start gap-2 text-xs">
+        <Plus size={14} /> Agregar firma
+      </Button>
     </div>
   )
 }
@@ -623,7 +629,7 @@ export function PanelManual({ proyecto }) {
   const [usosCorrectos, setUsosCorrectos] = useState([])
   const [usosIncorrectos, setUsosIncorrectos] = useState([])
   const [templates, setTemplates] = useState([])
-  const [firma, setFirma] = useState({})
+  const [firmas, setFirmas] = useState([])
 
   useEffect(() => { cargar() }, [proyecto.id])
 
@@ -645,12 +651,12 @@ export function PanelManual({ proyecto }) {
     setUsosCorrectos(row.usos_correctos || [])
     setUsosIncorrectos(row.usos_incorrectos || [])
     setTemplates(normalizeTemplates(row.templates))
-    setFirma(row.firma_mail || {})
+    setFirmas(Array.isArray(row.firma_mail) ? row.firma_mail : row.firma_mail ? [{ id: '1', nombre_firma: '', ...row.firma_mail }] : [])
   }
 
   const guardar = async () => {
     setSaving(true)
-    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, descripcion, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates, firma_mail: firma }
+    const payload = { proyecto_id: proyecto.id, logos, tematica, video_url: videoUrl, atributo, tagline, concepto, descripcion, colores, tipografias, mockups, usos_correctos: usosCorrectos, usos_incorrectos: usosIncorrectos, templates, firma_mail: firmas }
     if (data?.id) {
       await db.from('manual_marca').update(payload).eq('id', data.id)
     } else {
@@ -870,7 +876,7 @@ export function PanelManual({ proyecto }) {
 
       {/* FIRMA DE MAIL */}
       <Section title="Firma de mail" hint="Generá el HTML listo para usar en Gmail, Outlook o cualquier cliente de correo.">
-        <FirmaMailSection firma={firma} onChange={setFirma} logos={logos} colores={colores} />
+        <FirmaMailSection firmas={firmas} onChange={setFirmas} logos={logos} colores={colores} />
       </Section>
 
       <PexelsPicker

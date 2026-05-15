@@ -197,6 +197,35 @@ const LOGO_GRUPOS = [
   { key: 'vert',  label: 'Imagotipo vertical',   slug: 'imagotipo-vertical',  uso: 'Para espacios más altos que anchos.',                                   ej: 'Perfiles verticales, roll ups, señalética.', claro: 'vert_claro',  oscuro: 'vert_oscuro'  },
 ]
 
+// ── FirmaPublica ──────────────────────────────────────────────
+function FirmaPublica({ firma, html }) {
+  const [copied, setCopied] = useState(false)
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([''], { type: 'text/plain' }),
+      })])
+    } catch { navigator.clipboard.writeText(html) }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <div className="flex flex-col gap-4">
+      {firma.nombre_firma && (
+        <p className="text-[13px] font-semibold text-[#52586f] uppercase tracking-[1.4px]">{firma.nombre_firma}</p>
+      )}
+      <div className="border border-[#e8e8e8] rounded-2xl p-6 bg-white">
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
+      <button onClick={copiar}
+        className="self-start flex items-center gap-1.5 text-[12px] font-medium px-3 py-[7px] rounded-[10px] border border-[#e0e0e6] bg-white text-[#52586f] hover:border-[#363645] hover:text-[#363645] transition-colors cursor-pointer">
+        {copied ? '✓ Copiado' : 'Copiar firma'}
+      </button>
+    </div>
+  )
+}
+
 // ── Main ──────────────────────────────────────────────────────
 export default function MarcaManual() {
   const { nombre } = useParams()
@@ -294,6 +323,8 @@ export default function MarcaManual() {
   const hayMockups = mockups.length > 0
   const hayUsos = usosCorrectos.length > 0 || usosIncorrectos.length > 0
   const hayTemplates = templateCats.some(c => c.canva_url || c.items.some(t => t?.preview_url))
+  const firmas = Array.isArray(manual?.firma_mail) ? manual.firma_mail : manual?.firma_mail ? [manual.firma_mail] : []
+  const hayFirmas = firmas.length > 0
 
   let sectionNum = 0
   const nextNum = () => String(++sectionNum).padStart(2, '0')
@@ -660,8 +691,53 @@ export default function MarcaManual() {
           </div>
         )}
 
+        {/* FIRMAS DE MAIL */}
+        {hayFirmas && (
+          <div data-animate>
+            <SectionHeader num={nextNum()} label="Firmas de mail" />
+            <div className="flex flex-col gap-10">
+              {firmas.map((firma, i) => {
+                const acento = colores.find(c => c.esAcento)?.hex || '#1c1c1c'
+                const light  = colores.find(c => c.esLight)?.hex  || '#f5f5f3'
+                const logoUrl = manual?.logos?.vert_claro || null
+                const wpNum  = (firma.telefono || '').replace(/\D/g, '')
+                const wpHref = wpNum ? `https://wa.me/${wpNum}` : ''
+                const web    = (firma.web || '').replace(/^https?:\/\//, '')
+                const webHref = web ? `https://${web}` : ''
+
+                const fila = (icono, texto, href = '') => {
+                  const contenido = href
+                    ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:14px;color:#666666;text-decoration:none;">${texto}</a>`
+                    : `<span style="font-family:Arial,sans-serif;font-size:14px;color:#666666;">${texto}</span>`
+                  return `<tr>
+                    <td style="font-size:14px;padding-right:6px;padding-bottom:4px;vertical-align:middle;">${icono}</td>
+                    <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
+                  </tr>`
+                }
+
+                const infoHtml = [
+                  firma.nombre   ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${firma.nombre}</td></tr>` : '',
+                  firma.cargo    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:14px;font-weight:600;color:${acento};padding-bottom:8px;">${firma.cargo}</td></tr>` : '',
+                  firma.telefono ? fila('📞', firma.telefono, wpHref) : '',
+                  firma.email    ? fila('✉️', firma.email, `mailto:${firma.email}`) : '',
+                  firma.direccion? fila('📍', firma.direccion) : '',
+                  webHref        ? fila('🔗', web, webHref) : '',
+                ].join('')
+
+                const logoTd = logoUrl
+                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="120" style="display:block;max-width:120px;height:auto;" /></td><td style="width:20px;"></td>`
+                  : ''
+
+                const html = `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${infoHtml}</table></td></tr></table>`
+
+                return <FirmaPublica key={i} firma={firma} html={html} />
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Empty state */}
-        {!hayLogos && !hayColores && !hayTipos && !hayMockups && !hayUsos && !hayTemplates && (
+        {!hayLogos && !hayColores && !hayTipos && !hayMockups && !hayUsos && !hayTemplates && !hayFirmas && (
           <div className="py-24 text-center">
             <p className="text-[#bbb] text-sm">El manual todavía no tiene contenido.</p>
           </div>
