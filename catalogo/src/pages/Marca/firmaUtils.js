@@ -37,17 +37,26 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
   }
 
   if (template === 'apilada') {
-    const datos = [
-      telefono  ? (wpHref ? link(wpHref, `${ini('T')} ${telefono}`) : `${ini('T')} ${txt(telefono)}`) : '',
-      email     ? link(`mailto:${email}`, `${ini('M')} ${email}`, '_self') : '',
-      direccion ? `${ini('D')} ${txt(direccion)}` : '',
-      webHref   ? link(webHref, `${ini('W')} ${web}`) : '',
-    ].filter(Boolean).join(`<span style="color:#ccc;padding:0 8px;">·</span>`)
-    return `<table cellpadding="0" cellspacing="0" border="0" width="320">
-      ${logoUrl ? `<tr><td style="padding-bottom:12px;text-align:center;">${logoImg()}</td></tr>` : ''}
-      ${nombre  ? `<tr><td style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;text-align:center;">${nombre}</td></tr>` : ''}
-      ${cargo   ? `<tr><td style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:10px;text-align:center;">${cargo}</td></tr>` : ''}
-      ${datos   ? `<tr><td style="border-top:1px solid #e8e8e8;padding-top:10px;text-align:center;">${datos}</td></tr>` : ''}
+    const filaItem = (letra, texto, href = '') => {
+      const contenido = href
+        ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${texto}</a>`
+        : `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${texto}</span>`
+      return `<tr>
+        <td style="padding-right:8px;padding-bottom:4px;vertical-align:middle;">${ini(letra)}</td>
+        <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
+      </tr>`
+    }
+    const items = [
+      telefono  ? filaItem('T', telefono, wpHref) : '',
+      email     ? filaItem('M', email, `mailto:${email}`) : '',
+      direccion ? filaItem('D', direccion) : '',
+      webHref   ? filaItem('W', web, webHref) : '',
+    ].join('')
+    return `<table cellpadding="0" cellspacing="0" border="0">
+      ${logoUrl ? `<tr><td colspan="2" style="padding-bottom:12px;">${logoImg()}</td></tr>` : ''}
+      ${nombre  ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : ''}
+      ${cargo   ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : ''}
+      ${items}
     </table>`
   }
 
