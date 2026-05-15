@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { generarHtmlFirma, FIRMA_TEMPLATES } from './firmaUtils'
 import { Upload, Plus, Trash2, Check, X, Image, ExternalLink, Download, Search, ChevronUp, ChevronDown } from 'lucide-react'
 import { db, SUPABASE_URL } from '../../lib/supabase'
 import { Button } from '../../components/admin/ui/Button'
@@ -445,63 +446,10 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
   )
 }
 
-// ── FirmaMailSection ──────────────────────────────────────────
-function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento }) {
-  const email    = firma.email    || ''
-  const web      = (firma.web || '').replace(/^https?:\/\//, '')
-  const webHref  = web ? `https://${web}` : ''
-  const wpNum    = (firma.telefono || '').replace(/\D/g, '')
-  const wpHref   = wpNum ? `https://wa.me/${wpNum}` : ''
-  const nombre   = firma.nombre   || ''
-  const cargo    = firma.cargo    || ''
-  const telefono = firma.telefono || ''
-  const direccion= firma.direccion|| ''
-
-  const inicial = (letra) =>
-    `<span style="font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:${acento};">${letra}.</span>`
-
-  const fila = (letra, texto, href = '') => {
-    const contenido = href
-      ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${texto}</a>`
-      : `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${texto}</span>`
-    return `<tr>
-      <td style="padding-right:8px;padding-bottom:4px;vertical-align:middle;">${inicial(letra)}</td>
-      <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
-    </tr>`
-  }
-
-  const infoHtml = [
-    nombre    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
-    cargo     ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : '',
-    telefono  ? fila('T', telefono, wpHref) : '',
-    email     ? fila('M', email, `mailto:${email}`) : '',
-    direccion ? fila('D', direccion) : '',
-    webHref   ? fila('W', web, webHref) : '',
-  ].join('')
-
-  const logoTd = logoUrl
-    ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;">
-        <img src="${logoUrl}" alt="logo" width="${logoSize}" style="display:block;max-width:${logoSize}px;height:auto;" />
-      </td>
-      <td style="width:20px;"></td>`
-    : ''
-
-  return `<table cellpadding="0" cellspacing="0" border="0">
-  <tr>
-    ${logoTd}
-    <td style="vertical-align:middle;">
-      <table cellpadding="0" cellspacing="0" border="0">
-        ${infoHtml}
-      </table>
-    </td>
-  </tr>
-</table>`
-}
-
 // ── FirmaItem — una firma individual ──────────────────────────
-function FirmaItem({ firma, onChange, onDelete, logoUrl, logoSize, acento }) {
+function FirmaItem({ firma, onChange, onDelete, logoUrl, logoSize, acento, template }) {
   const [copied, setCopied] = useState(false)
-  const html = generarHtmlFirma({ firma, logoUrl, logoSize, acento })
+  const html = generarHtmlFirma({ firma, logoUrl, logoSize, acento, template })
 
   const campo = (key, label, placeholder) => (
     <div className="flex flex-col gap-1">
@@ -557,12 +505,14 @@ function FirmaItem({ firma, onChange, onDelete, logoUrl, logoSize, acento }) {
 function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
   const [uploading, setUploading] = useState(false)
   const acento  = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
-  const logoPng   = firmaData.logo_png || null
+  const logoPng   = firmaData.logo_png  || null
   const logoSize  = firmaData.logo_size || 80
-  const firmas    = firmaData.firmas || []
+  const template  = firmaData.template  || 'clasica'
+  const firmas    = firmaData.firmas    || []
 
   const setLogoPng  = (url)  => onChange({ ...firmaData, logo_png: url })
   const setLogoSize = (size) => onChange({ ...firmaData, logo_size: size })
+  const setTemplate = (t)    => onChange({ ...firmaData, template: t })
   const update = (id, data) => onChange({ ...firmaData, firmas: firmas.map(f => f.id === id ? data : f) })
   const remove = (id)       => onChange({ ...firmaData, firmas: firmas.filter(f => f.id !== id) })
   const add    = ()         => onChange({ ...firmaData, firmas: [...firmas, { id: Date.now().toString(), nombre_firma: '' }] })
@@ -579,6 +529,18 @@ function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <label className="text-xs text-[#999]">Diseño</label>
+        <div className="flex gap-2 flex-wrap">
+          {FIRMA_TEMPLATES.map(t => (
+            <button key={t.key} onClick={() => setTemplate(t.key)}
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${template === t.key ? 'border-[#1c1c1c] bg-[#1c1c1c] text-white' : 'border-[#e8e8e8] text-[#666] hover:border-[#1c1c1c]'}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex flex-col gap-2">
         <label className="text-xs text-[#999]">Logo PNG para firma</label>
         <div className="flex items-center gap-3">
@@ -605,7 +567,7 @@ function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
 
       {firmas.map(f => (
         <FirmaItem key={f.id} firma={f} onChange={d => update(f.id, d)} onDelete={() => remove(f.id)}
-          logoUrl={logoPng} logoSize={logoSize} acento={acento} />
+          logoUrl={logoPng} logoSize={logoSize} acento={acento} template={template} />
       ))}
       <Button variant="secondary" onClick={add} className="self-start gap-2 text-xs">
         <Plus size={14} /> Agregar firma

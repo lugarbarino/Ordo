@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { Download, ExternalLink, Check, X } from 'lucide-react'
 import { db } from '../../../lib/supabase'
+import { generarHtmlFirma } from '../firmaUtils'
 
 function loadGoogleFont(nombre) {
   if (!nombre) return
@@ -327,6 +328,7 @@ export default function MarcaManual() {
   const firmas = Array.isArray(firmaData) ? firmaData : (firmaData.firmas || [])
   const firmaLogoPng  = firmaData.logo_png  || null
   const firmaLogoSize = firmaData.logo_size || 80
+  const firmaTemplate = firmaData.template  || 'clasica'
   const hayFirmas = firmas.length > 0
 
   let sectionNum = 0
@@ -701,39 +703,12 @@ export default function MarcaManual() {
             <div className="flex flex-col gap-10">
               {firmas.map((firma, i) => {
                 const acento = colores.find(c => c.esAcento)?.hex || '#1c1c1c'
-                const light  = colores.find(c => c.esLight)?.hex  || '#f5f5f3'
-                const logoUrl = firmaLogoPng || null
-                const wpNum  = (firma.telefono || '').replace(/\D/g, '')
-                const wpHref = wpNum ? `https://wa.me/${wpNum}` : ''
-                const web    = (firma.web || '').replace(/^https?:\/\//, '')
-                const webHref = web ? `https://${web}` : ''
-
-                const inicial = (l) => `<span style="font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:${acento};">${l}.</span>`
-                const fila = (letra, texto, href = '') => {
-                  const contenido = href
-                    ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${texto}</a>`
-                    : `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${texto}</span>`
-                  return `<tr>
-                    <td style="padding-right:8px;padding-bottom:4px;vertical-align:middle;">${inicial(letra)}</td>
-                    <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
-                  </tr>`
-                }
-
-                const infoHtml = [
-                  firma.nombre   ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${firma.nombre}</td></tr>` : '',
-                  firma.cargo    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:8px;">${firma.cargo}</td></tr>` : '',
-                  firma.telefono ? fila('T', firma.telefono, wpHref) : '',
-                  firma.email    ? fila('M', firma.email, `mailto:${firma.email}`) : '',
-                  firma.direccion? fila('D', firma.direccion) : '',
-                  webHref        ? fila('W', web, webHref) : '',
-                ].join('')
-
-                const logoTd = logoUrl
-                  ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;"><img src="${logoUrl}" alt="logo" width="${firmaLogoSize}" style="display:block;max-width:${firmaLogoSize}px;height:auto;" /></td><td style="width:20px;"></td>`
-                  : ''
-
-                const html = `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${infoHtml}</table></td></tr></table>`
-
+                const html = generarHtmlFirma({
+                  firma, acento,
+                  logoUrl: firmaLogoPng,
+                  logoSize: firmaLogoSize,
+                  template: firmaTemplate,
+                })
                 return <FirmaPublica key={i} firma={firma} html={html} />
               })}
             </div>
