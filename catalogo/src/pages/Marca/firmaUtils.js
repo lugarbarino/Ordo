@@ -20,7 +20,7 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
   const link = (href, txt, target='_blank') => `<a href="${href}" target="${target}" style="font-family:Arial,sans-serif;font-size:13px;color:#666666;text-decoration:none;">${txt}</a>`
   const txt  = (t) => `<span style="font-family:Arial,sans-serif;font-size:13px;color:#666666;">${t}</span>`
   const logoImg = (size = logoSize) => logoUrl
-    ? `<img src="${logoUrl}" alt="logo" width="${size}" style="display:block;max-width:${size}px;height:auto;" />`
+    ? `<div style="display:inline-block;background-color:#ffffff;border-radius:8px;padding:6px;"><img src="${logoUrl}" alt="logo" width="${size}" style="display:block;max-width:100%;height:auto;" /></div>`
     : ''
 
   if (template === 'clasica') {
@@ -33,7 +33,7 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       webHref   ? `<tr><td style="padding-right:8px;padding-bottom:4px;">${ini('W')}</td><td style="padding-bottom:4px;">${link(webHref, web)}</td></tr>` : '',
     ].join('')
     const logoTd = logoUrl ? `<td style="padding-right:20px;border-right:2px solid ${acento};vertical-align:middle;">${logoImg()}</td><td style="width:20px;"></td>` : ''
-    return `<table cellpadding="0" cellspacing="0" border="0"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${filas}</table></td></tr></table>`
+    return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;"><tr>${logoTd}<td style="vertical-align:middle;"><table cellpadding="0" cellspacing="0" border="0">${filas}</table></td></tr></table>`
   }
 
   if (template === 'apilada') {
@@ -52,7 +52,7 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       direccion ? filaItem('D', direccion) : '',
       webHref   ? filaItem('W', web, webHref) : '',
     ].join('')
-    return `<table cellpadding="0" cellspacing="0" border="0">
+    return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;">
       ${logoUrl ? `<tr><td colspan="2" style="padding-bottom:12px;">${logoImg()}</td></tr>` : ''}
       ${nombre  ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:15px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : ''}
       ${cargo   ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : ''}
@@ -67,7 +67,7 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       direccion ? `${ini('D')} ${txt(direccion)}` : '',
       webHref   ? link(webHref, `${ini('W')} ${web}`) : '',
     ].filter(Boolean).join(`<span style="color:#ccc;padding:0 8px;">|</span>`)
-    return `<table cellpadding="0" cellspacing="0" border="0">
+    return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;">
       ${nombre ? `<tr><td style="font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : ''}
       ${cargo  ? `<tr><td style="font-family:Arial,sans-serif;font-size:13px;font-weight:600;color:${acento};padding-bottom:10px;">${cargo}</td></tr>` : ''}
       ${datos  ? `<tr><td style="border-top:2px solid ${acento};padding-top:8px;">${datos}</td></tr>` : ''}
@@ -82,7 +82,7 @@ export function generarHtmlFirma({ firma, logoUrl, logoSize = 80, acento, templa
       webHref   ? link(webHref, `${ini('W')} ${web}`) : '',
     ].filter(Boolean).join(`<span style="padding:0 4px;"> </span>`)
     const logoTd = logoUrl ? `<td style="padding-right:4px;vertical-align:middle;">${logoImg(Math.round(logoSize * 0.7))}</td>` : ''
-    return `<table cellpadding="0" cellspacing="0" border="0">
+    return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;">
       <tr>
         ${logoTd}
         <td style="vertical-align:middle;">
