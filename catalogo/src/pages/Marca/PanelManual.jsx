@@ -458,25 +458,29 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
   const telefono = firma.telefono || ''
   const direccion= firma.direccion|| ''
 
+  const fila = (icono, texto, href = '') => {
+    const contenido = href
+      ? `<a href="${href}" target="_blank" style="font-family:Arial,sans-serif;font-size:14px;color:#666666;text-decoration:none;">${texto}</a>`
+      : `<span style="font-family:Arial,sans-serif;font-size:14px;color:#666666;">${texto}</span>`
+    return `<tr>
+      <td style="font-size:14px;padding-right:6px;padding-bottom:4px;vertical-align:middle;">${icono}</td>
+      <td style="padding-bottom:4px;vertical-align:middle;">${contenido}</td>
+    </tr>`
+  }
+
   const infoHtml = [
-    nombre    ? `<tr><td style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
-    cargo     ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;font-weight:600;color:${acento};padding-bottom:6px;">${cargo}</td></tr>` : '',
-    telefono  ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;color:#666666;padding-bottom:3px;">${telefono}</td></tr>` : '',
-    direccion ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;color:#666666;padding-bottom:8px;">${direccion}</td></tr>` : '',
+    nombre    ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
+    cargo     ? `<tr><td colspan="2" style="font-family:Arial,sans-serif;font-size:14px;font-weight:600;color:${acento};padding-bottom:8px;">${cargo}</td></tr>` : '',
+    telefono  ? fila('📞', telefono) : '',
+    direccion ? fila('📍', direccion) : '',
+    webHref   ? fila('🔗', web, webHref) : '',
   ].join('')
 
-  const btn = (href, char, target = '') => `
-    <td>
-      <a href="${href}" ${target} style="display:inline-block;font-size:22px;text-decoration:none;line-height:1;">${char}</a>
-    </td>
-    <td style="width:12px;"></td>`
+  const btnEmail = email  ? `<td><a href="mailto:${email}" style="font-size:22px;text-decoration:none;line-height:1;">✉️</a></td><td style="width:12px;"></td>` : ''
+  const btnWp    = wpHref ? `<td><a href="${wpHref}" target="_blank" style="font-size:22px;text-decoration:none;line-height:1;">📞</a></td><td style="width:12px;"></td>` : ''
 
-  const iconEmail = email   ? btn(`mailto:${email}`, '✉️') : ''
-  const iconWeb   = webHref ? btn(webHref, '🔗', 'target="_blank"') : ''
-  const iconWp    = wpHref  ? btn(wpHref,  '📞', 'target="_blank"') : ''
-
-  const iconsHtml = (iconEmail || iconWeb || iconWp)
-    ? `<tr><td style="padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}${iconWp}</tr></table></td></tr>`
+  const iconsHtml = (btnEmail || btnWp)
+    ? `<tr><td colspan="2" style="padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${btnEmail}${btnWp}</tr></table></td></tr>`
     : ''
 
   const logoTd = logoUrl
