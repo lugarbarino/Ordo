@@ -446,7 +446,8 @@ function TemplateCategoria({ catData, onChange, onDelete, proyectoId }) {
 }
 
 // ── FirmaMailSection ──────────────────────────────────────────
-function generarHtmlFirma({ firma, logoUrl, acento }) {
+function generarHtmlFirma({ firma, logoUrl, acento, light }) {
+  const bgIcono = light || '#f5f5f3'
   const email    = firma.email    || ''
   const web      = (firma.web || '').replace(/^https?:\/\//, '')
   const webHref  = web ? `https://${web}` : ''
@@ -472,9 +473,9 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
     </tr></table></td>
     <td style="width:8px;"></td>`
 
-  const iconEmail = email   ? btn(`mailto:${email}`, '&#9993;', acento) : ''
-  const iconWeb   = webHref ? btn(webHref, '&#128279;', acento, 'target="_blank"') : ''
-  const iconWp    = wpHref  ? btn(wpHref,  '&#9990;',  acento, 'target="_blank"') : ''
+  const iconEmail = email   ? btn(`mailto:${email}`, '✉️', bgIcono) : ''
+  const iconWeb   = webHref ? btn(webHref, '🌐', bgIcono, 'target="_blank"') : ''
+  const iconWp    = wpHref  ? btn(wpHref,  '📞', bgIcono, 'target="_blank"') : ''
 
   const iconsHtml = (iconEmail || iconWeb || iconWp)
     ? `<tr><td style="padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${iconEmail}${iconWeb}${iconWp}</tr></table></td></tr>`
@@ -503,8 +504,9 @@ function generarHtmlFirma({ firma, logoUrl, acento }) {
 function FirmaMailSection({ firma, onChange, logos, colores }) {
   const [copied, setCopied] = useState(false)
   const acento = colores?.find(c => c.esAcento)?.hex || '#1c1c1c'
+  const light  = colores?.find(c => c.esLight)?.hex  || '#f5f5f3'
   const logoUrl = logos?.vert_claro || null
-  const html = generarHtmlFirma({ firma, logoUrl, acento })
+  const html = generarHtmlFirma({ firma, logoUrl, acento, light })
 
   const copiar = async () => {
     try {
