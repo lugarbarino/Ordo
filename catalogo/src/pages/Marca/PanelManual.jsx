@@ -459,7 +459,7 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
   const direccion= firma.direccion|| ''
 
   const infoHtml = [
-    nombre    ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
+    nombre    ? `<tr><td style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#1c1c1c;padding-bottom:2px;">${nombre}</td></tr>` : '',
     cargo     ? `<tr><td style="font-family:Arial,sans-serif;font-size:12px;font-weight:600;color:${acento};padding-bottom:6px;">${cargo}</td></tr>` : '',
     telefono  ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;color:#666666;padding-bottom:3px;">${telefono}</td></tr>` : '',
     direccion ? `<tr><td style="font-family:Arial,sans-serif;font-size:14px;color:#666666;padding-bottom:8px;">${direccion}</td></tr>` : '',
@@ -472,7 +472,7 @@ function generarHtmlFirma({ firma, logoUrl, acento, light }) {
     <td style="width:12px;"></td>`
 
   const iconEmail = email   ? btn(`mailto:${email}`, '✉️') : ''
-  const iconWeb   = webHref ? btn(webHref, '🌐', 'target="_blank"') : ''
+  const iconWeb   = webHref ? btn(webHref, '🔗', 'target="_blank"') : ''
   const iconWp    = wpHref  ? btn(wpHref,  '📞', 'target="_blank"') : ''
 
   const iconsHtml = (iconEmail || iconWeb || iconWp)
