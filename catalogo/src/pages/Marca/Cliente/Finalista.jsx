@@ -59,11 +59,11 @@ export default function ClienteFinalista() {
   const mockups = fin.mockups || []
   const logoResp = fin.logo_responsivo || []
 
-  // logos por orden de carga
-  const logo1 = logos[0]  // grande izq (col 1)
-  const logo2 = logos[1]  // grande der (col 1 right)
-  const logo3 = logos[2]  // cuadrado izq (col 2 left)
-  const logo4 = logos[3]  // tarjeta der  (col 2 left)
+  // logos por orden de carga — 0=claro izq, 1=oscuro der, 2=cuadrado, 3=logotipo
+  const logo1 = logos[1]  // claro → col izq (abajo del texto)
+  const logo2 = logos[0]  // oscuro → col der (grande, cuadrado)
+  const logo3 = logos[2]  // cuadrado acento
+  const logo4 = logos[3]  // logotipo
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -117,16 +117,16 @@ export default function ClienteFinalista() {
         {/* ── Fila 2: rectángulo con cuadrado adentro / tipografía ── */}
         <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: '45% 1fr' }}>
 
-          {/* Col izq: un rectángulo que contiene cuadrado + logo */}
+          {/* Col izq: rectángulo 2:1 con cuadrado adentro */}
           {(logo3 || logo4) && (
-            <div className="rounded-[22px] border border-[#ececf0] overflow-hidden flex">
+            <div className="rounded-[22px] border border-[#ececf0] overflow-hidden flex" style={{ aspectRatio: '2/1' }}>
               {logo3 && (
-                <div className="shrink-0 overflow-hidden" style={{ aspectRatio: '1/1', height: '100%' }}>
+                <div className="shrink-0 overflow-hidden" style={{ width: '50%' }}>
                   <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-contain" />
                 </div>
               )}
               {logo4 && (
-                <div className="flex-1 flex items-center justify-center p-6">
+                <div className="flex-1 flex items-center justify-center p-8 border-l border-[#ececf0]">
                   <img src={logo4.url} alt={logo4.titulo || ''} className="max-w-full max-h-full object-contain" />
                 </div>
               )}
