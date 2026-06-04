@@ -88,10 +88,10 @@ export default function ClienteFinalista() {
       {/* ── Contenido principal ── */}
       <div className="px-6 md:px-10 max-w-5xl mx-auto pb-16">
 
-        {/* ── Fila 1: texto + logo claro / logo oscuro grande ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* ── Fila 1: texto+logo angosto / logo cuadrado der ── */}
+        <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: '45% 1fr' }}>
 
-          {/* Col izq: texto + logo claro */}
+          {/* Col izq angosta: texto + logo claro */}
           <div className="flex flex-col gap-6">
             <div className="pt-4">
               {fin.atributo && <p className="text-xs font-bold uppercase tracking-[2px] mb-2" style={{ color: acento }}>{fin.atributo}</p>}
@@ -99,39 +99,39 @@ export default function ClienteFinalista() {
               {fin.concepto && <p className="text-base font-medium mb-3" style={{ color: darkBg }}>{fin.concepto}</p>}
               {fin.descripcion && <p className="text-sm leading-relaxed opacity-40" style={{ color: darkBg }}>{fin.descripcion}</p>}
             </div>
-
-            {/* Logo claro grande */}
             {logo1 && (
-              <div className="rounded-[22px] border border-[#ececf0] aspect-[4/3] overflow-hidden">
+              <div className="rounded-[22px] border border-[#ececf0] overflow-hidden" style={{ aspectRatio: '4/3' }}>
                 <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-contain" />
               </div>
             )}
           </div>
 
-          {/* Col der: logo oscuro grande */}
+          {/* Col der cuadrada: logo oscuro */}
           {logo2 && (
-            <div className="rounded-[22px] overflow-hidden aspect-[4/3]">
+            <div className="rounded-[22px] overflow-hidden" style={{ aspectRatio: '1/1' }}>
               <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-contain" />
             </div>
           )}
         </div>
 
-        {/* ── Fila 2: logo acento + logo pequeño / tipografía ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* ── Fila 2: rectángulo con cuadrado adentro / tipografía ── */}
+        <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: '45% 1fr' }}>
 
-          {/* Col izq: acento + logo pequeño */}
-          <div className="grid grid-cols-2 gap-4">
-            {logo3 && (
-              <div className="rounded-[22px] overflow-hidden aspect-square">
-                <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-contain" />
-              </div>
-            )}
-            {logo4 && (
-              <div className="rounded-[22px] overflow-hidden aspect-square border border-[#ececf0]">
-                <img src={logo4.url} alt={logo4.titulo || ''} className="w-full h-full object-contain" />
-              </div>
-            )}
-          </div>
+          {/* Col izq: un rectángulo que contiene cuadrado + logo */}
+          {(logo3 || logo4) && (
+            <div className="rounded-[22px] border border-[#ececf0] overflow-hidden flex">
+              {logo3 && (
+                <div className="shrink-0 overflow-hidden" style={{ aspectRatio: '1/1', height: '100%' }}>
+                  <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-contain" />
+                </div>
+              )}
+              {logo4 && (
+                <div className="flex-1 flex items-center justify-center p-6">
+                  <img src={logo4.url} alt={logo4.titulo || ''} className="max-w-full max-h-full object-contain" />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Col der: tipografía */}
           {fin.tipografia && (
