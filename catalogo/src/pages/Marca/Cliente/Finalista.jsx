@@ -102,7 +102,7 @@ export default function ClienteFinalista() {
 
             {/* Logo claro grande */}
             {logo1 && (
-              <div className="rounded-[22px] overflow-hidden border border-[#ececf0]">
+              <div className="rounded-[22px] overflow-hidden border border-[#ececf0] aspect-[4/3]">
                 <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-cover" />
               </div>
             )}
@@ -110,7 +110,7 @@ export default function ClienteFinalista() {
 
           {/* Col der: logo oscuro grande */}
           {logo2 && (
-            <div className="rounded-[22px] overflow-hidden min-h-[340px]">
+            <div className="rounded-[22px] overflow-hidden aspect-[4/3]">
               <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-cover" />
             </div>
           )}
