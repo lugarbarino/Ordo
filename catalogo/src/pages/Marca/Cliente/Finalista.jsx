@@ -59,11 +59,13 @@ export default function ClienteFinalista() {
   const mockups = fin.mockups || []
   const logoResp = fin.logo_responsivo || []
 
-  // logos por posición
-  const logo1 = logos[0]  // grande blanco (izq arriba)
-  const logo2 = logos[1]  // grande oscuro (der arriba)
-  const logo3 = logos[2]  // cuadrado acento (izq medio)
-  const logo4 = logos[3]  // tarjeta blanca (izq medio)
+  // logos por flag dark
+  const logosClaro  = logos.filter(l => !l.dark)
+  const logosOscuro = logos.filter(l =>  l.dark)
+  const logo1 = logosClaro[0]   // grande claro → izq col 1
+  const logo2 = logosOscuro[0]  // grande oscuro → der col 1
+  const logo3 = logosOscuro[1] || logosClaro[1]  // cuadrado acento → izq col 2
+  const logo4 = logosClaro[1]  || logosClaro[2]  // tarjeta blanca  → izq col 2
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
