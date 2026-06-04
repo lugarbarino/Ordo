@@ -122,8 +122,9 @@ export default function ClienteFinalista() {
           {/* Col izq: acento + logo pequeño */}
           <div className="grid grid-cols-2 gap-4">
             {logo3 && (
-              <div className="rounded-[22px] overflow-hidden aspect-square border border-[#ececf0]">
-                <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-cover" />
+              <div className="rounded-[22px] overflow-hidden aspect-square flex items-center justify-center p-6"
+                style={{ backgroundColor: acento }}>
+                <img src={logo3.url} alt={logo3.titulo || ''} className="max-w-full max-h-full object-contain" />
               </div>
             )}
             {logo4 && (
