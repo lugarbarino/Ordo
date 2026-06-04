@@ -163,15 +163,10 @@ export function PanelExploracion({ proyecto }) {
             <h3 className="text-base font-black text-[#1c1c1c]">¿Es un rebranding?</h3>
             <p className="text-xs text-[#999] mt-0.5">Activá si el cliente ya tiene un logo existente.</p>
           </div>
-          <button
-            onClick={() => setEsRebranding(v => !v)}
-            className="relative w-11 h-6 rounded-full transition-colors cursor-pointer border-none shrink-0"
-            style={{ backgroundColor: esRebranding ? '#1c1c1c' : '#e0e0e0' }}>
-            <span
-              className="absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-all duration-200"
-              style={{ left: esRebranding ? '20px' : '3px' }}
-            />
-          </button>
+          <label className="relative inline-flex items-center cursor-pointer shrink-0">
+            <input type="checkbox" className="sr-only peer" checked={esRebranding} onChange={e => setEsRebranding(e.target.checked)} />
+            <div className="w-11 h-6 bg-[#e0e0e0] rounded-full peer peer-checked:bg-[#1c1c1c] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5" />
+          </label>
         </div>
 
         {esRebranding && (
