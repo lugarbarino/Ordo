@@ -59,13 +59,11 @@ export default function ClienteFinalista() {
   const mockups = fin.mockups || []
   const logoResp = fin.logo_responsivo || []
 
-  // logos por flag dark
-  const logosClaro  = logos.filter(l => !l.dark)
-  const logosOscuro = logos.filter(l =>  l.dark)
-  const logo1 = logosClaro[0]   // grande claro → izq col 1
-  const logo2 = logosOscuro[0]  // grande oscuro → der col 1
-  const logo3 = logosOscuro[1] || logosClaro[1]  // cuadrado acento → izq col 2
-  const logo4 = logosClaro[1]  || logosClaro[2]  // tarjeta blanca  → izq col 2
+  // logos por orden de carga
+  const logo1 = logos[0]  // grande izq (col 1)
+  const logo2 = logos[1]  // grande der (col 1 right)
+  const logo3 = logos[2]  // cuadrado izq (col 2 left)
+  const logo4 = logos[3]  // tarjeta der  (col 2 left)
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -104,8 +102,8 @@ export default function ClienteFinalista() {
 
             {/* Logo claro grande */}
             {logo1 && (
-              <div className="rounded-[22px] overflow-hidden border border-[#ececf0] aspect-[4/3]">
-                <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-cover" />
+              <div className="rounded-[22px] border border-[#ececf0] aspect-[4/3] overflow-hidden">
+                <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-contain" />
               </div>
             )}
           </div>
@@ -113,7 +111,7 @@ export default function ClienteFinalista() {
           {/* Col der: logo oscuro grande */}
           {logo2 && (
             <div className="rounded-[22px] overflow-hidden aspect-[4/3]">
-              <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-cover" />
+              <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-contain" />
             </div>
           )}
         </div>
@@ -124,14 +122,13 @@ export default function ClienteFinalista() {
           {/* Col izq: acento + logo pequeño */}
           <div className="grid grid-cols-2 gap-4">
             {logo3 && (
-              <div className="rounded-[22px] overflow-hidden aspect-square flex items-center justify-center p-6"
-                style={{ backgroundColor: acento }}>
-                <img src={logo3.url} alt={logo3.titulo || ''} className="max-w-full max-h-full object-contain" />
+              <div className="rounded-[22px] overflow-hidden aspect-square">
+                <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-contain" />
               </div>
             )}
             {logo4 && (
               <div className="rounded-[22px] overflow-hidden aspect-square border border-[#ececf0]">
-                <img src={logo4.url} alt={logo4.titulo || ''} className="w-full h-full object-cover" />
+                <img src={logo4.url} alt={logo4.titulo || ''} className="w-full h-full object-contain" />
               </div>
             )}
           </div>
