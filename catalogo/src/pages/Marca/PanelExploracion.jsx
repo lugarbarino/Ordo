@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Upload, Check, X, Image } from 'lucide-react'
+import { Plus, Trash2, Upload, Check, X, Image, ExternalLink } from 'lucide-react'
 import { db, SUPABASE_URL } from '../../lib/supabase'
 import { Button } from '../../components/admin/ui/Button'
 import { Input } from '../../components/admin/ui/Input'
@@ -147,9 +147,15 @@ export function PanelExploracion({ proyecto }) {
           <h2 className="text-2xl font-black text-[#1c1c1c] mb-1">Exploración</h2>
           <p className="text-sm text-[#888]">Presentá las propuestas al cliente para que vote y dé feedback.</p>
         </div>
-        <Button variant="dark" loading={saving} onClick={guardar}>
-          {saved && !saving ? <><Check size={14} /> Guardado</> : 'Guardar'}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <a href={`/marca/${proyecto.slug || proyecto.id}/exploracion`} target="_blank" rel="noreferrer"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#1c1c1c] border border-[#e8e8e8] bg-white px-3 py-2 rounded-[8px] no-underline hover:border-[#ccc] transition-colors">
+            <ExternalLink size={13} /> Ver link del cliente
+          </a>
+          <Button variant="dark" loading={saving} onClick={guardar}>
+            {saved && !saving ? <><Check size={14} /> Guardado</> : 'Guardar'}
+          </Button>
+        </div>
       </div>
 
       {/* Rebranding */}
