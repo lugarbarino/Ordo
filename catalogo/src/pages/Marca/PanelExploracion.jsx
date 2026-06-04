@@ -55,14 +55,16 @@ function OpcionItem({ opcion, numero, onChange, onDelete, proyectoId }) {
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {(opcion.imagenes || []).map((img, i) => (
           <div key={i} className="flex flex-col gap-1 group">
-            <div className="aspect-square bg-[#f5f5f5] rounded-xl overflow-hidden border border-[#e0e0e0]">
+            <div className="relative aspect-square bg-[#f5f5f5] rounded-xl overflow-hidden border border-[#e0e0e0]">
               <img src={img.url} alt="" className="w-full h-full object-cover" />
+              <button
+                onClick={() => removeImg(i)}
+                className="absolute top-1.5 right-1.5 w-6 h-6 bg-white border border-[#e0e0e0] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-red-50 hover:border-red-200 hover:text-red-500 text-[#999]">
+                <X size={11} />
+              </button>
             </div>
             <Input value={img.titulo} onChange={e => updateImg(i, { titulo: e.target.value })}
               placeholder="Ej: Variante A" className="text-[11px]" />
-            <Button variant="ghost" size="sm" onClick={() => removeImg(i)} className="text-[#ccc] hover:text-red-500 self-end -mt-1">
-              <Trash2 size={12} /> Eliminar
-            </Button>
           </div>
         ))}
 
