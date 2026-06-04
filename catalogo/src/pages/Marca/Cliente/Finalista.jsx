@@ -102,17 +102,16 @@ export default function ClienteFinalista() {
 
             {/* Logo claro grande */}
             {logo1 && (
-              <div className="rounded-[22px] border border-[#ececf0] bg-white flex items-center justify-center py-14 px-10">
-                <img src={logo1.url} alt={logo1.titulo || ''} className="max-h-28 max-w-full object-contain" />
+              <div className="rounded-[22px] overflow-hidden">
+                <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-cover" />
               </div>
             )}
           </div>
 
           {/* Col der: logo oscuro grande */}
           {logo2 && (
-            <div className="rounded-[22px] overflow-hidden flex items-center justify-center py-14 px-10 min-h-[340px]"
-              style={{ background: `linear-gradient(135deg, ${acento}dd 0%, ${darkBg} 60%)` }}>
-              <img src={logo2.url} alt={logo2.titulo || ''} className="max-h-28 max-w-full object-contain" />
+            <div className="rounded-[22px] overflow-hidden min-h-[340px]">
+              <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-cover" />
             </div>
           )}
         </div>
@@ -123,14 +122,13 @@ export default function ClienteFinalista() {
           {/* Col izq: acento + logo pequeño */}
           <div className="grid grid-cols-2 gap-4">
             {logo3 && (
-              <div className="rounded-[22px] flex items-center justify-center p-8 aspect-square"
-                style={{ backgroundColor: acento }}>
-                <img src={logo3.url} alt={logo3.titulo || ''} className="max-h-full max-w-full object-contain" />
+              <div className="rounded-[22px] overflow-hidden aspect-square">
+                <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-cover" />
               </div>
             )}
             {logo4 && (
-              <div className="rounded-[22px] border border-[#ececf0] bg-white flex items-center justify-center p-6 aspect-square">
-                <img src={logo4.url} alt={logo4.titulo || ''} className="max-h-full max-w-full object-contain" />
+              <div className="rounded-[22px] overflow-hidden aspect-square">
+                <img src={logo4.url} alt={logo4.titulo || ''} className="w-full h-full object-cover" />
               </div>
             )}
           </div>
