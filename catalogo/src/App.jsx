@@ -39,6 +39,7 @@ export default function App() {
           <Route path="/marca" element={<MarcaLanding />} />
           <Route path="/marca/admin" element={<MarcaAdmin />} />
           <Route path="/marca/admin/:proyectoId" element={<MarcaProyecto />} />
+          <Route path="/marca/admin/:proyectoId/:section" element={<MarcaProyecto />} />
           <Route path="/marca/:nombre" element={<MarcaManual />} />
           <Route path="/marca/:nombre/brief" element={<Brief />} />
           <Route path="/marca/:nombre/exploracion" element={<Exploracion />} />

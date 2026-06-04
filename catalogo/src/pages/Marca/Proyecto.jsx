@@ -445,10 +445,10 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
 }
 
 // ── Main layout ──────────────────────────────────────────────
-function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
+function ProyectoLayout({ cuenta, proyectoInicial, proyectos, initialPanel = 'dashboard' }) {
   const navigate = useNavigate()
   const [proyecto, setProyecto] = useState(proyectoInicial)
-  const [panel, setPanel] = useState('dashboard')
+  const [panel, setPanel] = useState(initialPanel)
   const [stats, setStats] = useState({ vistas: 0, respuestas: 0, briefEnviado: false })
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [nuevoOpen, setNuevoOpen] = useState(false)
@@ -502,7 +502,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
   const handleProyecto = (p) => {
     setProyecto(p)
     setPanel('dashboard')
-    navigate(`/marca/admin/${p.id}`, { replace: true })
+    navigate(`/marca/admin/${p.id}`)
   }
 
   const handleLogout = async () => {
@@ -518,7 +518,12 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
     if (panel === 'manual')      return <PanelManual proyecto={proyecto} />
   }
 
-  const handlePanel = (key) => { setPanel(key); setSidebarOpen(false) }
+  const handlePanel = (key) => {
+    setPanel(key)
+    setSidebarOpen(false)
+    const base = `/marca/admin/${proyecto.id}`
+    navigate(key === 'dashboard' ? base : `${base}/${key}`, { replace: true })
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">
@@ -597,7 +602,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos }) {
 
 // ── Auth + data loader ───────────────────────────────────────
 export default function MarcaProyecto() {
-  const { proyectoId } = useParams()
+  const { proyectoId, section } = useParams()
   const navigate = useNavigate()
   const [state, setState] = useState({ checked: false, cuenta: null, proyecto: null, proyectos: [] })
 
@@ -621,7 +626,7 @@ export default function MarcaProyecto() {
     const proyecto = (proyectos || []).find(p => p.id === proyectoId)
     if (!proyecto) { navigate('/marca/admin'); return }
 
-    setState({ checked: true, cuenta, proyecto, proyectos: proyectos || [] })
+    setState({ checked: true, cuenta, proyecto, proyectos: proyectos || [], section })
   }
 
   if (!state.checked) return (
@@ -635,6 +640,7 @@ export default function MarcaProyecto() {
       cuenta={state.cuenta}
       proyectoInicial={state.proyecto}
       proyectos={state.proyectos}
+      initialPanel={state.section || 'dashboard'}
     />
   )
 }
