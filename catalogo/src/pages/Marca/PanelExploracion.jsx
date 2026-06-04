@@ -165,8 +165,12 @@ export function PanelExploracion({ proyecto }) {
           </div>
           <button
             onClick={() => setEsRebranding(v => !v)}
-            className={`relative w-11 h-6 rounded-full transition-colors cursor-pointer border-none shrink-0 ${esRebranding ? 'bg-[#1c1c1c]' : 'bg-[#e0e0e0]'}`}>
-            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${esRebranding ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            className="relative w-11 h-6 rounded-full transition-colors cursor-pointer border-none shrink-0"
+            style={{ backgroundColor: esRebranding ? '#1c1c1c' : '#e0e0e0' }}>
+            <span
+              className="absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm transition-all duration-200"
+              style={{ left: esRebranding ? '20px' : '3px' }}
+            />
           </button>
         </div>
 
