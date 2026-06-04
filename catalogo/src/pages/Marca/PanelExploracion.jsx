@@ -65,6 +65,15 @@ function OpcionItem({ opcion, numero, onChange, onDelete, proyectoId }) {
             </div>
             <Input value={img.titulo} onChange={e => updateImg(i, { titulo: e.target.value })}
               placeholder="Ej: Variante A" className="text-[11px]" />
+            <label className="flex items-center gap-1.5 cursor-pointer mt-0.5">
+              <input
+                type="checkbox"
+                checked={img.paraVotacion || false}
+                onChange={e => updateImg(i, { paraVotacion: e.target.checked })}
+                className="w-3.5 h-3.5 accent-[#1c1c1c] cursor-pointer"
+              />
+              <span className="text-[10px] text-[#888]">Para votación</span>
+            </label>
           </div>
         ))}
 

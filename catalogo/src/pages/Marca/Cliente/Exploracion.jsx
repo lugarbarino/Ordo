@@ -229,43 +229,50 @@ export default function ClienteExploracion() {
           </div>
 
           {/* Votos */}
-          <div className="mb-14">
-            <p className="text-lg font-semibold mb-1" style={{ color: darkBg }}>¿Qué opciones te gustan más?</p>
-            <p className="text-sm opacity-50 mb-6" style={{ color: darkBg }}>Podés elegir más de una</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {opciones.map((op, i) => {
-                const sel = votos.includes(op.id)
-                const primeraImg = op.imagenes?.[0]?.url
-                return (
-                  <button
-                    key={op.id}
-                    onClick={() => toggleVoto(op.id)}
-                    className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer text-left w-full"
-                    style={{
-                      borderColor: sel ? acento : '#e8e8e8',
-                      backgroundColor: sel ? acento + '08' : 'white',
-                    }}>
-                    {/* checkbox */}
-                    <div className="w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all"
-                      style={{ backgroundColor: sel ? acento : 'transparent', borderColor: sel ? acento : '#d0d0d0' }}>
-                      {sel && <Check size={13} className="text-white" strokeWidth={3} />}
-                    </div>
-                    {/* thumbnail */}
-                    {primeraImg && (
-                      <div className="w-16 h-12 rounded-xl overflow-hidden shrink-0 bg-[#f5f5f5]">
-                        <img src={primeraImg} alt="" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                    {/* label */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold" style={{ color: darkBg }}>Opción #{i + 1}</p>
-                      {op.titulo && <p className="text-xs opacity-50 truncate" style={{ color: darkBg }}>{op.titulo}</p>}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
+          {(() => {
+            // armar lista de imágenes para votación
+            const items = []
+            opciones.forEach((op, oi) => {
+              (op.imagenes || []).forEach((img, ii) => {
+                if (img.paraVotacion) {
+                  items.push({ id: `${op.id}_${ii}`, url: img.url, titulo: img.titulo, opcionNum: oi + 1, opcionTitulo: op.titulo })
+                }
+              })
+            })
+            if (items.length === 0) return null
+            return (
+              <div className="mb-14">
+                <p className="text-lg font-semibold mb-1" style={{ color: darkBg }}>¿Qué opciones te gustan más?</p>
+                <p className="text-sm opacity-50 mb-6" style={{ color: darkBg }}>Podés elegir más de una</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {items.map(item => {
+                    const sel = votos.includes(item.id)
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => toggleVoto(item.id)}
+                        className="flex flex-col gap-2 p-3 rounded-2xl border-2 transition-all cursor-pointer text-left w-full"
+                        style={{ borderColor: sel ? acento : '#e8e8e8', backgroundColor: sel ? acento + '08' : 'white' }}>
+                        {/* imagen */}
+                        <div className="w-full aspect-video rounded-xl overflow-hidden bg-[#f5f5f5] relative">
+                          <img src={item.url} alt="" className="w-full h-full object-cover" />
+                          <div className="absolute top-2 right-2 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all"
+                            style={{ backgroundColor: sel ? acento : 'white', borderColor: sel ? acento : '#d0d0d0' }}>
+                            {sel && <Check size={12} className="text-white" strokeWidth={3} />}
+                          </div>
+                        </div>
+                        {/* label */}
+                        <div>
+                          <p className="text-xs font-semibold opacity-40" style={{ color: darkBg }}>Opción #{item.opcionNum}</p>
+                          {item.titulo && <p className="text-sm font-medium leading-tight" style={{ color: darkBg }}>{item.titulo}</p>}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })()}
 
           {/* Comentario */}
           <div className="mb-14">
