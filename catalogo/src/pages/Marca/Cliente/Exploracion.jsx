@@ -65,6 +65,7 @@ export default function ClienteExploracion() {
     if (!p || !p.exploracion) { setError('No hay exploración disponible aún.'); setCargando(false); return }
     setProyecto(p)
     setExp(p.exploracion)
+    document.title = `${p.nombre} — Exploración`
 
     const { data: manualRows } = await db.from('manual_marca').select('colores').eq('proyecto_id', p.id).limit(1)
     const colores = manualRows?.[0]?.colores || []
