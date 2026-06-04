@@ -1,7 +1,33 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { db, SUPABASE_URL } from '../../../lib/supabase'
-import { Check, Upload, X } from 'lucide-react'
+import { Check, Upload, X, ZoomIn } from 'lucide-react'
+
+function Lightbox({ src, alt, onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+      onClick={onClose}>
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors border-none cursor-pointer">
+        <X size={18} />
+      </button>
+      <img
+        src={src}
+        alt={alt}
+        className="max-h-[90vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl cursor-default"
+        onClick={e => e.stopPropagation()}
+      />
+    </div>
+  )
+}
 
 async function subirArchivo(proyectoId, file) {
   const ext = file.name.split('.').pop()
@@ -27,6 +53,7 @@ export default function ClienteExploracion() {
   const [acento, setAcento]   = useState('#c63f3f')
   const [darkBg, setDarkBg]   = useState('#363645')
   const [lightBg, setLightBg] = useState('#f3f4f5')
+  const [lightbox, setLightbox] = useState(null) // { src, alt }
   const refInput = useRef()
 
   useEffect(() => { cargar() }, [nombre])
@@ -167,8 +194,13 @@ export default function ClienteExploracion() {
                   <div className={`grid gap-4 ${op.imagenes.length === 1 ? 'grid-cols-1 max-w-2xl' : op.imagenes.length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'}`}>
                     {op.imagenes.map((img, j) => (
                       <div key={j} className="flex flex-col gap-2">
-                        <div className="rounded-2xl overflow-hidden bg-white border border-black/5 aspect-video shadow-sm">
-                          <img src={img.url} alt={img.titulo || `Variante ${j + 1}`} className="w-full h-full object-cover" />
+                        <div
+                          className="rounded-2xl overflow-hidden bg-white border border-black/5 aspect-video shadow-sm cursor-zoom-in relative group"
+                          onClick={() => setLightbox({ src: img.url, alt: img.titulo || `Variante ${j + 1}` })}>
+                          <img src={img.url} alt={img.titulo || `Variante ${j + 1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                            <ZoomIn size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                          </div>
                         </div>
                         {img.titulo && (
                           <p className="text-xs text-center font-medium opacity-40" style={{ color: darkBg }}>{img.titulo}</p>
@@ -314,6 +346,9 @@ export default function ClienteExploracion() {
 
         </div>
       </section>
+
+      {/* ── Lightbox ── */}
+      {lightbox && <Lightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />}
 
       {/* ── Footer ── */}
       <footer className="py-8 px-8" style={{ backgroundColor: darkBg }}>
