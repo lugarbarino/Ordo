@@ -39,10 +39,9 @@ function OpcionItem({ opcion, numero, onChange, onDelete, proyectoId }) {
         <span className="text-sm font-black text-[#1c1c1c] shrink-0">Opción #{numero}</span>
         <Input value={opcion.titulo} onChange={e => onChange({ titulo: e.target.value })}
           placeholder="Título (ej: Minimalista, Bold, Clásica...)" className="flex-1" />
-        <button onClick={onDelete}
-          className="text-[#ccc] hover:text-red-400 transition-colors shrink-0 bg-transparent border-none cursor-pointer p-0">
-          <Trash2 size={15} />
-        </button>
+        <Button variant="ghost" size="sm" onClick={onDelete} className="text-[#ccc] hover:text-red-500 shrink-0">
+          <Trash2 size={14} />
+        </Button>
       </div>
 
       <textarea
@@ -56,15 +55,14 @@ function OpcionItem({ opcion, numero, onChange, onDelete, proyectoId }) {
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
         {(opcion.imagenes || []).map((img, i) => (
           <div key={i} className="flex flex-col gap-1 group">
-            <div className="relative aspect-square bg-[#f5f5f5] rounded-xl overflow-hidden border border-[#e0e0e0]">
+            <div className="aspect-square bg-[#f5f5f5] rounded-xl overflow-hidden border border-[#e0e0e0]">
               <img src={img.url} alt="" className="w-full h-full object-cover" />
-              <button onClick={() => removeImg(i)}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity border-none cursor-pointer">
-                <X size={10} />
-              </button>
             </div>
             <Input value={img.titulo} onChange={e => updateImg(i, { titulo: e.target.value })}
               placeholder="Ej: Variante A" className="text-[11px]" />
+            <Button variant="ghost" size="sm" onClick={() => removeImg(i)} className="text-[#ccc] hover:text-red-500 self-end -mt-1">
+              <Trash2 size={12} /> Eliminar
+            </Button>
           </div>
         ))}
 
@@ -202,10 +200,9 @@ export function PanelExploracion({ proyecto }) {
                 placeholder="¿Por qué se hace el rebranding? Ej: No transmite el potencial del estudio."
               />
               {logoActual.url && (
-                <button onClick={() => setLogoActual(prev => ({ ...prev, url: '' }))}
-                  className="self-start text-xs text-[#ccc] hover:text-red-400 transition-colors flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer">
-                  <Trash2 size={11} /> Eliminar imagen
-                </button>
+                <Button variant="ghost" size="sm" onClick={() => setLogoActual(prev => ({ ...prev, url: '' }))} className="text-[#ccc] hover:text-red-500 self-start">
+                  <Trash2 size={12} /> Eliminar imagen
+                </Button>
               )}
             </div>
           </div>
