@@ -175,9 +175,9 @@ export default function ClienteExploracion() {
               <div key={op.id}>
                 {/* encabezado opción */}
                 <div className="flex items-start gap-6 mb-8">
-                  <div className="w-8 h-8 rounded-full border flex items-center justify-center text-xs font-semibold shrink-0 mt-1"
-                    style={{ borderColor: acento + '50', color: acento }}>
-                    {i + 1}
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-black shrink-0"
+                    style={{ backgroundColor: darkBg + '12', color: darkBg }}>
+                    #{i + 1}
                   </div>
                   <div>
                     {op.titulo && (
