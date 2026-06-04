@@ -317,8 +317,7 @@ export default function ClienteExploracion() {
             )}
 
             <label className="cursor-pointer block">
-              <div className="border-2 border-dashed rounded-2xl p-10 flex flex-col items-center gap-3 transition-colors"
-                style={{ borderColor: '#e0e0e0', backgroundColor: lightBg }}>
+              <div className="border-2 border-dashed border-[#e0e0e0] rounded-2xl p-10 flex flex-col items-center gap-3 transition-colors bg-white hover:border-[#bbb]">
                 {uploadingRef
                   ? <div className="w-6 h-6 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
                   : <>
