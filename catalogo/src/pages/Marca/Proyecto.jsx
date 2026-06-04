@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu, LayoutDashboard } from 'lucide-react'
 import { db } from '../../lib/supabase'
 import { PanelManual } from './PanelManual'
+import { PanelExploracion } from './PanelExploracion'
 
 const PREGUNTAS_DEFAULT = [
   '¿A qué se dedica la empresa?',
@@ -201,14 +202,6 @@ function PanelBrief({ proyecto }) {
   )
 }
 
-function PanelExploracion({ proyecto }) {
-  return (
-    <div className="p-8">
-      <h2 className="text-xl font-black text-[#1c1c1c] mb-2">Exploración</h2>
-      <p className="text-sm text-[#888]">Próximamente — propuestas visuales.</p>
-    </div>
-  )
-}
 
 function PanelFinalistas({ proyecto }) {
   return (
