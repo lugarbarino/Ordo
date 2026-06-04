@@ -24,7 +24,6 @@ export default function ClienteExploracion() {
   const [guardado, setGuardado]       = useState(false)
   const [uploadingRef, setUploadingRef] = useState(false)
   const [error, setError]             = useState('')
-  // colores de marca
   const [acento, setAcento]   = useState('#c63f3f')
   const [darkBg, setDarkBg]   = useState('#363645')
   const [lightBg, setLightBg] = useState('#f3f4f5')
@@ -40,7 +39,6 @@ export default function ClienteExploracion() {
     setProyecto(p)
     setExp(p.exploracion)
 
-    // colores de marca
     const { data: manualRows } = await db.from('manual_marca').select('colores').eq('proyecto_id', p.id).limit(1)
     const colores = manualRows?.[0]?.colores || []
     const colorAcento = colores.find(c => c.esAcento) || colores[0]
@@ -50,7 +48,6 @@ export default function ClienteExploracion() {
     if (colorDark?.hex)   setDarkBg(colorDark.hex.startsWith('#') ? colorDark.hex : `#${colorDark.hex}`)
     if (colorLight?.hex)  setLightBg(colorLight.hex.startsWith('#') ? colorLight.hex : `#${colorLight.hex}`)
 
-    // feedback existente
     const { data: fb } = await db.from('exploracion_feedback').select('*').eq('proyecto_id', p.id).order('created_at', { ascending: false }).limit(1)
     if (fb?.[0]) {
       setFeedbackId(fb[0].id)
@@ -102,22 +99,30 @@ export default function ClienteExploracion() {
   const opciones = exp?.opciones || []
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-      {/* ── Logo actual (rebranding) ── */}
+      {/* ── Header ── */}
+      <header className="px-8 py-6 flex items-center justify-between border-b border-[#f0f0f0]">
+        <p className="text-sm font-semibold tracking-wide" style={{ color: darkBg }}>{proyecto?.nombre}</p>
+        <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style={{ backgroundColor: acento + '18', color: acento }}>
+          Exploración
+        </span>
+      </header>
+
+      {/* ── Rebranding ── */}
       {exp?.es_rebranding && (
-        <section className="py-16 px-6 max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-start gap-12">
+        <section className="py-20 px-6 md:px-16 max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-16">
             <div className="flex-1">
-              <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: acento }}>Re Branding</p>
-              <h2 className="text-4xl font-light mb-4" style={{ color: darkBg }}>Logo actual</h2>
+              <p className="text-xs font-bold uppercase tracking-[3px] mb-4" style={{ color: acento }}>Re Branding</p>
+              <h2 className="text-5xl font-light mb-5 leading-tight" style={{ color: darkBg }}>Logo actual</h2>
               {exp.logo_actual?.descripcion && (
-                <p className="text-sm leading-relaxed max-w-sm" style={{ color: darkBg + 'aa' }}>{exp.logo_actual.descripcion}</p>
+                <p className="text-base leading-relaxed opacity-60" style={{ color: darkBg }}>{exp.logo_actual.descripcion}</p>
               )}
             </div>
             {exp.logo_actual?.url && (
-              <div className="border border-[#ececf0] rounded-2xl p-8 flex items-center justify-center w-full md:w-[360px] shrink-0 bg-white">
-                <img src={exp.logo_actual.url} alt="Logo actual" className="max-h-40 max-w-full object-contain" />
+              <div className="rounded-3xl p-10 flex items-center justify-center w-full md:w-96 shrink-0 border border-[#e8e8e8]">
+                <img src={exp.logo_actual.url} alt="Logo actual" className="max-h-44 max-w-full object-contain" />
               </div>
             )}
           </div>
@@ -125,33 +130,49 @@ export default function ClienteExploracion() {
       )}
 
       {/* ── Propuestas ── */}
-      <section className="py-16 px-6" style={{ backgroundColor: lightBg }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-light mb-3" style={{ color: darkBg }}>Propuestas</h2>
-            <p className="text-sm max-w-sm mx-auto" style={{ color: darkBg }}>
-              Distintas opciones a profundizar — en este paso nos enfocamos en el estilo.
+      <section className="py-20 px-6 md:px-16" style={{ backgroundColor: lightBg }}>
+        <div className="max-w-6xl mx-auto">
+
+          {/* título sección */}
+          <div className="mb-16 text-center">
+            <p className="text-xs font-bold uppercase tracking-[3px] mb-3 opacity-50" style={{ color: darkBg }}>Propuestas</p>
+            <h2 className="text-5xl font-light mb-4" style={{ color: darkBg }}>Opciones de diseño</h2>
+            <p className="text-sm opacity-60 max-w-md mx-auto leading-relaxed" style={{ color: darkBg }}>
+              Distintas direcciones creativas para explorar. En esta etapa nos enfocamos en el estilo, no en el color final.
             </p>
           </div>
 
-          <div className="flex flex-col gap-16">
+          {/* lista de opciones */}
+          <div className="flex flex-col gap-20">
             {opciones.map((op, i) => (
-              <div key={op.id} className="flex flex-col gap-6">
-                <div className="flex flex-col md:flex-row items-start gap-6">
-                  <span className="text-2xl font-semibold shrink-0" style={{ color: darkBg }}>Opción #{i + 1}</span>
+              <div key={op.id}>
+                {/* encabezado opción */}
+                <div className="flex items-start gap-6 mb-8">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-sm font-bold shrink-0 mt-0.5"
+                    style={{ backgroundColor: acento }}>
+                    {i + 1}
+                  </div>
                   <div>
-                    {op.titulo && <p className="text-sm font-medium mb-1" style={{ color: darkBg }}>{op.titulo}</p>}
-                    {op.descripcion && <p className="text-xs leading-relaxed" style={{ color: darkBg + '99' }}>{op.descripcion}</p>}
+                    {op.titulo && (
+                      <h3 className="text-2xl font-semibold mb-1" style={{ color: darkBg }}>{op.titulo}</h3>
+                    )}
+                    {op.descripcion && (
+                      <p className="text-sm leading-relaxed opacity-60" style={{ color: darkBg }}>{op.descripcion}</p>
+                    )}
                   </div>
                 </div>
+
+                {/* imágenes */}
                 {op.imagenes?.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className={`grid gap-4 ${op.imagenes.length === 1 ? 'grid-cols-1 max-w-2xl' : op.imagenes.length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'}`}>
                     {op.imagenes.map((img, j) => (
                       <div key={j} className="flex flex-col gap-2">
-                        <div className="rounded-2xl overflow-hidden bg-white border border-[#e8e8e8] aspect-video">
+                        <div className="rounded-2xl overflow-hidden bg-white border border-black/5 aspect-video shadow-sm">
                           <img src={img.url} alt={img.titulo || `Variante ${j + 1}`} className="w-full h-full object-cover" />
                         </div>
-                        {img.titulo && <p className="text-xs text-center" style={{ color: darkBg + '88' }}>{img.titulo}</p>}
+                        {img.titulo && (
+                          <p className="text-xs text-center font-medium opacity-40" style={{ color: darkBg }}>{img.titulo}</p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -163,44 +184,51 @@ export default function ClienteExploracion() {
       </section>
 
       {/* ── Feedback ── */}
-      <section className="py-16 px-6 bg-white">
+      <section className="py-20 px-6 md:px-16 bg-white">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-light mb-2" style={{ color: darkBg }}>Feedback</h2>
-            <p className="text-sm" style={{ color: darkBg }}>Vamos a recolectar información para el siguiente paso.</p>
+
+          {/* título */}
+          <div className="mb-14 text-center">
+            <p className="text-xs font-bold uppercase tracking-[3px] mb-3 opacity-50" style={{ color: darkBg }}>Tu opinión</p>
+            <h2 className="text-5xl font-light mb-4" style={{ color: darkBg }}>Feedback</h2>
+            <p className="text-sm opacity-60 leading-relaxed" style={{ color: darkBg }}>
+              Tu feedback nos ayuda a definir el rumbo para la siguiente etapa.
+            </p>
           </div>
 
           {/* Votos */}
-          <div className="mb-10">
-            <p className="text-xl mb-1" style={{ color: darkBg }}>Seleccioná las opciones que más te gustan</p>
-            <p className="text-sm text-[#707084] mb-6">Puede ser más de una opción</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="mb-14">
+            <p className="text-lg font-semibold mb-1" style={{ color: darkBg }}>¿Qué opciones te gustan más?</p>
+            <p className="text-sm opacity-50 mb-6" style={{ color: darkBg }}>Podés elegir más de una</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {opciones.map((op, i) => {
-                const seleccionada = votos.includes(op.id)
+                const sel = votos.includes(op.id)
                 const primeraImg = op.imagenes?.[0]?.url
                 return (
                   <button
                     key={op.id}
                     onClick={() => toggleVoto(op.id)}
-                    className="flex flex-col gap-2 p-3 rounded-2xl border-2 transition-all cursor-pointer bg-transparent text-left"
+                    className="flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer text-left w-full"
                     style={{
-                      borderColor: seleccionada ? acento : '#e8e8e8',
-                      backgroundColor: seleccionada ? acento + '10' : 'transparent',
+                      borderColor: sel ? acento : '#e8e8e8',
+                      backgroundColor: sel ? acento + '08' : 'white',
                     }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors"
-                        style={{ backgroundColor: seleccionada ? acento : 'transparent', borderColor: seleccionada ? acento : '#ccc' }}>
-                        {seleccionada && <Check size={12} className="text-white" />}
-                      </div>
-                      <span className="text-sm font-medium" style={{ color: darkBg }}>Opción #{i + 1}</span>
+                    {/* checkbox */}
+                    <div className="w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all"
+                      style={{ backgroundColor: sel ? acento : 'transparent', borderColor: sel ? acento : '#d0d0d0' }}>
+                      {sel && <Check size={13} className="text-white" strokeWidth={3} />}
                     </div>
-                    {primeraImg
-                      ? <div className="rounded-xl overflow-hidden aspect-video bg-[#f5f5f5]">
-                          <img src={primeraImg} alt="" className="w-full h-full object-cover" />
-                        </div>
-                      : <div className="rounded-xl aspect-video" style={{ backgroundColor: lightBg }} />
-                    }
-                    {op.titulo && <p className="text-xs" style={{ color: darkBg + '88' }}>{op.titulo}</p>}
+                    {/* thumbnail */}
+                    {primeraImg && (
+                      <div className="w-16 h-12 rounded-xl overflow-hidden shrink-0 bg-[#f5f5f5]">
+                        <img src={primeraImg} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    {/* label */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold" style={{ color: darkBg }}>Opción #{i + 1}</p>
+                      {op.titulo && <p className="text-xs opacity-50 truncate" style={{ color: darkBg }}>{op.titulo}</p>}
+                    </div>
                   </button>
                 )
               })}
@@ -208,54 +236,60 @@ export default function ClienteExploracion() {
           </div>
 
           {/* Comentario */}
-          <div className="mb-10">
-            <p className="text-xl mb-1" style={{ color: darkBg }}>Qué funcionó y qué no en las propuestas que elegiste</p>
-            <p className="text-sm text-[#707084] mb-2">Contanos:</p>
-            <ul className="text-sm text-[#707084] list-disc list-inside space-y-1 mb-4">
-              <li>Qué elementos funcionan bien y cuáles no (símbolo, tipografía, composición, estilo).</li>
-              <li>Si te gustaría combinar elementos de distintas propuestas.</li>
-              <li>Si hay algo que no va en la dirección que imaginan.</li>
-              <li>Si tenés alguna preferencia en cuanto a colores.</li>
+          <div className="mb-14">
+            <p className="text-lg font-semibold mb-1" style={{ color: darkBg }}>¿Qué funcionó y qué no?</p>
+            <p className="text-sm opacity-50 mb-2" style={{ color: darkBg }}>Contanos sobre las opciones que elegiste:</p>
+            <ul className="text-sm opacity-50 list-disc list-inside space-y-1 mb-5" style={{ color: darkBg }}>
+              <li>Qué elementos funcionan (símbolo, tipografía, composición, estilo)</li>
+              <li>Si querés combinar elementos de distintas opciones</li>
+              <li>Preferencias de color o dirección que querés explorar</li>
             </ul>
             <textarea
               value={comentario}
               onChange={e => setComentario(e.target.value)}
-              placeholder="Te leemos."
+              placeholder="Te leemos..."
               rows={5}
-              className="w-full border border-[#e0e0e0] rounded-2xl px-5 py-4 text-sm resize-none outline-none transition-colors"
+              className="w-full border-2 border-[#e8e8e8] rounded-2xl px-5 py-4 text-sm resize-none outline-none transition-colors leading-relaxed"
               style={{ color: darkBg }}
               onFocus={e => e.target.style.borderColor = acento}
-              onBlur={e => e.target.style.borderColor = '#e0e0e0'}
+              onBlur={e => e.target.style.borderColor = '#e8e8e8'}
             />
           </div>
 
           {/* Referencias */}
-          <div className="mb-10">
-            <p className="text-xl mb-1" style={{ color: darkBg }}>Podés agregar algún logo de referencia que te guste</p>
-            <p className="text-sm text-[#707084] mb-4">y una descripción</p>
+          <div className="mb-14">
+            <p className="text-lg font-semibold mb-1" style={{ color: darkBg }}>Logos de referencia</p>
+            <p className="text-sm opacity-50 mb-6" style={{ color: darkBg }}>Si hay algún logo que te guste y quieras compartir como referencia</p>
+
             {referencias.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
                 {referencias.map((r, i) => (
-                  <div key={i} className="relative group">
-                    <img src={r.url} alt="" className="w-full aspect-square object-cover rounded-2xl border border-[#e8e8e8]" />
+                  <div key={i} className="relative group aspect-square">
+                    <img src={r.url} alt="" className="w-full h-full object-cover rounded-2xl border border-[#e8e8e8]" />
                     <button
                       onClick={() => setReferencias(prev => prev.filter((_, idx) => idx !== i))}
-                      className="absolute top-2 right-2 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity border-none cursor-pointer"
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border-none cursor-pointer"
                       style={{ backgroundColor: acento }}>
-                      <X size={12} />
+                      <X size={11} />
                     </button>
                   </div>
                 ))}
               </div>
             )}
-            <label className="cursor-pointer">
-              <div className="border-2 border-dashed border-[#e0e0e0] rounded-2xl p-8 flex flex-col items-center gap-2 hover:border-[#aaa] transition-colors" style={{ backgroundColor: lightBg }}>
+
+            <label className="cursor-pointer block">
+              <div className="border-2 border-dashed rounded-2xl p-10 flex flex-col items-center gap-3 transition-colors"
+                style={{ borderColor: '#e0e0e0', backgroundColor: lightBg }}>
                 {uploadingRef
-                  ? <div className="w-5 h-5 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
+                  ? <div className="w-6 h-6 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
                   : <>
-                      <Upload size={20} className="text-[#ccc]" />
-                      <p className="text-sm font-medium" style={{ color: darkBg }}>Subí tu referencia</p>
-                      <p className="text-xs text-[#9a9ab3]">Límite de peso: 10 MB</p>
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: acento + '15' }}>
+                        <Upload size={20} style={{ color: acento }} />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-semibold" style={{ color: darkBg }}>Subí tu referencia</p>
+                        <p className="text-xs opacity-40 mt-0.5" style={{ color: darkBg }}>PNG, JPG — máx. 10 MB</p>
+                      </div>
                     </>
                 }
               </div>
@@ -268,19 +302,22 @@ export default function ClienteExploracion() {
           <button
             onClick={guardar}
             disabled={guardando}
-            className="w-full sm:w-auto px-8 py-3.5 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-opacity cursor-pointer border-none disabled:opacity-50 hover:opacity-90"
+            className="w-full py-4 text-white font-semibold rounded-2xl flex items-center justify-center gap-2 transition-opacity cursor-pointer border-none disabled:opacity-50 hover:opacity-90 text-base"
             style={{ backgroundColor: darkBg }}>
             {guardando
-              ? <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-              : guardado ? <><Check size={16} /> Guardado</> : 'Guardar feedback'
+              ? <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+              : guardado
+                ? <><Check size={18} strokeWidth={3} /> Feedback guardado</>
+                : 'Enviar feedback'
             }
           </button>
+
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="py-6 px-6" style={{ backgroundColor: darkBg }}>
-        <p className="text-center text-[10px] text-white/60">
+      <footer className="py-8 px-8" style={{ backgroundColor: darkBg }}>
+        <p className="text-center text-[11px] text-white/40 tracking-wide">
           © {new Date().getFullYear()} {proyecto?.nombre} — Propuesta de marca
         </p>
       </footer>
