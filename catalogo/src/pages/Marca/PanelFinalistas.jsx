@@ -43,11 +43,6 @@ function ImageUploadGrid({ imagenes, onChange, proyectoId, placeholder = 'Títul
           </div>
           <Input value={img.titulo} onChange={e => update(i, { titulo: e.target.value })}
             placeholder={placeholder} className="text-[11px]" />
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input type="checkbox" checked={img.dark || false} onChange={e => update(i, { dark: e.target.checked })}
-              className="w-3.5 h-3.5 accent-[#1c1c1c] cursor-pointer" />
-            <span className="text-[10px] text-[#888]">Fondo oscuro</span>
-          </label>
         </div>
       ))}
       <button onClick={() => ref.current?.click()} disabled={uploading}
