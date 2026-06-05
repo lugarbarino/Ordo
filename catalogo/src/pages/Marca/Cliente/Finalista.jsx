@@ -133,7 +133,7 @@ export default function ClienteFinalista() {
       <div className="px-6 md:px-10 max-w-5xl mx-auto pb-16">
 
         {/* ── Fila 1: texto+logo angosto / logo cuadrado der ── */}
-        <div className="grid gap-4 mb-4 items-end" style={{ gridTemplateColumns: '45% 1fr' }}>
+        <div className="grid grid-cols-1 md:grid-cols-[45%_1fr] gap-4 mb-4 md:items-end">
 
           {/* Col izq angosta: texto + logo claro */}
           <div className="flex flex-col gap-6">
@@ -167,7 +167,7 @@ export default function ClienteFinalista() {
         </div>
 
         {/* ── Fila 2: rectángulo con cuadrado adentro / tipografía ── */}
-        <div className="grid gap-4 mb-4 items-stretch" style={{ gridTemplateColumns: '45% 1fr' }}>
+        <div className="grid grid-cols-1 md:grid-cols-[45%_1fr] gap-4 mb-4 md:items-stretch">
 
           {/* Col izq: rectángulo con cuadrado redondeado adentro */}
           {(logo3 || logo4) && (
@@ -264,7 +264,7 @@ export default function ClienteFinalista() {
           <div className="mt-8">
             <p className="text-xl font-medium text-center mb-8" style={{ color: darkBg }}>Logo responsivo</p>
             <div className={`grid border border-[#ececf0] rounded-[22px] overflow-hidden divide-x divide-[#ececf0]
-              ${logoResp.length <= 2 ? 'grid-cols-2' : logoResp.length === 3 ? 'grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
+              ${logoResp.length <= 2 ? 'grid-cols-2' : logoResp.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
               {logoResp.map((lr, i) => (
                 <div key={i} className="flex flex-col gap-4 p-6">
                   {(lr.titulo || lr.subtitulo) && (
