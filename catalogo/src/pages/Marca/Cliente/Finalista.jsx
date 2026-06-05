@@ -122,7 +122,7 @@ export default function ClienteFinalista() {
             <div className="rounded-[22px] border border-[#ececf0] flex p-3 gap-3">
               {logo3 && (
                 <div className="shrink-0 rounded-[16px] overflow-hidden" style={{ width: '45%', aspectRatio: '1/1' }}>
-                  <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-contain" />
+                  <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-cover" />
                 </div>
               )}
               {logo4 && (
