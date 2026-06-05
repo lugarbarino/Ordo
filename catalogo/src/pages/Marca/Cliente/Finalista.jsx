@@ -89,7 +89,7 @@ export default function ClienteFinalista() {
       <div className="px-6 md:px-10 max-w-5xl mx-auto pb-16">
 
         {/* ── Fila 1: texto+logo angosto / logo cuadrado der ── */}
-        <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: '45% 1fr' }}>
+        <div className="grid gap-4 mb-4 items-end" style={{ gridTemplateColumns: '45% 1fr' }}>
 
           {/* Col izq angosta: texto + logo claro */}
           <div className="flex flex-col gap-6">
