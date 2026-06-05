@@ -115,18 +115,18 @@ export default function ClienteFinalista() {
         </div>
 
         {/* ── Fila 2: rectángulo con cuadrado adentro / tipografía ── */}
-        <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: '45% 1fr' }}>
+        <div className="grid gap-4 mb-4 items-stretch" style={{ gridTemplateColumns: '45% 1fr' }}>
 
-          {/* Col izq: rectángulo 2:1 con cuadrado adentro */}
+          {/* Col izq: rectángulo con cuadrado redondeado adentro */}
           {(logo3 || logo4) && (
-            <div className="rounded-[22px] border border-[#ececf0] overflow-hidden flex" style={{ aspectRatio: '2/1' }}>
+            <div className="rounded-[22px] border border-[#ececf0] flex p-3 gap-3">
               {logo3 && (
-                <div className="shrink-0 overflow-hidden" style={{ width: '50%' }}>
+                <div className="shrink-0 rounded-[16px] overflow-hidden" style={{ width: '45%', aspectRatio: '1/1' }}>
                   <img src={logo3.url} alt={logo3.titulo || ''} className="w-full h-full object-contain" />
                 </div>
               )}
               {logo4 && (
-                <div className="flex-1 flex items-center justify-center p-8 border-l border-[#ececf0]">
+                <div className="flex-1 flex items-center justify-center p-4">
                   <img src={logo4.url} alt={logo4.titulo || ''} className="max-w-full max-h-full object-contain" />
                 </div>
               )}
