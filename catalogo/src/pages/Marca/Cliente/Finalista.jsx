@@ -120,7 +120,7 @@ export default function ClienteFinalista() {
             <button key={f.id} onClick={() => setTab(i)}
               className="px-5 py-1.5 rounded-full text-sm font-semibold transition-all cursor-pointer border-none"
               style={{
-                backgroundColor: tab === i ? acento : 'transparent',
+                backgroundColor: tab === i ? darkBg : 'transparent',
                 color: tab === i ? 'white' : '#888',
               }}>
               {f.nombre || `Opción ${i + 1}`}
@@ -138,7 +138,7 @@ export default function ClienteFinalista() {
           {/* Col izq angosta: texto + logo claro */}
           <div className="flex flex-col gap-6">
             <div className="pt-4">
-              {fin.atributo && <p className="text-xs font-bold uppercase tracking-[2px] mb-2" style={{ color: acento }}>{fin.atributo}</p>}
+              {fin.atributo && <p className="text-xs font-bold uppercase tracking-[2px] mb-2 text-[#aaa]">{fin.atributo}</p>}
               {fin.tagline && <h1 className="text-5xl font-light leading-tight mb-2" style={{ color: darkBg }}>{fin.tagline}</h1>}
               {fin.concepto && <p className="text-base font-medium mb-3" style={{ color: darkBg }}>{fin.concepto}</p>}
               {fin.descripcion && <p className="text-sm leading-relaxed opacity-40" style={{ color: darkBg }}>{fin.descripcion}</p>}
