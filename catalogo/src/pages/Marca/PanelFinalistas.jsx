@@ -14,16 +14,27 @@ async function subirArchivo(proyectoId, file) {
 
 // ── ImageUploadGrid — grilla de imágenes con título ────────────
 function ImageUploadGrid({ imagenes, onChange, proyectoId, placeholder = 'Título' }) {
-  const ref = useRef()
+  const addRef = useRef()
+  const replaceRefs = useRef([])
   const [uploading, setUploading] = useState(false)
+  const [replacingIdx, setReplacingIdx] = useState(null)
 
   const subir = async (files) => {
     setUploading(true)
     try {
       const urls = await Promise.all(Array.from(files).map(f => subirArchivo(proyectoId, f)))
-      onChange([...imagenes, ...urls.map(url => ({ url, titulo: '', dark: false }))])
+      onChange([...imagenes, ...urls.map(url => ({ url, titulo: '' }))])
     } catch (e) { alert('Error: ' + e.message) }
     finally { setUploading(false) }
+  }
+
+  const reemplazar = async (i, file) => {
+    setReplacingIdx(i)
+    try {
+      const url = await subirArchivo(proyectoId, file)
+      onChange(imagenes.map((x, idx) => idx === i ? { ...x, url } : x))
+    } catch (e) { alert('Error: ' + e.message) }
+    finally { setReplacingIdx(null) }
   }
 
   const update = (i, data) => onChange(imagenes.map((x, idx) => idx === i ? { ...x, ...data } : x))
@@ -33,26 +44,35 @@ function ImageUploadGrid({ imagenes, onChange, proyectoId, placeholder = 'Títul
     <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
       {imagenes.map((img, i) => (
         <div key={i} className="flex flex-col gap-1 group">
-          <div className="relative aspect-video rounded-xl overflow-hidden border border-[#e0e0e0]"
-            style={{ backgroundColor: img.dark ? '#1c1c1c' : '#f5f5f5' }}>
-            <img src={img.url} alt="" className="w-full h-full object-contain p-2" />
-            <button onClick={() => remove(i)}
+          <div className="relative aspect-video rounded-xl overflow-hidden border border-[#e0e0e0] bg-[#f5f5f5] cursor-pointer"
+            onClick={() => replaceRefs.current[i]?.click()}>
+            {replacingIdx === i
+              ? <div className="w-full h-full flex items-center justify-center"><div className="w-4 h-4 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" /></div>
+              : <img src={img.url} alt="" className="w-full h-full object-contain p-2" />
+            }
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+              <Upload size={13} className="text-white" />
+              <span className="text-white text-[11px] font-medium">Reemplazar</span>
+            </div>
+            <button onClick={e => { e.stopPropagation(); remove(i) }}
               className="absolute top-1 right-1 w-6 h-6 bg-white border border-[#e0e0e0] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500 text-[#999]">
               <X size={10} />
             </button>
+            <input ref={el => replaceRefs.current[i] = el} type="file" accept="image/*" className="hidden"
+              onChange={e => reemplazar(i, e.target.files[0])} />
           </div>
           <Input value={img.titulo} onChange={e => update(i, { titulo: e.target.value })}
             placeholder={placeholder} className="text-[11px]" />
         </div>
       ))}
-      <button onClick={() => ref.current?.click()} disabled={uploading}
+      <button onClick={() => addRef.current?.click()} disabled={uploading}
         className="aspect-video rounded-xl border-2 border-dashed border-[#e0e0e0] flex flex-col items-center justify-center gap-1 hover:border-[#aaa] transition-colors cursor-pointer bg-transparent disabled:opacity-50">
         {uploading
           ? <div className="w-4 h-4 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
           : <><Plus size={14} className="text-[#ccc]" /><span className="text-[10px] text-[#ccc]">Imagen</span></>
         }
       </button>
-      <input ref={ref} type="file" accept="image/*" multiple className="hidden" onChange={e => subir(e.target.files)} />
+      <input ref={addRef} type="file" accept="image/*" multiple className="hidden" onChange={e => subir(e.target.files)} />
     </div>
   )
 }
