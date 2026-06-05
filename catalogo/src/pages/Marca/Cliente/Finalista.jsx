@@ -1,6 +1,48 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { db } from '../../../lib/supabase'
+import { X, ZoomIn } from 'lucide-react'
+
+// ── Lightbox ──────────────────────────────────────────────────
+function Lightbox({ src, onClose }) {
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+  return (
+    <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out" onClick={onClose}>
+      <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white border-none cursor-pointer">
+        <X size={18} />
+      </button>
+      <img src={src} alt="" className="max-h-[90vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl cursor-default" onClick={e => e.stopPropagation()} />
+    </div>
+  )
+}
+
+// ── ColorModal ────────────────────────────────────────────────
+function ColorModal({ colores, onClose }) {
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-6" onClick={onClose}>
+      <div className="w-full max-w-2xl rounded-[24px] overflow-hidden flex shadow-2xl cursor-default relative" style={{ maxHeight: '80vh' }} onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center text-white border-none cursor-pointer">
+          <X size={14} />
+        </button>
+        {colores.map((c, i) => (
+          <div key={i} className="flex-1 flex flex-col justify-end pb-8 pt-16 px-4" style={{ backgroundColor: c.hex }}>
+            <p className="text-sm font-bold text-center" style={{ color: c.hex < '#888888' ? 'white' : '#1c1c1c' }}>{c.nombre || `Color ${i+1}`}</p>
+            <p className="text-xs text-center opacity-70 mt-1" style={{ color: c.hex < '#888888' ? 'white' : '#1c1c1c' }}>{c.hex}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function loadGoogleFont(nombre) {
   if (!nombre) return
@@ -20,6 +62,8 @@ export default function ClienteFinalista() {
   const [cargando, setCargando] = useState(true)
   const [acento, setAcento] = useState('#c63f3f')
   const [darkBg, setDarkBg] = useState('#363645')
+  const [lightbox, setLightbox] = useState(null)
+  const [colorModal, setColorModal] = useState(false)
 
   useEffect(() => { cargar() }, [nombre])
 
@@ -100,16 +144,24 @@ export default function ClienteFinalista() {
               {fin.descripcion && <p className="text-sm leading-relaxed opacity-40" style={{ color: darkBg }}>{fin.descripcion}</p>}
             </div>
             {logo1 && (
-              <div className="rounded-[22px] border border-[#ececf0] overflow-hidden" style={{ aspectRatio: '4/3' }}>
+              <div className="rounded-[22px] border border-[#ececf0] overflow-hidden cursor-zoom-in relative group" style={{ aspectRatio: '4/3' }}
+                onClick={() => setLightbox(logo1.url)}>
                 <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-contain" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                  <ZoomIn size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                </div>
               </div>
             )}
           </div>
 
           {/* Col der cuadrada: logo oscuro */}
           {logo2 && (
-            <div className="rounded-[22px] overflow-hidden" style={{ aspectRatio: '1/1' }}>
+            <div className="rounded-[22px] overflow-hidden cursor-zoom-in relative group" style={{ aspectRatio: '1/1' }}
+              onClick={() => setLightbox(logo2.url)}>
               <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-contain" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                <ZoomIn size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+              </div>
             </div>
           )}
         </div>
@@ -154,30 +206,39 @@ export default function ClienteFinalista() {
           )}
         </div>
 
-        {/* ── Fila 3: colores + mockup izq / mockup grande der ── */}
+        {/* ── Fila 3: colores centrados al mockup / mockup der ── */}
         {((fin.colores || []).length > 0 || mockups.length > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-            {/* Col izq: colores + primer mockup */}
+            {/* Col izq: colores centrados + primer mockup */}
             <div className="flex flex-col gap-4">
               {(fin.colores || []).length > 0 && (
-                <div className="flex gap-3 flex-wrap items-center py-2">
-                  {fin.colores.map((hex, i) => (
-                    <div key={i} className="w-[72px] h-[72px] rounded-full shadow-md border-4 border-white" style={{ backgroundColor: hex }} />
+                <div className="flex gap-3 justify-center flex-wrap py-2 cursor-pointer" onClick={() => setColorModal(true)}>
+                  {fin.colores.map((c, i) => (
+                    <div key={i} className="w-[64px] h-[64px] rounded-full shadow-md border-4 border-white transition-transform hover:scale-110"
+                      style={{ backgroundColor: c.hex || c }} />
                   ))}
                 </div>
               )}
               {mockups[0] && (
-                <div className="rounded-[22px] overflow-hidden" style={{ aspectRatio: '4/3' }}>
-                  <img src={mockups[0].url} alt="" className="w-full h-full object-cover" />
+                <div className="rounded-[22px] overflow-hidden cursor-zoom-in relative group" style={{ aspectRatio: '4/3' }}
+                  onClick={() => setLightbox(mockups[0].url)}>
+                  <img src={mockups[0].url} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <ZoomIn size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Col der: segundo mockup */}
             {mockups[1] && (
-              <div className="rounded-[22px] overflow-hidden" style={{ minHeight: 300 }}>
-                <img src={mockups[1].url} alt="" className="w-full h-full object-cover" />
+              <div className="rounded-[22px] overflow-hidden cursor-zoom-in relative group" style={{ minHeight: 300 }}
+                onClick={() => setLightbox(mockups[1].url)}>
+                <img src={mockups[1].url} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                  <ZoomIn size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                </div>
               </div>
             )}
           </div>
@@ -187,8 +248,12 @@ export default function ClienteFinalista() {
         {mockups.length > 2 && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
             {mockups.slice(2).map((m, i) => (
-              <div key={i} className="rounded-[22px] overflow-hidden aspect-video">
-                <img src={m.url} alt="" className="w-full h-full object-cover" />
+              <div key={i} className="rounded-[22px] overflow-hidden aspect-video cursor-zoom-in relative group"
+                onClick={() => setLightbox(m.url)}>
+                <img src={m.url} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                  <ZoomIn size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                </div>
               </div>
             ))}
           </div>
@@ -208,7 +273,7 @@ export default function ClienteFinalista() {
                       {lr.subtitulo && <p className="text-xs opacity-40 mt-0.5" style={{ color: darkBg }}>{lr.subtitulo}</p>}
                     </div>
                   )}
-                  <div className="flex items-center justify-start h-20">
+                  <div className="flex items-center justify-start h-20 cursor-zoom-in" onClick={() => setLightbox(lr.url)}>
                     <img src={lr.url} alt={lr.titulo || ''} className="max-h-full max-w-[140px] object-contain" />
                   </div>
                 </div>
@@ -217,6 +282,12 @@ export default function ClienteFinalista() {
           </div>
         )}
       </div>
+
+      {/* ── Modales ── */}
+      {lightbox && <Lightbox src={lightbox} onClose={() => setLightbox(null)} />}
+      {colorModal && fin.colores?.length > 0 && (
+        <ColorModal colores={fin.colores.map((c, i) => ({ hex: c.hex || c, nombre: c.nombre || `Color ${i+1}` }))} onClose={() => setColorModal(false)} />
+      )}
 
       {/* ── Footer ── */}
       <footer className="py-8 px-8" style={{ backgroundColor: darkBg }}>
