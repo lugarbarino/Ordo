@@ -263,18 +263,18 @@ export default function ClienteFinalista() {
         {logoResp.length > 0 && (
           <div className="mt-8">
             <p className="text-xl font-medium text-center mb-8" style={{ color: darkBg }}>Logo responsivo</p>
-            <div className={`grid border border-[#ececf0] rounded-[22px] overflow-hidden divide-x divide-[#ececf0]
+            <div className={`grid divide-x divide-[#ececf0]
               ${logoResp.length <= 2 ? 'grid-cols-2' : logoResp.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
               {logoResp.map((lr, i) => (
-                <div key={i} className="flex flex-col gap-4 p-6">
+                <div key={i} className="flex flex-col gap-4 px-8 py-6">
                   {(lr.titulo || lr.subtitulo) && (
                     <div>
                       {lr.titulo && <p className="text-sm font-semibold" style={{ color: darkBg }}>{lr.titulo}</p>}
                       {lr.subtitulo && <p className="text-xs opacity-40 mt-0.5" style={{ color: darkBg }}>{lr.subtitulo}</p>}
                     </div>
                   )}
-                  <div className="flex items-center justify-start h-20 cursor-zoom-in" onClick={() => setLightbox(lr.url)}>
-                    <img src={lr.url} alt={lr.titulo || ''} className="max-h-full max-w-[140px] object-contain" />
+                  <div className="flex items-center justify-start h-32 cursor-zoom-in" onClick={() => setLightbox(lr.url)}>
+                    <img src={lr.url} alt={lr.titulo || ''} className="max-h-full max-w-full object-contain" />
                   </div>
                 </div>
               ))}
