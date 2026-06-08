@@ -81,8 +81,12 @@ function ImageUploadGrid({ imagenes, onChange, proyectoId, placeholder = 'Títul
 function FinalistaItem({ fin, numero, onChange, onDelete, proyectoId }) {
   const mockupRef = useRef()
   const respRef = useRef()
+  const mockupReplaceRefs = useRef([])
+  const respReplaceRefs = useRef([])
   const [uploadingMockup, setUploadingMockup] = useState(false)
   const [uploadingResp, setUploadingResp] = useState(false)
+  const [replacingMockup, setReplacingMockup] = useState(null)
+  const [replacingResp, setReplacingResp] = useState(null)
 
   const subirMockups = async (files) => {
     setUploadingMockup(true)
@@ -93,6 +97,15 @@ function FinalistaItem({ fin, numero, onChange, onDelete, proyectoId }) {
     finally { setUploadingMockup(false) }
   }
 
+  const reemplazarMockup = async (i, file) => {
+    setReplacingMockup(i)
+    try {
+      const url = await subirArchivo(proyectoId, file)
+      onChange({ mockups: (fin.mockups || []).map((x, idx) => idx === i ? { ...x, url } : x) })
+    } catch (e) { alert('Error: ' + e.message) }
+    finally { setReplacingMockup(null) }
+  }
+
   const subirResponsivos = async (files) => {
     setUploadingResp(true)
     try {
@@ -100,6 +113,17 @@ function FinalistaItem({ fin, numero, onChange, onDelete, proyectoId }) {
       onChange({ logo_responsivo: [...(fin.logo_responsivo || []), ...urls.map(url => ({ url, titulo: '', subtitulo: '' }))] })
     } catch (e) { alert('Error: ' + e.message) }
     finally { setUploadingResp(false) }
+  }
+
+  const reemplazarResp = async (i, file) => {
+    setReplacingResp(i)
+    try {
+      const url = await subirArchivo(proyectoId, file)
+      const next = [...(fin.logo_responsivo || [])]
+      next[i] = { ...next[i], url }
+      onChange({ logo_responsivo: next })
+    } catch (e) { alert('Error: ' + e.message) }
+    finally { setReplacingResp(null) }
   }
 
   const updateResp = (i, data) => {
@@ -196,12 +220,22 @@ function FinalistaItem({ fin, numero, onChange, onDelete, proyectoId }) {
         <p className="text-xs font-bold text-[#555] uppercase tracking-wide">Mockups / contexto</p>
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {(fin.mockups || []).map((m, i) => (
-            <div key={i} className="relative group aspect-video rounded-xl overflow-hidden border border-[#e0e0e0] bg-[#f5f5f5]">
-              <img src={m.url} alt="" className="w-full h-full object-cover" />
-              <button onClick={() => onChange({ mockups: fin.mockups.filter((_, idx) => idx !== i) })}
-                className="absolute top-1 right-1 w-6 h-6 bg-white border border-[#e0e0e0] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500 text-[#999]">
+            <div key={i} className="relative group aspect-video rounded-xl overflow-hidden border border-[#e0e0e0] bg-[#f5f5f5] cursor-pointer"
+              onClick={() => mockupReplaceRefs.current[i]?.click()}>
+              {replacingMockup === i
+                ? <div className="w-full h-full flex items-center justify-center"><div className="w-4 h-4 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" /></div>
+                : <img src={m.url} alt="" className="w-full h-full object-cover" />
+              }
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                <Upload size={13} className="text-white" />
+                <span className="text-white text-[11px] font-medium">Reemplazar</span>
+              </div>
+              <button onClick={e => { e.stopPropagation(); onChange({ mockups: fin.mockups.filter((_, idx) => idx !== i) }) }}
+                className="absolute top-1 right-1 w-6 h-6 bg-white border border-[#e0e0e0] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500 text-[#999] z-10">
                 <X size={10} />
               </button>
+              <input ref={el => mockupReplaceRefs.current[i] = el} type="file" accept="image/*" className="hidden"
+                onChange={e => reemplazarMockup(i, e.target.files[0])} />
             </div>
           ))}
           <button onClick={() => mockupRef.current?.click()} disabled={uploadingMockup}
@@ -222,12 +256,22 @@ function FinalistaItem({ fin, numero, onChange, onDelete, proyectoId }) {
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {(fin.logo_responsivo || []).map((lr, i) => (
             <div key={i} className="flex flex-col gap-1 group">
-              <div className="relative aspect-square rounded-xl overflow-hidden border border-[#e0e0e0] bg-[#f5f5f5] flex items-center justify-center p-3">
-                <img src={lr.url} alt="" className="max-w-full max-h-full object-contain" />
-                <button onClick={() => onChange({ logo_responsivo: (fin.logo_responsivo || []).filter((_, idx) => idx !== i) })}
-                  className="absolute top-1 right-1 w-6 h-6 bg-white border border-[#e0e0e0] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500 text-[#999]">
+              <div className="relative aspect-square rounded-xl overflow-hidden border border-[#e0e0e0] bg-[#f5f5f5] flex items-center justify-center p-3 cursor-pointer"
+                onClick={() => respReplaceRefs.current[i]?.click()}>
+                {replacingResp === i
+                  ? <div className="w-4 h-4 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
+                  : <img src={lr.url} alt="" className="max-w-full max-h-full object-contain" />
+                }
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                  <Upload size={13} className="text-white" />
+                  <span className="text-white text-[11px] font-medium">Reemplazar</span>
+                </div>
+                <button onClick={e => { e.stopPropagation(); onChange({ logo_responsivo: (fin.logo_responsivo || []).filter((_, idx) => idx !== i) }) }}
+                  className="absolute top-1 right-1 w-6 h-6 bg-white border border-[#e0e0e0] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-red-500 text-[#999] z-10">
                   <X size={10} />
                 </button>
+                <input ref={el => respReplaceRefs.current[i] = el} type="file" accept="image/*" className="hidden"
+                  onChange={e => reemplazarResp(i, e.target.files[0])} />
               </div>
               <Input value={lr.titulo} onChange={e => updateResp(i, { titulo: e.target.value })} placeholder="Ej: Isotipo" className="text-[11px]" />
               <Input value={lr.subtitulo} onChange={e => updateResp(i, { subtitulo: e.target.value })} placeholder="Ej: Sólo símbolo" className="text-[10px]" />
