@@ -1,7 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { db } from '../../../lib/supabase'
 import { X, ZoomIn } from 'lucide-react'
+
+// ── FadeIn ────────────────────────────────────────────────────
+function FadeIn({ children, delay = 0, className = '' }) {
+  const ref = useRef()
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect() }
+    }, { threshold: 0.08 })
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={className} style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(24px)',
+      transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms`,
+    }}>
+      {children}
+    </div>
+  )
+}
 
 // ── Lightbox ──────────────────────────────────────────────────
 function Lightbox({ src, onClose }) {
@@ -113,8 +135,8 @@ export default function ClienteFinalista() {
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
       {/* ── Header con tabs ── */}
-      <header className="px-8 py-4 flex items-center justify-between">
-        <p className="text-sm font-medium opacity-40" style={{ color: darkBg }}>{proyecto.nombre}</p>
+      <header className="sticky top-0 z-50 px-8 py-3 flex items-center justify-between bg-white/90 backdrop-blur-md border-b border-[#f0f0f0]">
+        <p className="text-sm font-semibold" style={{ color: darkBg }}>{proyecto.nombre}</p>
         <div className="flex items-center bg-[#f0f0f0] rounded-full p-1 gap-0.5">
           {finalistas.map((f, i) => (
             <button key={f.id} onClick={() => setTab(i)}
@@ -133,7 +155,7 @@ export default function ClienteFinalista() {
       <div className="px-6 md:px-10 max-w-5xl mx-auto pb-16">
 
         {/* ── Fila 1: texto+logo angosto / logo cuadrado der ── */}
-        <div className="grid grid-cols-1 md:grid-cols-[45%_1fr] gap-4 mb-4 md:items-end">
+        <FadeIn delay={0} className="grid grid-cols-1 md:grid-cols-[45%_1fr] gap-4 mb-4 md:items-end">
 
           {/* Col izq angosta: texto + logo claro */}
           <div className="flex flex-col gap-6">
@@ -164,10 +186,10 @@ export default function ClienteFinalista() {
               </div>
             </div>
           )}
-        </div>
+        </FadeIn>
 
         {/* ── Fila 2: rectángulo con cuadrado adentro / tipografía ── */}
-        <div className="grid grid-cols-1 md:grid-cols-[45%_1fr] gap-4 mb-4 md:items-stretch">
+        <FadeIn delay={100} className="grid grid-cols-1 md:grid-cols-[45%_1fr] gap-4 mb-4 md:items-stretch">
 
           {/* Col izq: rectángulo con cuadrado redondeado adentro */}
           {(logo3 || logo4) && (
@@ -204,11 +226,11 @@ export default function ClienteFinalista() {
               </p>
             </div>
           )}
-        </div>
+        </FadeIn>
 
         {/* ── Fila 3: colores centrados al mockup / mockup der ── */}
         {((fin.colores || []).length > 0 || mockups.length > 0) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <FadeIn delay={200} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
             {/* Col izq: colores centrados + primer mockup */}
             <div className="flex flex-col gap-4">
@@ -242,11 +264,12 @@ export default function ClienteFinalista() {
               </div>
             )}
           </div>
+        </FadeIn>
         )}
 
         {/* mockups extras */}
         {mockups.length > 2 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+          <FadeIn delay={0} className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
             {mockups.slice(2).map((m, i) => (
               <div key={i} className="rounded-[22px] overflow-hidden aspect-video cursor-zoom-in relative group"
                 onClick={() => setLightbox(m.url)}>
@@ -256,12 +279,12 @@ export default function ClienteFinalista() {
                 </div>
               </div>
             ))}
-          </div>
+          </FadeIn>
         )}
 
         {/* ── Logo responsivo ── */}
         {logoResp.length > 0 && (
-          <div className="mt-8">
+          <FadeIn delay={0} className="mt-8">
             <p className="text-xl font-medium text-center mb-8" style={{ color: darkBg }}>Logo responsivo</p>
             <div className={`grid divide-x divide-[#ececf0]
               ${logoResp.length <= 2 ? 'grid-cols-2' : logoResp.length === 3 ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
@@ -279,7 +302,7 @@ export default function ClienteFinalista() {
                 </div>
               ))}
             </div>
-          </div>
+          </FadeIn>
         )}
       </div>
 
