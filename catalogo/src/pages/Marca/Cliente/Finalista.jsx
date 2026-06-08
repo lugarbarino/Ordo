@@ -146,7 +146,7 @@ export default function ClienteFinalista() {
             {logo1 && (
               <div className="rounded-[22px] border border-[#ececf0] overflow-hidden cursor-zoom-in relative group" style={{ aspectRatio: '4/3' }}
                 onClick={() => setLightbox(logo1.url)}>
-                <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-contain" />
+                <img src={logo1.url} alt={logo1.titulo || ''} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                   <ZoomIn size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
                 </div>
