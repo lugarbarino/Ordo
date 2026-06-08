@@ -156,9 +156,9 @@ export default function ClienteFinalista() {
 
           {/* Col der cuadrada: logo oscuro */}
           {logo2 && (
-            <div className="rounded-[22px] overflow-hidden cursor-zoom-in relative group" style={{ aspectRatio: '1/1' }}
+            <div className="rounded-[22px] overflow-hidden cursor-zoom-in relative group" style={{ aspectRatio: '1/1', backgroundColor: darkBg }}
               onClick={() => setLightbox(logo2.url)}>
-              <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-contain" />
+              <img src={logo2.url} alt={logo2.titulo || ''} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                 <ZoomIn size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
               </div>
