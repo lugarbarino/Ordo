@@ -263,8 +263,7 @@ export default function ClienteFinalista() {
                 </div>
               </div>
             )}
-          </div>
-        </FadeIn>
+          </FadeIn>
         )}
 
         {/* mockups extras */}
