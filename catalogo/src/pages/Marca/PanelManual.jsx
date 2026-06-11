@@ -538,7 +538,9 @@ function FirmaMailSection({ firmaData, onChange, proyectoId, colores }) {
                 <div className="w-5 h-5 rounded-full border-2 border-[#ccc] border-t-[#666] animate-spin" />
               ) : logoPng ? (
                 <>
-                  <img src={logoPng} alt="logo firma" className="max-h-full max-w-full object-contain p-3" />
+                  <div className="bg-white rounded-lg p-2 flex items-center justify-center">
+                    <img src={logoPng} alt="logo firma" className="max-h-16 max-w-[100px] object-contain" />
+                  </div>
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
                     <Upload size={14} className="text-white" />
                   </div>
