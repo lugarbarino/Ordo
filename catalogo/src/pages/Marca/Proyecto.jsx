@@ -332,8 +332,9 @@ const NAV_LINKS = [
 ]
 
 // ── Sidebar ──────────────────────────────────────────────────
-function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onLogout, accentColor }) {
+function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onEliminar, onLogout, accentColor }) {
   const [selectorOpen, setSelectorOpen] = useState(false)
+  const [confirmar, setConfirmar] = useState(null)
 
   return (
     <aside className="w-[220px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
@@ -359,13 +360,19 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
         {selectorOpen && (
           <div className="absolute left-4 right-4 top-[58px] bg-white rounded-[12px] shadow-xl border border-[#e8e8e8] py-1.5 z-50">
             {proyectos.map(p => (
-              <button
-                key={p.id}
-                onClick={() => { onProyecto(p); setSelectorOpen(false) }}
-                className={`w-full text-left px-3.5 py-2 text-sm truncate bg-transparent border-none cursor-pointer transition-colors rounded-[8px] mx-1 ${p.id === proyecto.id ? 'font-semibold text-[#1c1c1c] bg-[#f5f5f5]' : 'text-[#555] hover:bg-[#f5f5f5]'}`}
-                style={{ width: 'calc(100% - 8px)' }}>
-                {p.nombre}
-              </button>
+              <div key={p.id} className="flex items-center group mx-1" style={{ width: 'calc(100% - 8px)' }}>
+                <button
+                  onClick={() => { onProyecto(p); setSelectorOpen(false) }}
+                  className={`flex-1 min-w-0 text-left px-3.5 py-2 text-sm truncate bg-transparent border-none cursor-pointer transition-colors rounded-[8px] ${p.id === proyecto.id ? 'font-semibold text-[#1c1c1c] bg-[#f5f5f5]' : 'text-[#555] hover:bg-[#f5f5f5]'}`}>
+                  {p.nombre}
+                </button>
+                <button
+                  onClick={() => setConfirmar(p)}
+                  title="Eliminar marca"
+                  className="shrink-0 p-1.5 mr-1 rounded-[6px] text-[#ccc] hover:text-red-500 hover:bg-red-50 bg-transparent border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Trash2 size={13} />
+                </button>
+              </div>
             ))}
             <div className="border-t border-[#f1f1f1] mt-1 pt-1">
               <button
@@ -426,14 +433,39 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
           </div>
         </div>
       </div>
+
+      {/* Confirmar eliminar marca */}
+      {confirmar && (
+        <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4"
+          onClick={e => e.target === e.currentTarget && setConfirmar(null)}>
+          <div className="bg-white rounded-[18px] p-6 w-full max-w-[380px] shadow-2xl">
+            <h3 className="text-base font-black text-[#1c1c1c] mb-2">Eliminar marca</h3>
+            <p className="text-sm text-[#666] mb-5">
+              ¿Seguro que querés eliminar <span className="font-semibold text-[#1c1c1c]">{confirmar.nombre}</span>?
+              Esta acción no se puede deshacer desde acá.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setConfirmar(null)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-[#555] bg-[#f0f0f0] hover:bg-[#e8e8e8] border-none cursor-pointer transition-colors">
+                Cancelar
+              </button>
+              <button onClick={() => { onEliminar(confirmar); setConfirmar(null) }}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-500 hover:bg-red-600 border-none cursor-pointer transition-colors">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }
 
 // ── Main layout ──────────────────────────────────────────────
-function ProyectoLayout({ cuenta, proyectoInicial, proyectos, initialPanel = 'dashboard' }) {
+function ProyectoLayout({ cuenta, proyectoInicial, proyectos: proyectosIniciales, initialPanel = 'dashboard' }) {
   const navigate = useNavigate()
   const [proyecto, setProyecto] = useState(proyectoInicial)
+  const [proyectos, setProyectos] = useState(proyectosIniciales)
   const [panel, setPanel] = useState(initialPanel)
   const [stats, setStats] = useState({ vistas: 0, respuestas: 0, briefEnviado: false })
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -491,6 +523,16 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos, initialPanel = 'da
     navigate(`/marca/admin/${p.id}`)
   }
 
+  const handleEliminar = async (p) => {
+    await db.from('proyectos_marca').update({ estado: 'archivado' }).eq('id', p.id)
+    const restantes = proyectos.filter(x => x.id !== p.id)
+    setProyectos(restantes)
+    if (p.id === proyecto.id) {
+      if (restantes.length > 0) handleProyecto(restantes[0])
+      else navigate('/marca/admin')
+    }
+  }
+
   const handleLogout = async () => {
     await db.auth.signOut()
     window.location.href = '/marca'
@@ -528,6 +570,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos, initialPanel = 'da
           onPanel={handlePanel}
           onProyecto={handleProyecto}
           onNuevo={() => setNuevoOpen(true)}
+          onEliminar={handleEliminar}
           onLogout={handleLogout}
           accentColor={accentColor}
         />
