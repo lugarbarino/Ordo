@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu, LayoutDashboard } from 'lucide-react'
+import { FileText, Palette, Star, BookOpen, ChevronDown, ExternalLink, ClipboardList, LayoutGrid, Eye, MessageSquare, ShoppingBag, Link, Pencil, Check, X, Plus, Trash2, Menu, LayoutDashboard, GripVertical } from 'lucide-react'
 import { db } from '../../lib/supabase'
 import { PanelManual } from './PanelManual'
 import { PanelExploracion } from './PanelExploracion'
@@ -332,9 +332,20 @@ const NAV_LINKS = [
 ]
 
 // ── Sidebar ──────────────────────────────────────────────────
-function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onEliminar, onLogout, accentColor }) {
+function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNuevo, onEliminar, onReordenar, onLogout, accentColor }) {
   const [selectorOpen, setSelectorOpen] = useState(false)
   const [confirmar, setConfirmar] = useState(null)
+  const [dragIdx, setDragIdx] = useState(null)
+  const [overIdx, setOverIdx] = useState(null)
+
+  const handleDrop = (idx) => {
+    if (dragIdx === null || dragIdx === idx) { setDragIdx(null); setOverIdx(null); return }
+    const next = [...proyectos]
+    const [moved] = next.splice(dragIdx, 1)
+    next.splice(idx, 0, moved)
+    onReordenar(next)
+    setDragIdx(null); setOverIdx(null)
+  }
 
   return (
     <aside className="w-[220px] shrink-0 bg-white border-r-2 border-[#f1f1f1] flex flex-col h-screen sticky top-0">
@@ -359,11 +370,21 @@ function Sidebar({ cuenta, proyecto, proyectos, panel, onPanel, onProyecto, onNu
 
         {selectorOpen && (
           <div className="absolute left-4 right-4 top-[58px] bg-white rounded-[12px] shadow-xl border border-[#e8e8e8] py-1.5 z-50">
-            {proyectos.map(p => (
-              <div key={p.id} className="flex items-center group mx-1" style={{ width: 'calc(100% - 8px)' }}>
+            {proyectos.map((p, i) => (
+              <div key={p.id}
+                draggable
+                onDragStart={() => setDragIdx(i)}
+                onDragOver={e => { e.preventDefault(); setOverIdx(i) }}
+                onDragEnd={() => { setDragIdx(null); setOverIdx(null) }}
+                onDrop={() => handleDrop(i)}
+                className={`flex items-center group mx-1 rounded-[8px] transition-colors ${overIdx === i && dragIdx !== null && dragIdx !== i ? 'bg-[#f0f0f0]' : ''}`}
+                style={{ width: 'calc(100% - 8px)' }}>
+                <span className="shrink-0 pl-1 pr-0.5 text-[#ddd] cursor-grab active:cursor-grabbing">
+                  <GripVertical size={13} />
+                </span>
                 <button
                   onClick={() => { onProyecto(p); setSelectorOpen(false) }}
-                  className={`flex-1 min-w-0 text-left px-3.5 py-2 text-sm truncate bg-transparent border-none cursor-pointer transition-colors rounded-[8px] ${p.id === proyecto.id ? 'font-semibold text-[#1c1c1c] bg-[#f5f5f5]' : 'text-[#555] hover:bg-[#f5f5f5]'}`}>
+                  className={`flex-1 min-w-0 text-left px-2 py-2 text-sm truncate bg-transparent border-none cursor-pointer transition-colors rounded-[8px] ${p.id === proyecto.id ? 'font-semibold text-[#1c1c1c] bg-[#f5f5f5]' : 'text-[#555] hover:bg-[#f5f5f5]'}`}>
                   {p.nombre}
                 </button>
                 <button
@@ -523,6 +544,11 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos: proyectosIniciales
     navigate(`/marca/admin/${p.id}`)
   }
 
+  const handleReordenar = async (next) => {
+    setProyectos(next)
+    await Promise.all(next.map((p, i) => db.from('proyectos_marca').update({ orden: i }).eq('id', p.id)))
+  }
+
   const handleEliminar = async (p) => {
     await db.from('proyectos_marca').update({ estado: 'archivado' }).eq('id', p.id)
     const restantes = proyectos.filter(x => x.id !== p.id)
@@ -571,6 +597,7 @@ function ProyectoLayout({ cuenta, proyectoInicial, proyectos: proyectosIniciales
           onProyecto={handleProyecto}
           onNuevo={() => setNuevoOpen(true)}
           onEliminar={handleEliminar}
+          onReordenar={handleReordenar}
           onLogout={handleLogout}
           accentColor={accentColor}
         />
@@ -651,6 +678,8 @@ export default function MarcaProyecto() {
       .select('*')
       .eq('cuenta_id', cuenta.id)
       .neq('estado', 'archivado')
+      .order('orden', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: true })
 
     const proyecto = (proyectos || []).find(p => p.id === proyectoId)
     if (!proyecto) { navigate('/marca/admin'); return }
