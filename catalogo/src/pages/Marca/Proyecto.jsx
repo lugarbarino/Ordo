@@ -673,18 +673,22 @@ export default function MarcaProyecto() {
     const cuenta = cuentas?.[0]
     if (!cuenta) { navigate('/marca/admin'); return }
 
-    const { data: proyectos } = await db
+    const { data: proyectosData } = await db
       .from('proyectos_marca')
       .select('*')
       .eq('cuenta_id', cuenta.id)
       .neq('estado', 'archivado')
-      .order('orden', { ascending: true, nullsFirst: false })
-      .order('created_at', { ascending: true })
 
-    const proyecto = (proyectos || []).find(p => p.id === proyectoId)
+    const proyectos = [...(proyectosData || [])].sort((a, b) => {
+      const oa = a.orden ?? 0, ob = b.orden ?? 0
+      if (oa !== ob) return oa - ob
+      return new Date(a.created_at) - new Date(b.created_at)
+    })
+
+    const proyecto = proyectos.find(p => p.id === proyectoId)
     if (!proyecto) { navigate('/marca/admin'); return }
 
-    setState({ checked: true, cuenta, proyecto, proyectos: proyectos || [], section })
+    setState({ checked: true, cuenta, proyecto, proyectos, section })
   }
 
   if (!state.checked) return (
